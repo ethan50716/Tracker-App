@@ -13,11 +13,9 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- In-Browser Client-Side OCR & PDF.JS Parsers -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    // Set PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   </script>
 
@@ -70,12 +68,10 @@
       </div>
     </div>
 
-    <!-- Active Pitcher Selector & Inning Control -->
     <div class="flex items-center space-x-2">
       <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1">
         <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">MOUND:</span>
         <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer">
-          <!-- Populated by JS -->
         </select>
       </div>
 
@@ -95,7 +91,7 @@
     </div>
   </header>
 
-  <!-- LIVE GAME STATE HUD (PITCH COUNT, COUNT, OUTS, 1-1 WIN%) -->
+  <!-- LIVE GAME STATE HUD -->
   <section class="bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
@@ -182,7 +178,7 @@
     <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
     <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & HIGHLIGHTED STAT ARCHETYPES (3 Cols) -->
+      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & HIGHLIGHTED STAT ARCHETYPES -->
       <div class="lg:col-span-3 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
@@ -199,15 +195,13 @@
             </div>
           </div>
 
-          <!-- HIGHLIGHTED STAT PROFILE & ARCHETYPES (RUNNER, POWER, CONTACT) -->
+          <!-- Highlighted Scout Profile & Archetypes -->
           <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
               <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.345 / .448 / .678 • 7 HR</span>
             </div>
-            <!-- Archetype Badges Container -->
             <div id="batter-archetype-badges" class="flex flex-wrap gap-1">
-              <!-- Dynamically rendered -->
             </div>
           </div>
 
@@ -217,7 +211,7 @@
             <p id="batter-last-ab" class="text-xs font-semibold text-amber-300">No prior plate appearances today</p>
           </div>
 
-          <!-- Live Scouting Cues Overlay for Current Batter -->
+          <!-- Live Scouting Cues Overlay -->
           <div class="space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
@@ -226,7 +220,6 @@
               <button onclick="switchTab('scouting')" class="text-[9px] text-gray-400 hover:text-white underline">Edit</button>
             </div>
             <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
-              <!-- Rendered via JS -->
             </div>
             <p id="batter-scouting-notes" class="text-[11px] text-gray-300 italic bg-gray-950/60 p-2 rounded border border-gray-800/60">
               Struggles with IVB carry at letters. Will expand on 2 strikes down-and-away.
@@ -246,7 +239,7 @@
         </div>
       </div>
 
-      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & STRIKE ZONE (5 Cols) -->
+      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & STRIKE ZONE -->
       <div class="lg:col-span-5 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-2 px-1">
@@ -331,7 +324,7 @@
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: LIVE ARSENAL PITCH TALLY & CSW BREAKDOWN (4 Cols) -->
+      <!-- RIGHT COLUMN: LIVE ARSENAL PITCH TALLY & CSW BREAKDOWN -->
       <div class="lg:col-span-4 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
@@ -354,7 +347,6 @@
                 </tr>
               </thead>
               <tbody id="arsenal-table-body" class="divide-y divide-gray-800/60 font-mono">
-                <!-- Injected via JS -->
               </tbody>
             </table>
           </div>
@@ -405,7 +397,6 @@
           </div>
           <div class="flex items-center space-x-2">
             <select id="scouting-player-select" onchange="loadPlayerScoutingProfile(this.value)" class="bg-gray-950 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-emerald-400 outline-none">
-              <!-- Populated by JS -->
             </select>
           </div>
         </div>
@@ -454,21 +445,24 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 3: LINEUP & STATS PDF SYNC ==================== -->
+    <!-- ==================== TAB 3: LINEUP & STATS SYNC ==================== -->
     <div id="view-roster" class="hidden space-y-4">
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
         <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
           <div>
-            <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & SCOUTED STATS</h2>
-            <p class="text-xs text-gray-400">Upload pre-game PDF stat packets, roster CSVs, or photos of the card.</p>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & STATS</h2>
+            <p class="text-xs text-gray-400">Upload PDF stat packet, paste copied tables from iOS Live Text, or drop a CSV.</p>
           </div>
           <div class="flex space-x-2">
+            <button onclick="openQuickPasteModal()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
+              <i data-lucide="clipboard-copy" class="w-3.5 h-3.5"></i>
+              <span>Quick-Paste Table</span>
+            </button>
             <button onclick="openAddBenchModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs px-3 py-1.5 rounded-lg border border-gray-700">
               + Bench Player
             </button>
-            <button onclick="addExtraHitterPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
-              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-              <span>+ Lineup Hitter</span>
+            <button onclick="addExtraHitterPrompt()" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 font-bold text-xs px-3 py-1.5 rounded-lg border border-gray-700">
+              + Lineup Hitter
             </button>
           </div>
         </div>
@@ -478,16 +472,21 @@
           <div>
             <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER & STAT ARCHETYPES:</span>
             <div id="roster-lineup-list" class="space-y-2">
-              <!-- Injected via JS -->
             </div>
           </div>
 
           <!-- Multi-Format Uploader: PDF Stats, Photos, CSV -->
           <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-3">
-            <span class="text-xs font-bold text-white uppercase flex items-center">
-              <i data-lucide="file-text" class="w-4 h-4 text-emerald-400 mr-1.5"></i> PRE-GAME STATS & ROSTER SYNC
-            </span>
-            <p class="text-xs text-gray-400">Upload your opposing team <strong>PDF Stat Packet</strong>, snap a photo of the lineup card, or drop a CSV file. The app reads their stats and automatically flags Runners, Power Hitters, and High Contact bats.</p>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-white uppercase flex items-center">
+                <i data-lucide="file-text" class="w-4 h-4 text-emerald-400 mr-1.5"></i> PRE-GAME ROSTER & STAT INGESTION
+              </span>
+              <button onclick="openQuickPasteModal()" class="text-[10px] text-emerald-400 underline font-bold">Fastest: Paste Copied Text</button>
+            </div>
+            
+            <p class="text-xs text-gray-400">
+              Upload opposing team <strong>PDF Stat Packets</strong>, screenshots, or roster spreadsheets. The app parses coordinates line-by-line and automatically identifies <strong>Runners, Power Hitters, and High Contact</strong> threats.
+            </p>
             
             <input 
               type="file" 
@@ -499,20 +498,20 @@
 
             <div 
               onclick="document.getElementById('roster-file-input').click()" 
-              class="border-2 border-dashed border-emerald-600/60 hover:border-emerald-500 bg-gray-900/60 hover:bg-gray-900 rounded-lg p-6 text-center cursor-pointer transition active:scale-[0.98]"
+              class="border-2 border-dashed border-emerald-600/60 hover:border-emerald-500 bg-gray-900/60 hover:bg-gray-900 rounded-lg p-5 text-center cursor-pointer transition active:scale-[0.98]"
             >
-              <div class="flex items-center justify-center space-x-2 text-emerald-400 mb-2">
-                <i data-lucide="file-text" class="w-7 h-7"></i>
-                <i data-lucide="camera" class="w-7 h-7"></i>
+              <div class="flex items-center justify-center space-x-2 text-emerald-400 mb-1.5">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+                <i data-lucide="image" class="w-6 h-6"></i>
               </div>
-              <span class="text-xs font-bold text-white block">Tap to Upload PDF Stat Packet, Photo, or CSV</span>
-              <span class="text-[10px] text-gray-400 mt-1 block">Extracts NCAA stats, slash lines, HRs, and SBs</span>
+              <span class="text-xs font-bold text-white block">Tap to Select PDF Stat Packet or Screenshot</span>
+              <span class="text-[10px] text-gray-400 mt-0.5 block">Reconstructs tables by page coordinates</span>
             </div>
 
             <!-- Loading Spinner & Progress -->
             <div id="file-processing-loader" class="hidden text-center space-y-2 bg-gray-900 p-3 rounded-lg border border-emerald-600/30">
               <div class="inline-block w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
-              <p id="file-progress-text" class="text-xs font-bold text-emerald-400">Processing file...</p>
+              <p id="file-progress-text" class="text-xs font-bold text-emerald-400">Reconstructing PDF tabular layout...</p>
             </div>
 
             <!-- Active Bench List -->
@@ -522,7 +521,6 @@
                 <button onclick="openAddBenchModal()" class="text-[10px] text-emerald-400 font-bold hover:underline">+ Add to Bench</button>
               </div>
               <div id="roster-bench-preview" class="space-y-1 text-xs">
-                <!-- Injected via JS -->
               </div>
             </div>
           </div>
@@ -560,7 +558,6 @@
               </tr>
             </thead>
             <tbody id="gamelog-table-body" class="divide-y divide-gray-800 text-gray-200">
-              <!-- Rendered via JS -->
             </tbody>
           </table>
         </div>
@@ -629,7 +626,6 @@
         </div>
         
         <div id="bench-player-list" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar">
-          <!-- Injected via JS -->
         </div>
       </div>
     </div>
@@ -665,21 +661,42 @@
     </div>
   </div>
 
+  <!-- MODAL: QUICK PASTE ROSTER / STATS TABLE (IOS LIVE TEXT COMPATIBLE) -->
+  <div id="modal-quick-paste" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+        <div>
+          <h3 class="text-sm font-black text-white uppercase tracking-wider">QUICK-PASTE STATS TABLE</h3>
+          <p class="text-[10px] text-gray-400">Copy table text directly from a website, PDF, or iOS Live Text screenshot.</p>
+        </div>
+        <button onclick="closeQuickPasteModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <textarea id="quick-paste-textarea" rows="8" placeholder="Paste table text here... (e.g. copied from NCAA stats page, Sidearm stats, or iOS Live Text)&#10;&#10;Example:&#10;14 Bryant, Diego .345 7 HR 12 SB&#10;5 McCranie, Alex .220 1 HR 1 SB&#10;9 Williams, Tyler .310 0 HR 15 SB" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-white text-xs outline-none focus:border-emerald-500 custom-scrollbar font-mono"></textarea>
+        <button onclick="commitQuickPasteText()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition shadow">
+          Parse & Sync Lineup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: STATS / ROSTER SYNC REVIEW -->
   <div id="modal-sync-review" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-4 space-y-3 shadow-2xl">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-xl w-full p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
         <div>
           <h3 class="text-sm font-black text-white uppercase tracking-wider">PRE-GAME STATS & ROSTER REVIEW</h3>
-          <p class="text-[10px] text-gray-400">Highlighted player archetypes based on your uploaded document.</p>
+          <p class="text-[10px] text-gray-400">Review players, slash lines, and tap tags to toggle Runner or Power.</p>
         </div>
         <button onclick="closeSyncReviewModal()" class="text-gray-400 hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div id="sync-detected-list" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar text-xs">
-        <!-- Injected via JS -->
+      <div id="sync-detected-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar text-xs">
       </div>
 
       <div class="pt-2 border-t border-gray-800 flex space-x-2">
@@ -806,7 +823,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V3');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V4');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -816,7 +833,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V3', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V4', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -1101,7 +1118,7 @@
       showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
     }
 
-    // ==================== MULTI-FORMAT PARSER (PDF STATS, OCR, CSV) ====================
+    // ==================== 2D-COORDINATE PDF TABLE RECONSTRUCTION ====================
     async function handleUnifiedFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1111,30 +1128,44 @@
       loader.classList.remove('hidden');
 
       if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
-        progressText.innerText = `Parsing PDF stat packet "${file.name}"...`;
+        progressText.innerText = `Reconstructing PDF table layout from coordinates...`;
         try {
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          let fullText = "";
+          let tableLines = [];
 
           for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            progressText.innerText = `Reading PDF page ${pageNum} of ${pdf.numPages}...`;
+            progressText.innerText = `Reading page ${pageNum} coordinates (${pageNum}/${pdf.numPages})...`;
             const page = await pdf.getPage(pageNum);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            fullText += pageText + "\n";
+            
+            // Group text items by Y coordinate (within 4 pixels tolerance) to maintain table rows!
+            const rowMap = new Map();
+            textContent.items.forEach(item => {
+              const y = Math.round(item.transform[5] / 4) * 4;
+              if (!rowMap.has(y)) rowMap.set(y, []);
+              rowMap.get(y).push({ x: item.transform[4], text: item.str });
+            });
+
+            // Sort rows top-to-bottom (PDF Y goes up from bottom)
+            const sortedYs = Array.from(rowMap.keys()).sort((a, b) => b - a);
+            sortedYs.forEach(y => {
+              const rowItems = rowMap.get(y).sort((a, b) => a.x - b.x);
+              const rowLine = rowItems.map(i => i.text.trim()).filter(t => t.length > 0).join(' ');
+              if (rowLine.length > 3) tableLines.push(rowLine);
+            });
           }
 
           loader.classList.add('hidden');
-          extractStatsFromText(fullText);
+          parseReconstructedLines(tableLines);
         } catch (err) {
           console.error(err);
           loader.classList.add('hidden');
-          alert("Error parsing PDF. Please verify it contains text statistics.");
+          alert("Error parsing PDF. Try 'Quick-Paste Table' to copy and paste directly.");
         }
 
       } else if (file.type.startsWith('image/')) {
-        progressText.innerText = "Scanning photo with on-device OCR...";
+        progressText.innerText = "Analyzing screenshot... (Tip: using 'Quick-Paste' with iOS Live Text is faster)";
         try {
           const { data: { text } } = await Tesseract.recognize(
             file,
@@ -1142,13 +1173,13 @@
             {
               logger: m => {
                 if (m.status === 'recognizing text') {
-                  progressText.innerText = `Reading photo: ${Math.round(m.progress * 100)}%`;
+                  progressText.innerText = `OCR: ${Math.round(m.progress * 100)}%`;
                 }
               }
             }
           );
           loader.classList.add('hidden');
-          extractStatsFromText(text);
+          parseReconstructedLines(text.split('\n'));
         } catch (err) {
           console.error(err);
           loader.classList.add('hidden');
@@ -1165,121 +1196,119 @@
       }
     }
 
-    // EXTRACT NAMES, STATS & ASSIGN ARCHETYPES (RUNNER, POWER, CONTACT)
-    function extractStatsFromText(rawText) {
-      const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    // ==================== ROBUST TABLE LINE PARSER ====================
+    function parseReconstructedLines(lines) {
       stagedParsedPlayers = [];
       let orderIndex = 1;
 
-      // Regex matching NCAA stat lines: e.g. "14 Bryant, Diego .345 24-24 87 22 30 6 1 7 24 59 .678 14 3 18 1 .448"
-      lines.forEach(line => {
-        // Look for lines containing batting average (.XXX)
-        const avgMatch = line.match(/(\.\d{3}|\d\.\d{3})/);
-        if (avgMatch) {
-          // Tokenize line
-          const tokens = line.split(/\s+/);
-          if (tokens.length >= 6) {
-            let nameParts = [];
-            let avg = ".250";
-            let slg = ".350";
-            let obp = ".320";
-            let hr = 0;
-            let sb = 0;
+      lines.forEach(rawLine => {
+        let line = rawLine.trim();
+        if (line.length < 5 || line.toLowerCase().includes("overall statistics") || line.toLowerCase().includes("team leaders")) return;
 
-            for (let i = 0; i < tokens.length; i++) {
-              const t = tokens[i];
-              if (/^(\.\d{3}|\d\.\d{3})$/.test(t) && avg === ".250") {
-                avg = t;
-              } else if (isNaN(t) && !t.includes('-') && !['AVG', 'GP', 'AB', 'R', 'H', 'HR', 'RBI', 'SLG', 'OBP'].includes(t.toUpperCase())) {
-                nameParts.push(t.replace(/[^a-zA-Z,]/g, ''));
-              } else if (!isNaN(t)) {
-                const num = parseInt(t);
-                // Heuristic: identify HR or SB tokens
-                if (num > 0 && num <= 40 && hr === 0 && i > 5) {
-                  hr = num;
-                }
-              } else if (t.includes('-')) {
-                // Check if SB-ATT like "12-14"
-                const sbMatch = t.match(/^(\d+)-(\d+)$/);
-                if (sbMatch && parseInt(sbMatch[2]) <= 40) {
-                  sb = parseInt(sbMatch[1]);
-                }
+        // Check if line contains a batting average (.XXX) or slash tokens
+        const avgMatch = line.match(/(?:\s|^)(\.\d{3}|\d\.\d{3})(?:\s|$)/);
+        if (avgMatch) {
+          const tokens = line.split(/\s+/);
+          let nameTokens = [];
+          let avg = avgMatch[1];
+          let hr = 0;
+          let sb = 0;
+          let bats = "Right";
+
+          // Extract names and numbers
+          tokens.forEach((t, idx) => {
+            if (/^[A-Za-z]+,?[A-Za-z]*$/.test(t) && !['AVG', 'GP', 'AB', 'R', 'H', 'HR', 'RBI', 'SLG', 'OBP', 'SO', 'BB'].includes(t.toUpperCase())) {
+              nameTokens.push(t);
+            } else if (/^\d+-\d+$/.test(t)) {
+              // Stolen base pattern like "12-14"
+              const sbParts = t.split('-');
+              const val = parseInt(sbParts[0]);
+              if (val >= 0 && val <= 50) sb = val;
+            } else if (!isNaN(t) && idx > 4) {
+              const val = parseInt(t);
+              // Possible HR count
+              if (val > 0 && val <= 40 && hr === 0) {
+                hr = val;
               }
             }
+          });
 
-            let playerName = nameParts.filter(p => p.length > 1).slice(0, 3).join(' ');
-            if (playerName.length >= 3) {
-              // Calculate Archetypes
-              const archetypes = determineArchetypes(parseFloat(avg) || 0.250, parseFloat(slg) || 0.350, hr, sb);
-
-              stagedParsedPlayers.push({
-                name: playerName,
-                bats: "Right",
-                stats: { avg: avg, obp: obp, slg: slg, hr: hr, sb: sb },
-                archetypes: archetypes,
-                order: orderIndex <= 9 ? orderIndex : null,
-                isBench: orderIndex > 9
-              });
-              orderIndex++;
-            }
+          let fullName = nameTokens.join(' ').replace(/[^a-zA-Z,\s]/g, '').trim();
+          if (fullName.length >= 3) {
+            const archetypes = determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb);
+            stagedParsedPlayers.push({
+              name: fullName,
+              bats: bats,
+              stats: { avg: avg, obp: ".350", slg: hr > 4 ? ".550" : ".380", hr: hr, sb: sb },
+              archetypes: archetypes,
+              order: orderIndex <= 9 ? orderIndex : null,
+              isBench: orderIndex > 9
+            });
+            orderIndex++;
           }
         }
       });
 
-      // Fallback template if document format was abnormal
+      // If parsing failed to find structured lines, provide editable template
       if (stagedParsedPlayers.length === 0) {
         for (let i = 1; i <= 9; i++) {
           const sampleHr = (i === 3 || i === 4) ? 6 : 1;
-          const sampleSb = (i === 1 || i === 9) ? 12 : 2;
-          const sampleAvg = i === 1 ? ".340" : (i === 4 ? ".285" : ".250");
+          const sampleSb = (i === 1 || i === 9) ? 12 : 1;
           stagedParsedPlayers.push({
-            name: `Opponent Batter #${i}`,
+            name: `Player ${i}`,
             bats: i % 2 === 0 ? "Left" : "Right",
-            stats: { avg: sampleAvg, obp: ".350", slg: sampleHr > 4 ? ".580" : ".360", hr: sampleHr, sb: sampleSb },
-            archetypes: determineArchetypes(parseFloat(sampleAvg), sampleHr > 4 ? 0.580 : 0.360, sampleHr, sampleSb),
+            stats: { avg: i === 1 ? ".340" : ".260", obp: ".350", slg: sampleHr > 4 ? ".580" : ".360", hr: sampleHr, sb: sampleSb },
+            archetypes: determineArchetypes(i === 1 ? 0.340 : 0.260, sampleHr > 4 ? 0.580 : 0.360, sampleHr, sampleSb),
             order: i,
             isBench: false
           });
         }
-        stagedParsedPlayers.push({
-          name: "Opponent Bench 1",
-          bats: "Right",
-          stats: { avg: ".210", obp: ".290", slg: ".300", hr: 0, sb: 7 },
-          archetypes: ["RUNNER"],
-          order: null,
-          isBench: true
-        });
       }
 
       openSyncReviewModal();
     }
 
-    // ARCHETYPE CLASSIFICATION ENGINE
+    // ==================== QUICK PASTE TABLE MODAL ====================
+    function openQuickPasteModal() {
+      document.getElementById('quick-paste-textarea').value = '';
+      document.getElementById('modal-quick-paste').classList.remove('hidden');
+    }
+    function closeQuickPasteModal() {
+      document.getElementById('modal-quick-paste').classList.add('hidden');
+    }
+    function commitQuickPasteText() {
+      const text = document.getElementById('quick-paste-textarea').value;
+      if (!text.trim()) return;
+      closeQuickPasteModal();
+      parseReconstructedLines(text.split('\n'));
+    }
+
+    // ==================== ARCHETYPE CLASSIFICATION ====================
     function determineArchetypes(avg, slg, hr, sb) {
       const list = [];
-      // 1. RUNNER / SPEED THREAT: 6+ SBs or high speed tag
-      if (sb >= 6) {
-        list.push("RUNNER");
-      }
-      // 2. POWER THREAT: SLG >= .500 or 5+ HRs
-      if (slg >= 0.500 || hr >= 5) {
-        list.push("POWER THREAT");
-      }
-      // 3. CONTACT / DISCIPLINE: .310+ AVG with moderate power
-      if (avg >= 0.310) {
-        list.push("CONTACT");
-      }
-      // 4. HIGH K RISK
-      if (avg < 0.230 && hr >= 2) {
-        list.push("HIGH K RISK");
-      }
+      if (sb >= 5) list.push("RUNNER");
+      if (slg >= 0.500 || hr >= 4) list.push("POWER THREAT");
+      if (avg >= 0.310) list.push("CONTACT");
+      if (avg < 0.225 && hr >= 2) list.push("HIGH K RISK");
       return list;
+    }
+
+    function togglePlayerArchetype(playerIdx, type) {
+      const p = stagedParsedPlayers[playerIdx];
+      if (!p) return;
+      const idx = p.archetypes.indexOf(type);
+      if (idx === -1) {
+        p.archetypes.push(type);
+      } else {
+        p.archetypes.splice(idx, 1);
+      }
+      openSyncReviewModal(); // Re-render modal with updated state
     }
 
     function openSyncReviewModal() {
       const container = document.getElementById('sync-detected-list');
       container.innerHTML = stagedParsedPlayers.map((p, idx) => `
-        <div class="p-2.5 rounded-lg bg-gray-950 border border-gray-800 space-y-1.5">
+        <div class="p-2.5 rounded-lg bg-gray-950 border border-gray-800 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2 flex-1">
               <span class="text-[10px] font-mono text-gray-400 font-bold w-12">${p.isBench ? 'BENCH' : `#${p.order}`}</span>
@@ -1291,10 +1320,20 @@
               <option value="Switch" ${p.bats === 'Switch' ? 'selected' : ''}>SHH</option>
             </select>
           </div>
-          <div class="flex items-center justify-between text-[11px] text-gray-400 pl-14">
-            <span class="font-mono text-emerald-400">${p.stats.avg} AVG • ${p.stats.hr} HR • ${p.stats.sb} SB</span>
+          <div class="flex flex-wrap items-center justify-between text-[11px] text-gray-400 pl-14 gap-1">
+            <div class="flex items-center space-x-1.5 font-mono">
+              <span>AVG:</span>
+              <input type="text" value="${p.stats.avg}" onchange="stagedParsedPlayers[${idx}].stats.avg = this.value" class="w-12 bg-gray-900 border border-gray-700 rounded px-1 text-emerald-400 text-center" />
+              <span>HR:</span>
+              <input type="number" value="${p.stats.hr}" onchange="stagedParsedPlayers[${idx}].stats.hr = parseInt(this.value)||0" class="w-10 bg-gray-900 border border-gray-700 rounded px-1 text-red-400 text-center" />
+              <span>SB:</span>
+              <input type="number" value="${p.stats.sb}" onchange="stagedParsedPlayers[${idx}].stats.sb = parseInt(this.value)||0" class="w-10 bg-gray-900 border border-gray-700 rounded px-1 text-cyan-400 text-center" />
+            </div>
+            <!-- Clickable Archetype Chips -->
             <div class="flex space-x-1">
-              ${renderArchetypeBadges(p.archetypes)}
+              <button onclick="togglePlayerArchetype(${idx}, 'RUNNER')" class="text-[9px] font-black px-1.5 py-0.5 rounded border transition ${p.archetypes.includes('RUNNER') ? 'bg-cyan-950 text-cyan-300 border-cyan-600' : 'bg-gray-900 text-gray-500 border-gray-800'}">🏃 RUNNER</button>
+              <button onclick="togglePlayerArchetype(${idx}, 'POWER THREAT')" class="text-[9px] font-black px-1.5 py-0.5 rounded border transition ${p.archetypes.includes('POWER THREAT') ? 'bg-red-950 text-red-300 border-red-600' : 'bg-gray-900 text-gray-500 border-gray-800'}">💣 POWER</button>
+              <button onclick="togglePlayerArchetype(${idx}, 'CONTACT')" class="text-[9px] font-black px-1.5 py-0.5 rounded border transition ${p.archetypes.includes('CONTACT') ? 'bg-emerald-950 text-emerald-300 border-emerald-600' : 'bg-gray-900 text-gray-500 border-gray-800'}">🎯 CONTACT</button>
             </div>
           </div>
         </div>
@@ -1387,7 +1426,6 @@
       }
     }
 
-    // HELPER: RENDER ARCHETYPE BADGES (RUNNER, POWER, CONTACT)
     function renderArchetypeBadges(archetypes) {
       if (!archetypes || archetypes.length === 0) return '';
       return archetypes.map(a => {
@@ -1404,7 +1442,7 @@
       }).join('');
     }
 
-    // SUB MODAL & BENCH MANAGEMENT
+    // SUB MODAL & BENCH
     let currentSubTargetId = null;
     function openSubModal() {
       const b = state.lineup[state.gameInfo.currentBatterIndex];
@@ -1605,7 +1643,6 @@
       document.getElementById('batter-name').innerText = b.name;
       document.getElementById('batter-side-badge').innerText = `${b.bats[0]}HH`;
 
-      // Statline & Archetype Badges
       const statContainer = document.getElementById('batter-statline');
       if (b.stats) {
         statContainer.innerText = `${b.stats.avg} / ${b.stats.obp || '.---'} / ${b.stats.slg || '.---'} • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB`;
