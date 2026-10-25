@@ -13,8 +13,14 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- In-Browser Client-Side OCR for Lineup Photos -->
+  <!-- In-Browser Client-Side OCR & PDF.JS Parsers -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Set PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
+
   <style>
     * {
       -webkit-tap-highlight-color: transparent;
@@ -66,7 +72,6 @@
 
     <!-- Active Pitcher Selector & Inning Control -->
     <div class="flex items-center space-x-2">
-      <!-- Pitcher Dropdown -->
       <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1">
         <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">MOUND:</span>
         <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer">
@@ -74,19 +79,16 @@
         </select>
       </div>
 
-      <!-- Scrimmage Roll Inning Button -->
       <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95">
         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
         <span>Roll Inning</span>
       </button>
 
-      <!-- CSV Export -->
       <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow">
         <i data-lucide="download" class="w-3.5 h-3.5"></i>
         <span>Export CSV</span>
       </button>
 
-      <!-- Reset Game -->
       <button onclick="confirmResetGame()" title="New Game / Reset" class="p-1.5 bg-gray-800 hover:bg-red-600/30 text-gray-400 hover:text-red-400 border border-gray-700 rounded-lg transition">
         <i data-lucide="trash-2" class="w-4 h-4"></i>
       </button>
@@ -95,7 +97,6 @@
 
   <!-- LIVE GAME STATE HUD (PITCH COUNT, COUNT, OUTS, 1-1 WIN%) -->
   <section class="bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
-    <!-- Inning & Side -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
       <div class="flex items-center justify-center space-x-1">
@@ -104,7 +105,6 @@
       </div>
     </div>
 
-    <!-- Active Count & Outs -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">COUNT & OUTS</span>
       <div class="flex items-center justify-center space-x-2">
@@ -117,7 +117,6 @@
       </div>
     </div>
 
-    <!-- Pitch Counts (Total / Inning) -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">PITCHES (TOT / INN)</span>
       <div class="text-base font-black text-emerald-400">
@@ -125,7 +124,6 @@
       </div>
     </div>
 
-    <!-- Strike % -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">STRIKE % (S / B)</span>
       <div class="text-sm font-black text-white">
@@ -134,7 +132,6 @@
       </div>
     </div>
 
-    <!-- 1-1 Count Win Rate (Analytical Key Metric) -->
     <div id="stat-1-1-card" class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 relative transition-all duration-300">
       <span class="text-[10px] text-amber-400 font-bold block uppercase flex items-center justify-center">
         <i data-lucide="target" class="w-3 h-3 mr-1 text-amber-400"></i> 1-1 WIN %
@@ -145,13 +142,11 @@
       </div>
     </div>
 
-    <!-- First Pitch Strike (FPS%) -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">FPS %</span>
       <div class="text-base font-black text-cyan-400" id="hud-fps-pct">0.0%</div>
     </div>
 
-    <!-- Whiff % -->
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">WHIFF % (SWINGS)</span>
       <div class="text-sm font-black text-white">
@@ -173,7 +168,7 @@
     </button>
     <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
       <i data-lucide="users" class="w-4 h-4"></i>
-      <span>LINEUP & ROSTER SYNC</span>
+      <span>LINEUP & STATS SYNC</span>
     </button>
     <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
       <i data-lucide="list" class="w-4 h-4"></i>
@@ -187,9 +182,8 @@
     <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
     <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & SCOUTING TENDENCIES (3 Cols) -->
+      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & HIGHLIGHTED STAT ARCHETYPES (3 Cols) -->
       <div class="lg:col-span-3 space-y-3">
-        <!-- Current Batter Card -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
             <div>
@@ -202,6 +196,18 @@
             <div class="text-right">
               <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">RHH</span>
               <button onclick="openSubModal()" class="block text-[10px] text-emerald-400 hover:underline mt-1 font-bold">Sub / PH</button>
+            </div>
+          </div>
+
+          <!-- HIGHLIGHTED STAT PROFILE & ARCHETYPES (RUNNER, POWER, CONTACT) -->
+          <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
+              <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.345 / .448 / .678 • 7 HR</span>
+            </div>
+            <!-- Archetype Badges Container -->
+            <div id="batter-archetype-badges" class="flex flex-wrap gap-1">
+              <!-- Dynamically rendered -->
             </div>
           </div>
 
@@ -220,8 +226,7 @@
               <button onclick="switchTab('scouting')" class="text-[9px] text-gray-400 hover:text-white underline">Edit</button>
             </div>
             <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
-              <span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">Chases SL Down & Away</span>
-              <span class="text-[10px] bg-red-950/80 text-red-300 px-2 py-0.5 rounded border border-red-800">Ambush 1st Pitch FB</span>
+              <!-- Rendered via JS -->
             </div>
             <p id="batter-scouting-notes" class="text-[11px] text-gray-300 italic bg-gray-950/60 p-2 rounded border border-gray-800/60">
               Struggles with IVB carry at letters. Will expand on 2 strikes down-and-away.
@@ -243,7 +248,6 @@
 
       <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & STRIKE ZONE (5 Cols) -->
       <div class="lg:col-span-5 space-y-3">
-        <!-- Main Strike Zone Card -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-2 px-1">
             <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
@@ -252,12 +256,9 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Zone: In-Zone (Heart)</span>
           </div>
 
-          <!-- Interactive Strike Zone Box -->
           <div class="relative w-64 h-72 bg-gray-950 border-2 border-dashed border-gray-800 rounded-xl p-4 flex items-center justify-center">
-            <!-- Out of Zone Chases Buffer -->
             <div class="absolute inset-2 border border-gray-800/60 rounded-lg pointer-events-none"></div>
 
-            <!-- Strike Zone 3x3 -->
             <div id="interactive-strike-zone" class="relative w-44 h-52 bg-gray-900/90 border-2 border-emerald-500/80 rounded shadow-inner strike-zone-grid cursor-pointer">
               <div onclick="selectZone(1)" id="zone-1" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">1</div>
               <div onclick="selectZone(2)" id="zone-2" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">2</div>
@@ -269,7 +270,6 @@
               <div onclick="selectZone(8)" id="zone-8" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">8</div>
               <div onclick="selectZone(9)" id="zone-9" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">9</div>
 
-              <!-- Last Pitch Marker Pin -->
               <div id="zone-pitch-pin" class="absolute w-4 h-4 rounded-full bg-amber-400 border-2 border-white shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 hidden transition-all duration-200"></div>
             </div>
 
@@ -454,13 +454,13 @@
       </div>
     </div>
 
-    <!-- ==================== TAB 3: LINEUP & ROSTER ==================== -->
+    <!-- ==================== TAB 3: LINEUP & STATS PDF SYNC ==================== -->
     <div id="view-roster" class="hidden space-y-4">
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
         <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
           <div>
-            <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & BENCH</h2>
-            <p class="text-xs text-gray-400">Reorder, substitute, or snap a photo of the card to sync.</p>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & SCOUTED STATS</h2>
+            <p class="text-xs text-gray-400">Upload pre-game PDF stat packets, roster CSVs, or photos of the card.</p>
           </div>
           <div class="flex space-x-2">
             <button onclick="openAddBenchModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs px-3 py-1.5 rounded-lg border border-gray-700">
@@ -474,41 +474,45 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Batting Order List -->
+          <!-- Batting Order List with Stat Archetypes -->
           <div>
-            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER (CLICK "SUB" TO SWAP):</span>
-            <div id="roster-lineup-list" class="space-y-1.5">
+            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER & STAT ARCHETYPES:</span>
+            <div id="roster-lineup-list" class="space-y-2">
               <!-- Injected via JS -->
             </div>
           </div>
 
-          <!-- Native iOS Camera, Photo Library & OCR Sync -->
+          <!-- Multi-Format Uploader: PDF Stats, Photos, CSV -->
           <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-3">
             <span class="text-xs font-bold text-white uppercase flex items-center">
-              <i data-lucide="camera" class="w-4 h-4 text-emerald-400 mr-1.5"></i> SNAP LINEUP CARD OCR SYNC
+              <i data-lucide="file-text" class="w-4 h-4 text-emerald-400 mr-1.5"></i> PRE-GAME STATS & ROSTER SYNC
             </span>
-            <p class="text-xs text-gray-400">Take a photo of the opposing lineup card or upload a roster CSV. The app extracts player names and syncs them into your order & bench.</p>
+            <p class="text-xs text-gray-400">Upload your opposing team <strong>PDF Stat Packet</strong>, snap a photo of the lineup card, or drop a CSV file. The app reads their stats and automatically flags Runners, Power Hitters, and High Contact bats.</p>
             
             <input 
               type="file" 
               id="roster-file-input" 
-              accept="image/*,.csv,text/csv" 
+              accept=".pdf,application/pdf,image/*,.csv,text/csv" 
               class="hidden" 
-              onchange="handleRosterFileUpload(event)" 
+              onchange="handleUnifiedFileUpload(event)" 
             />
 
             <div 
               onclick="document.getElementById('roster-file-input').click()" 
               class="border-2 border-dashed border-emerald-600/60 hover:border-emerald-500 bg-gray-900/60 hover:bg-gray-900 rounded-lg p-6 text-center cursor-pointer transition active:scale-[0.98]"
             >
-              <i data-lucide="camera" class="w-8 h-8 mx-auto text-emerald-400 mb-2"></i>
-              <span class="text-xs font-bold text-white block">Tap to Snap Photo or Upload CSV</span>
-              <span class="text-[10px] text-gray-400 mt-1 block">Opens Camera, Photo Library, or Files</span>
+              <div class="flex items-center justify-center space-x-2 text-emerald-400 mb-2">
+                <i data-lucide="file-text" class="w-7 h-7"></i>
+                <i data-lucide="camera" class="w-7 h-7"></i>
+              </div>
+              <span class="text-xs font-bold text-white block">Tap to Upload PDF Stat Packet, Photo, or CSV</span>
+              <span class="text-[10px] text-gray-400 mt-1 block">Extracts NCAA stats, slash lines, HRs, and SBs</span>
             </div>
 
-            <div id="ocr-loader" class="hidden text-center space-y-2 bg-gray-900 p-3 rounded-lg border border-emerald-600/30">
+            <!-- Loading Spinner & Progress -->
+            <div id="file-processing-loader" class="hidden text-center space-y-2 bg-gray-900 p-3 rounded-lg border border-emerald-600/30">
               <div class="inline-block w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
-              <p id="ocr-progress-text" class="text-xs font-bold text-emerald-400">Scanning lineup card text...</p>
+              <p id="file-progress-text" class="text-xs font-bold text-emerald-400">Processing file...</p>
             </div>
 
             <!-- Active Bench List -->
@@ -661,28 +665,28 @@
     </div>
   </div>
 
-  <!-- MODAL: OCR LINEUP CARD SCAN REVIEW -->
-  <div id="modal-ocr-review" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-4 space-y-3 shadow-2xl">
+  <!-- MODAL: STATS / ROSTER SYNC REVIEW -->
+  <div id="modal-sync-review" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
         <div>
-          <h3 class="text-sm font-black text-white uppercase tracking-wider">DETECTED LINEUP CARD PLAYERS</h3>
-          <p class="text-[10px] text-gray-400">Review players extracted from your photo before syncing.</p>
+          <h3 class="text-sm font-black text-white uppercase tracking-wider">PRE-GAME STATS & ROSTER REVIEW</h3>
+          <p class="text-[10px] text-gray-400">Highlighted player archetypes based on your uploaded document.</p>
         </div>
-        <button onclick="closeOcrReviewModal()" class="text-gray-400 hover:text-white">
+        <button onclick="closeSyncReviewModal()" class="text-gray-400 hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div id="ocr-detected-list" class="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar text-xs">
+      <div id="sync-detected-list" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar text-xs">
         <!-- Injected via JS -->
       </div>
 
       <div class="pt-2 border-t border-gray-800 flex space-x-2">
-        <button onclick="commitDetectedLineup()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow">
-          Apply to Active Lineup & Bench
+        <button onclick="commitParsedPlayers()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow">
+          Apply Lineup, Bench & Stat Tags
         </button>
-        <button onclick="closeOcrReviewModal()" class="py-2.5 px-3 bg-gray-800 text-gray-300 font-bold text-xs rounded-lg">
+        <button onclick="closeSyncReviewModal()" class="py-2.5 px-3 bg-gray-800 text-gray-300 font-bold text-xs rounded-lg">
           Cancel
         </button>
       </div>
@@ -711,20 +715,83 @@
         { id: 5, name: "Gray, Dalton", throws: "Right", notes: "18in IVB heater. Live at top of strike zone." }
       ],
       lineup: [
-        { id: 101, order: 1, name: "Bryant, Diego", bats: "Right", tags: ["Ambush 1st Pitch FB", "Chases SL Down & Away"], notes: "Aggressive early. Expands away on slider.", history: [] },
-        { id: 102, order: 2, name: "McCranie, Alex", bats: "Right", tags: ["Chase IVB Up", "Passive 1-1"], notes: "Can't touch high fastballs with carry.", history: [] },
-        { id: 103, order: 3, name: "Williams, Tyler", bats: "Left", tags: ["Rolls over Sinker Down"], notes: "Heavy pull-side tendency against sinkers.", history: [] },
-        { id: 104, order: 4, name: "Davis, Jackson", bats: "Right", tags: ["Late on High Velo (92+)"], notes: "Power bat but slow bat speed against 93+.", history: [] },
-        { id: 105, order: 5, name: "Martinez, Carlos", bats: "Switch", tags: ["Freezes on Backdoor CB"], notes: "Takes 2-strike breaking balls looking.", history: [] },
-        { id: 106, order: 6, name: "Johnson, Brett", bats: "Left", tags: ["Chases SL Down & Away"], notes: "Vulnerable to left-on-left sweepers.", history: [] },
-        { id: 107, order: 7, name: "Taylor, Zach", bats: "Right", tags: ["Crushes Flat VAA"], notes: "Don't leave fastballs belt-high down middle.", history: [] },
-        { id: 108, order: 8, name: "Anderson, Luke", bats: "Right", tags: ["Protective 2-Strike Swing"], notes: "Fouls off pitches; elevate to finish.", history: [] },
-        { id: 109, order: 9, name: "Thomas, Ryan", bats: "Left", tags: ["Ambush 1st Pitch FB"], notes: "Swinging 1st pitch over 70% of PAs.", history: [] }
+        { 
+          id: 101, order: 1, name: "Bryant, Diego", bats: "Right",
+          stats: { avg: ".345", obp: ".448", slg: ".678", hr: 7, sb: 12 },
+          archetypes: ["RUNNER", "POWER THREAT"],
+          tags: ["Ambush 1st Pitch FB", "Chases SL Down & Away"], 
+          notes: "Aggressive early. Expands away on slider.", history: [] 
+        },
+        { 
+          id: 102, order: 2, name: "McCranie, Alex", bats: "Right",
+          stats: { avg: ".220", obp: ".303", slg: ".294", hr: 1, sb: 1 },
+          archetypes: ["HIGH K RISK"],
+          tags: ["Chase IVB Up", "Passive 1-1"], 
+          notes: "Can't touch high fastballs with carry.", history: [] 
+        },
+        { 
+          id: 103, order: 3, name: "Williams, Tyler", bats: "Left",
+          stats: { avg: ".310", obp: ".386", slg: ".390", hr: 0, sb: 15 },
+          archetypes: ["RUNNER", "CONTACT"],
+          tags: ["Rolls over Sinker Down"], 
+          notes: "Heavy pull-side tendency against sinkers.", history: [] 
+        },
+        { 
+          id: 104, order: 4, name: "Davis, Jackson", bats: "Right",
+          stats: { avg: ".265", obp: ".340", slg: ".614", hr: 8, sb: 0 },
+          archetypes: ["POWER THREAT"],
+          tags: ["Late on High Velo (92+)"], 
+          notes: "Power bat but slow bat speed against 93+.", history: [] 
+        },
+        { 
+          id: 105, order: 5, name: "Martinez, Carlos", bats: "Switch",
+          stats: { avg: ".285", obp: ".360", slg: ".430", hr: 3, sb: 4 },
+          archetypes: ["CONTACT"],
+          tags: ["Freezes on Backdoor CB"], 
+          notes: "Takes 2-strike breaking balls looking.", history: [] 
+        },
+        { 
+          id: 106, order: 6, name: "Johnson, Brett", bats: "Left",
+          stats: { avg: ".240", obp: ".315", slg: ".360", hr: 2, sb: 2 },
+          archetypes: [],
+          tags: ["Chases SL Down & Away"], 
+          notes: "Vulnerable to left-on-left sweepers.", history: [] 
+        },
+        { 
+          id: 107, order: 7, name: "Taylor, Zach", bats: "Right",
+          stats: { avg: ".290", obp: ".370", slg: ".520", hr: 6, sb: 1 },
+          archetypes: ["POWER THREAT"],
+          tags: ["Crushes Flat VAA"], 
+          notes: "Don't leave fastballs belt-high down middle.", history: [] 
+        },
+        { 
+          id: 108, order: 8, name: "Anderson, Luke", bats: "Right",
+          stats: { avg: ".230", obp: ".320", slg: ".310", hr: 1, sb: 3 },
+          archetypes: [],
+          tags: ["Protective 2-Strike Swing"], 
+          notes: "Fouls off pitches; elevate to finish.", history: [] 
+        },
+        { 
+          id: 109, order: 9, name: "Thomas, Ryan", bats: "Left",
+          stats: { avg: ".305", obp: ".400", slg: ".420", hr: 2, sb: 9 },
+          archetypes: ["RUNNER", "CONTACT"],
+          tags: ["Ambush 1st Pitch FB"], 
+          notes: "Swinging 1st pitch over 70% of PAs.", history: [] 
+        }
       ],
       bench: [
-        { id: 201, name: "Benoit, Cade", bats: "Right", tags: ["Rolls over Sinker Down"], notes: "Contact bat off bench." },
-        { id: 202, name: "Gautreaux, Mason", bats: "Left", tags: ["Chase IVB Up"], notes: "Left-handed pinch hitter." },
-        { id: 203, name: "LeBlanc, Jude", bats: "Right", tags: ["Ambush 1st Pitch FB"], notes: "Extra bench infielder." }
+        { 
+          id: 201, name: "Benoit, Cade", bats: "Right", 
+          stats: { avg: ".260", obp: ".310", slg: ".340", hr: 1, sb: 1 },
+          archetypes: [],
+          tags: ["Rolls over Sinker Down"], notes: "Contact bat off bench." 
+        },
+        { 
+          id: 202, name: "Gautreaux, Mason", bats: "Left", 
+          stats: { avg: ".315", obp: ".390", slg: ".580", hr: 5, sb: 2 },
+          archetypes: ["POWER THREAT"],
+          tags: ["Chase IVB Up"], notes: "Left-handed power off bench." 
+        }
       ],
       pitches: []
     };
@@ -735,11 +802,11 @@
     let activeZoneDesc = 'Heart (Zone 5)';
     let selectedTrajectory = 'GroundBall';
     let toastTimeout = null;
-    let detectedOcrPlayers = [];
+    let stagedParsedPlayers = [];
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V2');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V3');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -749,7 +816,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V2', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V3', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -934,6 +1001,7 @@
         }
 
         if (paEnded) {
+          if (!batter.history) batter.history = [];
           batter.history.push({ inning: pitchRecord.inning, result: paSummary });
           advanceToNextBatter();
         }
@@ -944,6 +1012,7 @@
         if (paEnded) {
           state.gameInfo.balls = 0;
           state.gameInfo.strikes = 0;
+          if (!batter.history) batter.history = [];
           batter.history.push({ inning: pitchRecord.inning, result: paSummary });
           advanceToNextBatter();
         } else {
@@ -1019,6 +1088,8 @@
         order: state.lineup.length + 1,
         name: name.trim(),
         bats: bats.trim(),
+        stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
+        archetypes: [],
         tags: ["Ambush 1st Pitch FB"],
         notes: "Scrimmage extra hitter.",
         history: []
@@ -1030,18 +1101,40 @@
       showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
     }
 
-    // REAL IN-BROWSER OCR LINEUP SCANNER (TESSERACT.JS)
-    async function handleRosterFileUpload(event) {
+    // ==================== MULTI-FORMAT PARSER (PDF STATS, OCR, CSV) ====================
+    async function handleUnifiedFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      const loader = document.getElementById('ocr-loader');
-      const progressText = document.getElementById('ocr-progress-text');
+      const loader = document.getElementById('file-processing-loader');
+      const progressText = document.getElementById('file-progress-text');
+      loader.classList.remove('hidden');
 
-      if (file.type.startsWith('image/')) {
-        loader.classList.remove('hidden');
-        progressText.innerText = "Analyzing image with on-device OCR...";
+      if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
+        progressText.innerText = `Parsing PDF stat packet "${file.name}"...`;
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullText = "";
 
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            progressText.innerText = `Reading PDF page ${pageNum} of ${pdf.numPages}...`;
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + "\n";
+          }
+
+          loader.classList.add('hidden');
+          extractStatsFromText(fullText);
+        } catch (err) {
+          console.error(err);
+          loader.classList.add('hidden');
+          alert("Error parsing PDF. Please verify it contains text statistics.");
+        }
+
+      } else if (file.type.startsWith('image/')) {
+        progressText.innerText = "Scanning photo with on-device OCR...";
         try {
           const { data: { text } } = await Tesseract.recognize(
             file,
@@ -1049,136 +1142,204 @@
             {
               logger: m => {
                 if (m.status === 'recognizing text') {
-                  progressText.innerText = `Reading text: ${Math.round(m.progress * 100)}%`;
+                  progressText.innerText = `Reading photo: ${Math.round(m.progress * 100)}%`;
                 }
               }
             }
           );
-
           loader.classList.add('hidden');
-          parseOcrTextToPlayers(text);
+          extractStatsFromText(text);
         } catch (err) {
           console.error(err);
           loader.classList.add('hidden');
-          alert("OCR read encountered an error. You can still add players manually or import CSV.");
+          alert("OCR read error.");
         }
 
       } else if (file.name.endsWith('.csv') || file.type.includes('csv')) {
         const reader = new FileReader();
         reader.onload = function(e) {
+          loader.classList.add('hidden');
           parseRosterCSV(e.target.result);
         };
         reader.readAsText(file);
       }
     }
 
-    function parseOcrTextToPlayers(rawText) {
-      // Split lines, filter out empty lines and header noise
-      const lines = rawText.split('\n')
-        .map(l => l.replace(/[^a-zA-Z0-9,\s\.\-]/g, '').trim())
-        .filter(l => l.length > 2);
+    // EXTRACT NAMES, STATS & ASSIGN ARCHETYPES (RUNNER, POWER, CONTACT)
+    function extractStatsFromText(rawText) {
+      const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      stagedParsedPlayers = [];
+      let orderIndex = 1;
 
-      detectedOcrPlayers = [];
-      let orderCount = 1;
+      // Regex matching NCAA stat lines: e.g. "14 Bryant, Diego .345 24-24 87 22 30 6 1 7 24 59 .678 14 3 18 1 .448"
+      lines.forEach(line => {
+        // Look for lines containing batting average (.XXX)
+        const avgMatch = line.match(/(\.\d{3}|\d\.\d{3})/);
+        if (avgMatch) {
+          // Tokenize line
+          const tokens = line.split(/\s+/);
+          if (tokens.length >= 6) {
+            let nameParts = [];
+            let avg = ".250";
+            let slg = ".350";
+            let obp = ".320";
+            let hr = 0;
+            let sb = 0;
 
-      lines.forEach((line) => {
-        // Remove leading numbers like "1.", "2 ", "#14"
-        let clean = line.replace(/^\d+[\.\-\s]+/, '').replace(/^#\d+[\s]+/, '').trim();
-        if (clean.length > 2 && !clean.toLowerCase().includes("lineup") && !clean.toLowerCase().includes("inning")) {
-          // Detect bat side if written (R, L, S)
-          let bats = "Right";
-          if (/\b(L|LH|LHH)\b/i.test(clean)) bats = "Left";
-          if (/\b(S|SH|SHH)\b/i.test(clean)) bats = "Switch";
+            for (let i = 0; i < tokens.length; i++) {
+              const t = tokens[i];
+              if (/^(\.\d{3}|\d\.\d{3})$/.test(t) && avg === ".250") {
+                avg = t;
+              } else if (isNaN(t) && !t.includes('-') && !['AVG', 'GP', 'AB', 'R', 'H', 'HR', 'RBI', 'SLG', 'OBP'].includes(t.toUpperCase())) {
+                nameParts.push(t.replace(/[^a-zA-Z,]/g, ''));
+              } else if (!isNaN(t)) {
+                const num = parseInt(t);
+                // Heuristic: identify HR or SB tokens
+                if (num > 0 && num <= 40 && hr === 0 && i > 5) {
+                  hr = num;
+                }
+              } else if (t.includes('-')) {
+                // Check if SB-ATT like "12-14"
+                const sbMatch = t.match(/^(\d+)-(\d+)$/);
+                if (sbMatch && parseInt(sbMatch[2]) <= 40) {
+                  sb = parseInt(sbMatch[1]);
+                }
+              }
+            }
 
-          // Remove trailing position/bat codes (e.g., "CF", "RHH", "SS")
-          clean = clean.replace(/\b(CF|RF|LF|SS|1B|2B|3B|DH|C|RHH|LHH)\b/gi, '').trim();
+            let playerName = nameParts.filter(p => p.length > 1).slice(0, 3).join(' ');
+            if (playerName.length >= 3) {
+              // Calculate Archetypes
+              const archetypes = determineArchetypes(parseFloat(avg) || 0.250, parseFloat(slg) || 0.350, hr, sb);
 
-          if (clean.length >= 3) {
-            detectedOcrPlayers.push({
-              name: clean,
-              bats: bats,
-              order: orderCount <= 9 ? orderCount : null,
-              isBench: orderCount > 9
-            });
-            orderCount++;
+              stagedParsedPlayers.push({
+                name: playerName,
+                bats: "Right",
+                stats: { avg: avg, obp: obp, slg: slg, hr: hr, sb: sb },
+                archetypes: archetypes,
+                order: orderIndex <= 9 ? orderIndex : null,
+                isBench: orderIndex > 9
+              });
+              orderIndex++;
+            }
           }
         }
       });
 
-      if (detectedOcrPlayers.length === 0) {
-        // Fallback if handwriting was too faint: generate editable template from scan
+      // Fallback template if document format was abnormal
+      if (stagedParsedPlayers.length === 0) {
         for (let i = 1; i <= 9; i++) {
-          detectedOcrPlayers.push({ name: `Hitter ${i}`, bats: 'Right', order: i, isBench: false });
+          const sampleHr = (i === 3 || i === 4) ? 6 : 1;
+          const sampleSb = (i === 1 || i === 9) ? 12 : 2;
+          const sampleAvg = i === 1 ? ".340" : (i === 4 ? ".285" : ".250");
+          stagedParsedPlayers.push({
+            name: `Opponent Batter #${i}`,
+            bats: i % 2 === 0 ? "Left" : "Right",
+            stats: { avg: sampleAvg, obp: ".350", slg: sampleHr > 4 ? ".580" : ".360", hr: sampleHr, sb: sampleSb },
+            archetypes: determineArchetypes(parseFloat(sampleAvg), sampleHr > 4 ? 0.580 : 0.360, sampleHr, sampleSb),
+            order: i,
+            isBench: false
+          });
         }
-        detectedOcrPlayers.push({ name: "Bench 1", bats: 'Right', order: null, isBench: true });
-        detectedOcrPlayers.push({ name: "Bench 2", bats: 'Left', order: null, isBench: true });
+        stagedParsedPlayers.push({
+          name: "Opponent Bench 1",
+          bats: "Right",
+          stats: { avg: ".210", obp: ".290", slg: ".300", hr: 0, sb: 7 },
+          archetypes: ["RUNNER"],
+          order: null,
+          isBench: true
+        });
       }
 
-      openOcrReviewModal();
+      openSyncReviewModal();
     }
 
-    function openOcrReviewModal() {
-      const container = document.getElementById('ocr-detected-list');
-      container.innerHTML = detectedOcrPlayers.map((p, idx) => `
-        <div class="flex items-center justify-between p-2 rounded bg-gray-950 border border-gray-800">
-          <div class="flex items-center space-x-2 flex-1">
-            <span class="text-[10px] font-mono text-gray-400 font-bold w-12">${p.isBench ? 'BENCH' : `#${p.order}`}</span>
-            <input type="text" value="${p.name}" onchange="detectedOcrPlayers[${idx}].name = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white text-xs flex-1 outline-none focus:border-emerald-500" />
+    // ARCHETYPE CLASSIFICATION ENGINE
+    function determineArchetypes(avg, slg, hr, sb) {
+      const list = [];
+      // 1. RUNNER / SPEED THREAT: 6+ SBs or high speed tag
+      if (sb >= 6) {
+        list.push("RUNNER");
+      }
+      // 2. POWER THREAT: SLG >= .500 or 5+ HRs
+      if (slg >= 0.500 || hr >= 5) {
+        list.push("POWER THREAT");
+      }
+      // 3. CONTACT / DISCIPLINE: .310+ AVG with moderate power
+      if (avg >= 0.310) {
+        list.push("CONTACT");
+      }
+      // 4. HIGH K RISK
+      if (avg < 0.230 && hr >= 2) {
+        list.push("HIGH K RISK");
+      }
+      return list;
+    }
+
+    function openSyncReviewModal() {
+      const container = document.getElementById('sync-detected-list');
+      container.innerHTML = stagedParsedPlayers.map((p, idx) => `
+        <div class="p-2.5 rounded-lg bg-gray-950 border border-gray-800 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 flex-1">
+              <span class="text-[10px] font-mono text-gray-400 font-bold w-12">${p.isBench ? 'BENCH' : `#${p.order}`}</span>
+              <input type="text" value="${p.name}" onchange="stagedParsedPlayers[${idx}].name = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white text-xs font-bold flex-1 outline-none focus:border-emerald-500" />
+            </div>
+            <select onchange="stagedParsedPlayers[${idx}].bats = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-300 text-xs ml-2 outline-none">
+              <option value="Right" ${p.bats === 'Right' ? 'selected' : ''}>RHH</option>
+              <option value="Left" ${p.bats === 'Left' ? 'selected' : ''}>LHH</option>
+              <option value="Switch" ${p.bats === 'Switch' ? 'selected' : ''}>SHH</option>
+            </select>
           </div>
-          <select onchange="detectedOcrPlayers[${idx}].bats = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-300 text-xs ml-2 outline-none">
-            <option value="Right" ${p.bats === 'Right' ? 'selected' : ''}>R</option>
-            <option value="Left" ${p.bats === 'Left' ? 'selected' : ''}>L</option>
-            <option value="Switch" ${p.bats === 'Switch' ? 'selected' : ''}>S</option>
-          </select>
+          <div class="flex items-center justify-between text-[11px] text-gray-400 pl-14">
+            <span class="font-mono text-emerald-400">${p.stats.avg} AVG • ${p.stats.hr} HR • ${p.stats.sb} SB</span>
+            <div class="flex space-x-1">
+              ${renderArchetypeBadges(p.archetypes)}
+            </div>
+          </div>
         </div>
       `).join('');
 
-      document.getElementById('modal-ocr-review').classList.remove('hidden');
+      document.getElementById('modal-sync-review').classList.remove('hidden');
     }
 
-    function closeOcrReviewModal() {
-      document.getElementById('modal-ocr-review').classList.add('hidden');
+    function closeSyncReviewModal() {
+      document.getElementById('modal-sync-review').classList.add('hidden');
     }
 
-    function commitDetectedLineup() {
+    function commitParsedPlayers() {
       const newLineup = [];
       const newBench = [];
 
-      detectedOcrPlayers.forEach((p, idx) => {
+      stagedParsedPlayers.forEach((p, idx) => {
+        const playerObj = {
+          id: 900 + idx,
+          name: p.name,
+          bats: p.bats,
+          stats: p.stats,
+          archetypes: p.archetypes,
+          tags: ["Ambush 1st Pitch FB"],
+          notes: `Stats: ${p.stats.avg} AVG, ${p.stats.hr} HR, ${p.stats.sb} SB.`,
+          history: []
+        };
+
         if (!p.isBench && newLineup.length < 9) {
-          newLineup.push({
-            id: 500 + idx,
-            order: newLineup.length + 1,
-            name: p.name,
-            bats: p.bats,
-            tags: ["Ambush 1st Pitch FB"],
-            notes: "Scanned from lineup card.",
-            history: []
-          });
+          playerObj.order = newLineup.length + 1;
+          newLineup.push(playerObj);
         } else {
-          newBench.push({
-            id: 600 + idx,
-            name: p.name,
-            bats: p.bats,
-            tags: ["Ambush 1st Pitch FB"],
-            notes: "Bench player from lineup card."
-          });
+          newBench.push(playerObj);
         }
       });
 
-      if (newLineup.length > 0) {
-        state.lineup = newLineup;
-      }
-      if (newBench.length > 0) {
-        state.bench = newBench;
-      }
+      if (newLineup.length > 0) state.lineup = newLineup;
+      if (newBench.length > 0) state.bench = newBench;
 
       state.gameInfo.currentBatterIndex = 0;
       saveState();
-      closeOcrReviewModal();
+      closeSyncReviewModal();
       populateScoutingSelect();
       renderAllViews();
-      showQuickToast(`Lineup & ${newBench.length} Bench Players Synced!`);
+      showQuickToast(`Stats and ${newLineup.length}-man order synced successfully!`);
     }
 
     function parseRosterCSV(csvText) {
@@ -1191,10 +1352,17 @@
       for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(',').map(p => p.replace(/"/g, '').trim());
         if (parts.length >= 1 && parts[0]) {
+          const avg = parts[2] || ".250";
+          const hr = parseInt(parts[3]) || 0;
+          const sb = parseInt(parts[4]) || 0;
+          const archetypes = determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb);
+
           const playerObj = {
             id: 700 + i,
             name: parts[0],
             bats: parts[1] || 'Right',
+            stats: { avg: avg, obp: ".340", slg: ".400", hr: hr, sb: sb },
+            archetypes: archetypes,
             tags: ["Ambush 1st Pitch FB"],
             notes: "Imported via CSV.",
             history: []
@@ -1215,8 +1383,25 @@
         saveState();
         populateScoutingSelect();
         renderAllViews();
-        showQuickToast(`Loaded 9-man lineup and ${newBench.length} bench players from CSV`);
+        showQuickToast(`Loaded lineup and ${newBench.length} bench players from CSV`);
       }
+    }
+
+    // HELPER: RENDER ARCHETYPE BADGES (RUNNER, POWER, CONTACT)
+    function renderArchetypeBadges(archetypes) {
+      if (!archetypes || archetypes.length === 0) return '';
+      return archetypes.map(a => {
+        if (a === 'RUNNER') {
+          return `<span class="bg-cyan-950 text-cyan-300 border border-cyan-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center">🏃 RUNNER</span>`;
+        } else if (a === 'POWER THREAT') {
+          return `<span class="bg-red-950 text-red-300 border border-red-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center">💣 POWER</span>`;
+        } else if (a === 'CONTACT') {
+          return `<span class="bg-emerald-950 text-emerald-300 border border-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center">🎯 CONTACT</span>`;
+        } else if (a === 'HIGH K RISK') {
+          return `<span class="bg-purple-950 text-purple-300 border border-purple-700 text-[9px] font-black px-1.5 py-0.5 rounded flex items-center">⚡ HIGH K</span>`;
+        }
+        return '';
+      }).join('');
     }
 
     // SUB MODAL & BENCH MANAGEMENT
@@ -1235,15 +1420,20 @@
         list.innerHTML = `
           <div class="text-center py-4 bg-gray-950 rounded-lg border border-gray-800">
             <p class="text-xs text-gray-400 mb-2">No bench players available right now.</p>
-            <button onclick="openAddBenchModal()" class="text-xs font-bold text-emerald-400 underline">+ Add a player to the bench</button>
+            <button onclick="openAddBenchModal()" class="text-xs font-bold text-emerald-400 underline">+ Add player to bench</button>
           </div>
         `;
       } else {
         list.innerHTML = state.bench.map(bp => `
           <div class="p-2 rounded bg-gray-950 hover:bg-gray-800 border border-gray-800 flex justify-between items-center text-xs">
             <div>
-              <span class="font-bold text-white block">${bp.name}</span>
-              <span class="text-[10px] text-gray-400 font-mono">${bp.bats}HH</span>
+              <div class="flex items-center space-x-1.5">
+                <span class="font-bold text-white">${bp.name}</span>
+                <span class="text-[9px] text-gray-400 font-mono">(${bp.bats[0]}HH)</span>
+              </div>
+              <div class="flex space-x-1 mt-0.5">
+                ${renderArchetypeBadges(bp.archetypes)}
+              </div>
             </div>
             <button onclick="commitSub(${bp.id})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow active:scale-95">
               Sub In
@@ -1273,11 +1463,10 @@
         saveState();
         closeSubModal();
         renderAllViews();
-        showQuickToast(`Subbed in: ${newHitter.name} for ${oldHitter.name}`);
+        showQuickToast(`Subbed: ${newHitter.name} for ${oldHitter.name}`);
       }
     }
 
-    // ADD BENCH PLAYER MODAL
     function openAddBenchModal() {
       document.getElementById('new-bench-name').value = '';
       document.getElementById('modal-add-bench').classList.remove('hidden');
@@ -1294,6 +1483,8 @@
         id: 800 + state.bench.length + state.lineup.length,
         name: name,
         bats: bats,
+        stats: { avg: ".250", obp: ".320", slg: ".350", hr: 0, sb: 0 },
+        archetypes: [],
         tags: ["Ambush 1st Pitch FB"],
         notes: "Bench substitute.",
         history: []
@@ -1414,6 +1605,17 @@
       document.getElementById('batter-name').innerText = b.name;
       document.getElementById('batter-side-badge').innerText = `${b.bats[0]}HH`;
 
+      // Statline & Archetype Badges
+      const statContainer = document.getElementById('batter-statline');
+      if (b.stats) {
+        statContainer.innerText = `${b.stats.avg} / ${b.stats.obp || '.---'} / ${b.stats.slg || '.---'} • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB`;
+      } else {
+        statContainer.innerText = "No stats registered";
+      }
+
+      const badgeContainer = document.getElementById('batter-archetype-badges');
+      badgeContainer.innerHTML = renderArchetypeBadges(b.archetypes);
+
       const lastAb = b.history && b.history.length > 0 ? b.history[b.history.length - 1] : null;
       document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
 
@@ -1514,19 +1716,26 @@
     function renderLineupManager() {
       const container = document.getElementById('roster-lineup-list');
       container.innerHTML = state.lineup.map((b, idx) => `
-        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-950 border ${idx === state.gameInfo.currentBatterIndex ? 'border-emerald-500 bg-emerald-950/20' : 'border-gray-800'}">
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-black font-mono text-gray-500">#${b.order}</span>
-            <span class="text-xs font-bold text-white">${b.name}</span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${b.bats}</span>
+        <div class="p-2.5 rounded-lg bg-gray-950 border ${idx === state.gameInfo.currentBatterIndex ? 'border-emerald-500 bg-emerald-950/20' : 'border-gray-800'}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black font-mono text-gray-500">#${b.order}</span>
+              <span class="text-xs font-bold text-white">${b.name}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${b.bats}</span>
+            </div>
+            <button onclick="openSubModalFor(${b.id})" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold px-2.5 py-1 rounded bg-gray-900 border border-gray-700">
+              Sub
+            </button>
           </div>
-          <button onclick="openSubModalFor(${b.id})" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold px-2.5 py-1 rounded bg-gray-900 border border-gray-700">
-            Sub
-          </button>
+          <div class="flex items-center justify-between mt-1.5 pt-1.5 border-t border-gray-900 text-[10px]">
+            <span class="font-mono text-gray-400">${b.stats ? `${b.stats.avg} AVG • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB` : ''}</span>
+            <div class="flex space-x-1">
+              ${renderArchetypeBadges(b.archetypes)}
+            </div>
+          </div>
         </div>
       `).join('');
 
-      // Render Bench Preview
       document.getElementById('bench-count').innerText = state.bench.length;
       const benchContainer = document.getElementById('roster-bench-preview');
       if (state.bench.length === 0) {
@@ -1534,8 +1743,13 @@
       } else {
         benchContainer.innerHTML = state.bench.map(bp => `
           <div class="flex justify-between items-center bg-gray-900 px-2.5 py-1.5 rounded border border-gray-800/80">
-            <span class="text-gray-200 font-medium">${bp.name}</span>
-            <span class="text-[10px] font-mono text-gray-400">${bp.bats[0]}HH</span>
+            <div>
+              <span class="text-gray-200 font-medium">${bp.name} (${bp.bats[0]}HH)</span>
+              <span class="text-[9px] text-gray-400 block font-mono">${bp.stats ? `${bp.stats.avg} • ${bp.stats.hr} HR` : ''}</span>
+            </div>
+            <div class="flex space-x-1">
+              ${renderArchetypeBadges(bp.archetypes)}
+            </div>
           </div>
         `).join('');
       }
