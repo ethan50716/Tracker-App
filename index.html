@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dugout Pitch Tracker & Scouting Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Prevent accidental zoom and text selection during rapid dugout tapping */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .strike-zone-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #111827;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 2px;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .leverage-pulse {
+      animation: pulse-subtle 1.8s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans antialiased overflow-x-hidden">
+
+  <!-- TOP APP BAR -->
+  <header class="bg-gray-900 border-b border-gray-800 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30">
+        <i data-lucide="activity" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-sm font-black tracking-wider uppercase text-white">DUGOUT ANALYTICS</h1>
+          <span id="storage-indicator" class="flex items-center text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span> AUTO-SAVED
+          </span>
+        </div>
+        <p class="text-[11px] text-gray-400 font-medium">SLU Pitch Tracking & Scouting Platform</p>
+      </div>
+    </div>
+
+    <!-- Active Pitcher Selector & Inning Control -->
+    <div class="flex items-center space-x-2">
+      <!-- Pitcher Dropdown -->
+      <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1">
+        <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">MOUND:</span>
+        <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <!-- Scrimmage Roll Inning Button -->
+      <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+        <span>Roll Inning</span>
+      </button>
+
+      <!-- CSV Export -->
+      <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>Export CSV</span>
+      </button>
+
+      <!-- Reset Game -->
+      <button onclick="confirmResetGame()" title="New Game / Reset" class="p-1.5 bg-gray-800 hover:bg-red-600/30 text-gray-400 hover:text-red-400 border border-gray-700 rounded-lg transition">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- LIVE GAME STATE HUD (PITCH COUNT, COUNT, OUTS, 1-1 WIN%) -->
+  <section class="bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
+    <!-- Inning & Side -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
+      <div class="flex items-center justify-center space-x-1">
+        <span id="inning-side-icon" class="text-xs text-amber-400 font-black">▲</span>
+        <span id="inning-text" class="text-base font-black text-white">1st</span>
+      </div>
+    </div>
+
+    <!-- Active Count & Outs -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">COUNT & OUTS</span>
+      <div class="flex items-center justify-center space-x-2">
+        <span id="count-display" class="text-base font-black text-white tracking-wide">0 - 0</span>
+        <span class="text-gray-600 font-black">|</span>
+        <div class="flex space-x-1 items-center">
+          <span id="out-dot-1" class="w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600"></span>
+          <span id="out-dot-2" class="w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pitch Counts (Total / Inning) -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">PITCHES (TOT / INN)</span>
+      <div class="text-base font-black text-emerald-400">
+        <span id="hud-total-pitches">0</span> <span class="text-xs text-gray-500 font-normal">/</span> <span id="hud-inn-pitches" class="text-white text-sm">0</span>
+      </div>
+    </div>
+
+    <!-- Strike % -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">STRIKE % (S / B)</span>
+      <div class="text-sm font-black text-white">
+        <span id="hud-strike-pct" class="text-emerald-400 text-base">0.0%</span>
+        <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-strikes">0</span>/<span id="hud-balls">0</span>)</span>
+      </div>
+    </div>
+
+    <!-- 1-1 Count Win Rate (Analytical Key Metric) -->
+    <div id="stat-1-1-card" class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 relative transition-all duration-300">
+      <span class="text-[10px] text-amber-400 font-bold block uppercase flex items-center justify-center">
+        <i data-lucide="target" class="w-3 h-3 mr-1 text-amber-400"></i> 1-1 WIN %
+      </span>
+      <div class="text-sm font-black text-white">
+        <span id="hud-1-1-win-pct" class="text-amber-400 text-base">0.0%</span>
+        <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-1-1-wins">0</span>/<span id="hud-1-1-total">0</span>)</span>
+      </div>
+    </div>
+
+    <!-- First Pitch Strike (FPS%) -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">FPS %</span>
+      <div class="text-base font-black text-cyan-400" id="hud-fps-pct">0.0%</div>
+    </div>
+
+    <!-- Whiff % -->
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">WHIFF % (SWINGS)</span>
+      <div class="text-sm font-black text-white">
+        <span id="hud-whiff-pct" class="text-purple-400 text-base">0.0%</span>
+        <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-whiff-count">0</span>/<span id="hud-swing-count">0</span>)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold">
+    <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5">
+      <i data-lucide="crosshair" class="w-4 h-4"></i>
+      <span>LIVE CHARTING & TALLY</span>
+    </button>
+    <button onclick="switchTab('scouting')" id="tab-btn-scouting" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+      <i data-lucide="book-open" class="w-4 h-4"></i>
+      <span>SCOUTING & CUES HUB</span>
+    </button>
+    <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+      <i data-lucide="users" class="w-4 h-4"></i>
+      <span>LINEUP & ROSTER SYNC</span>
+    </button>
+    <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+      <i data-lucide="list" class="w-4 h-4"></i>
+      <span>PITCH LOG (<span id="tab-pitch-count">0</span>)</span>
+    </button>
+  </nav>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 p-3 sm:p-4 max-w-7xl w-full mx-auto">
+
+    <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
+    <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & SCOUTING TENDENCIES (3 Cols) -->
+      <div class="lg:col-span-3 space-y-3">
+        <!-- Current Batter Card -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
+            <div>
+              <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AT THE PLATE</span>
+              <div class="flex items-center space-x-1.5">
+                <span id="batter-order-num" class="bg-gray-800 text-gray-300 text-xs px-1.5 py-0.5 rounded font-black font-mono">#1</span>
+                <h3 id="batter-name" class="text-sm font-black text-white">Smith, John</h3>
+              </div>
+            </div>
+            <div class="text-right">
+              <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">RHH</span>
+              <button onclick="openSubModal()" class="block text-[10px] text-emerald-400 hover:underline mt-1 font-bold">Sub / PH</button>
+            </div>
+          </div>
+
+          <!-- Previous At-Bat Result -->
+          <div class="bg-gray-950 rounded-lg p-2 border border-gray-800/80 mb-2.5">
+            <span class="text-[9px] text-gray-400 font-bold uppercase block mb-0.5">PREVIOUS AT-BAT:</span>
+            <p id="batter-last-ab" class="text-xs font-semibold text-amber-300">No prior plate appearances today</p>
+          </div>
+
+          <!-- Live Scouting Cues Overlay for Current Batter -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
+                <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-400 mr-1"></i> HITTER GAME PLAN
+              </span>
+              <button onclick="switchTab('scouting')" class="text-[9px] text-gray-400 hover:text-white underline">Edit</button>
+            </div>
+            <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
+              <!-- Rendered via JS -->
+              <span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">Chases SL Down & Away</span>
+              <span class="text-[10px] bg-red-950/80 text-red-300 px-2 py-0.5 rounded border border-red-800">Ambush 1st Pitch FB</span>
+            </div>
+            <p id="batter-scouting-notes" class="text-[11px] text-gray-300 italic bg-gray-950/60 p-2 rounded border border-gray-800/60">
+              Struggles with IVB carry at letters. Will expand on 2 strikes down-and-away.
+            </p>
+          </div>
+        </div>
+
+        <!-- Previous Pitch Sequence for this Batter -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-md">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-1.5 mb-2">
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">CURRENT AB SEQUENCE</span>
+            <span id="seq-pitch-count" class="text-[10px] text-gray-400 font-mono">0 Pitches</span>
+          </div>
+          <div id="sequence-list" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs">
+            <div class="text-[11px] text-gray-500 italic text-center py-3">No pitches thrown this at-bat</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & STRIKE ZONE (5 Cols) -->
+      <div class="lg:col-span-5 space-y-3">
+        <!-- Main Strike Zone Card -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md flex flex-col items-center">
+          <div class="w-full flex justify-between items-center mb-2 px-1">
+            <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
+              <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 mr-1"></i> TAP LOCATION (OR CHOOSE CALL)
+            </span>
+            <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Zone: In-Zone (Heart)</span>
+          </div>
+
+          <!-- Interactive Strike Zone Box -->
+          <div class="relative w-64 h-72 bg-gray-950 border-2 border-dashed border-gray-800 rounded-xl p-4 flex items-center justify-center">
+            <!-- Out of Zone Chases Buffer -->
+            <div class="absolute inset-2 border border-gray-800/60 rounded-lg pointer-events-none"></div>
+
+            <!-- Strike Zone 3x3 -->
+            <div id="interactive-strike-zone" class="relative w-44 h-52 bg-gray-900/90 border-2 border-emerald-500/80 rounded shadow-inner strike-zone-grid cursor-pointer">
+              <!-- 9 Grid Zones -->
+              <div onclick="selectZone(1)" id="zone-1" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">1</div>
+              <div onclick="selectZone(2)" id="zone-2" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">2</div>
+              <div onclick="selectZone(3)" id="zone-3" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">3</div>
+              <div onclick="selectZone(4)" id="zone-4" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">4</div>
+              <div onclick="selectZone(5)" id="zone-5" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition bg-emerald-950/20 text-emerald-500/40">5</div>
+              <div onclick="selectZone(6)" id="zone-6" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">6</div>
+              <div onclick="selectZone(7)" id="zone-7" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">7</div>
+              <div onclick="selectZone(8)" id="zone-8" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">8</div>
+              <div onclick="selectZone(9)" id="zone-9" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">9</div>
+
+              <!-- Last Pitch Marker Pin -->
+              <div id="zone-pitch-pin" class="absolute w-4 h-4 rounded-full bg-amber-400 border-2 border-white shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 hidden transition-all duration-200"></div>
+            </div>
+
+            <!-- Out of zone tap shortcuts -->
+            <button onclick="selectZone(10, 'Chase High')" class="absolute top-0 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">High Waste</button>
+            <button onclick="selectZone(11, 'Chase Arm')" class="absolute left-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">In</button>
+            <button onclick="selectZone(12, 'Chase Glove')" class="absolute right-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">Away</button>
+            <button onclick="selectZone(13, 'Chase Dirt')" class="absolute bottom-0 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">Dirt</button>
+          </div>
+
+          <!-- Pitch Selection Strip -->
+          <div class="w-full mt-3">
+            <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1.5 px-1">SELECT PITCH TYPE:</span>
+            <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+              <button onclick="selectPitchType('4S')" id="pt-4S" class="py-2 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition">4S</button>
+              <button onclick="selectPitchType('SI')" id="pt-SI" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SI</button>
+              <button onclick="selectPitchType('CT')" id="pt-CT" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CT</button>
+              <button onclick="selectPitchType('SL')" id="pt-SL" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SL</button>
+              <button onclick="selectPitchType('CB')" id="pt-CB" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CB</button>
+              <button onclick="selectPitchType('CH')" id="pt-CH" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CH</button>
+              <button onclick="selectPitchType('SPL')" id="pt-SPL" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SPL</button>
+            </div>
+          </div>
+
+          <!-- Direct Pitch Call Action Buttons (1 Tap to Log) -->
+          <div class="w-full mt-3.5 space-y-2">
+            <span class="text-[10px] text-gray-400 font-bold uppercase block px-1">LOG PITCH RESULT (AUTO-SAVES & ADVANCES):</span>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="recordPitch('BallCalled')" class="py-3 bg-blue-950/80 hover:bg-blue-900 border border-blue-700 text-blue-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-sm">BALL</span>
+                <span class="text-[9px] text-blue-400 font-normal">Take / Dirt</span>
+              </button>
+
+              <button onclick="recordPitch('StrikeCalled')" class="py-3 bg-amber-950/80 hover:bg-amber-900 border border-amber-600 text-amber-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-sm">CALLED STR</span>
+                <span class="text-[9px] text-amber-400 font-normal">Looking</span>
+              </button>
+
+              <button onclick="recordPitch('StrikeSwinging')" class="py-3 bg-purple-950/80 hover:bg-purple-900 border border-purple-600 text-purple-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-sm">WHIFF</span>
+                <span class="text-[9px] text-purple-400 font-normal">Swinging Strike</span>
+              </button>
+
+              <button onclick="recordPitch('FoulBall')" class="py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span>FOUL</span>
+                <span class="text-[9px] text-gray-400 font-normal">2-Strike Hold</span>
+              </button>
+
+              <button onclick="openInPlayModal()" class="py-2.5 bg-emerald-900/80 hover:bg-emerald-800 border border-emerald-600 text-emerald-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span class="text-sm">IN PLAY</span>
+                <span class="text-[9px] text-emerald-300 font-normal">Hit / Out / Error</span>
+              </button>
+
+              <button onclick="recordPitch('HitByPitch')" class="py-2.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-700 text-rose-300 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
+                <span>HBP</span>
+                <span class="text-[9px] text-rose-400 font-normal">Hit By Pitch</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: LIVE ARSENAL PITCH TALLY & CSW BREAKDOWN (4 Cols) -->
+      <div class="lg:col-span-4 space-y-3">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
+          <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400"></i>
+              <h3 class="text-xs font-black text-white uppercase tracking-wider">LIVE ARSENAL TALLY</h3>
+            </div>
+            <span id="tally-pitcher-label" class="text-[10px] font-bold text-gray-400">Robb, Carson</span>
+          </div>
+
+          <!-- Pitch Breakdown Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-[10px] text-gray-400 border-b border-gray-800">
+                  <th class="pb-1.5 font-bold">TYPE</th>
+                  <th class="pb-1.5 font-bold text-center">THROWN</th>
+                  <th class="pb-1.5 font-bold text-center">STR %</th>
+                  <th class="pb-1.5 font-bold text-center">WHIFF %</th>
+                  <th class="pb-1.5 font-bold text-center">CSW %</th>
+                </tr>
+              </thead>
+              <tbody id="arsenal-table-body" class="divide-y divide-gray-800/60 font-mono">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Total Arsenal Summary -->
+          <div class="mt-3 bg-gray-950 p-2.5 rounded-lg border border-gray-800 text-xs space-y-1">
+            <div class="flex justify-between items-center text-gray-400">
+              <span>Primary Weapon:</span>
+              <span id="tally-top-weapon" class="font-bold text-emerald-400">Slider (0 Whiffs)</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-400">
+              <span>In-Zone Pitch Rate:</span>
+              <span id="tally-zone-rate" class="font-bold text-white">0.0%</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-400">
+              <span>Early Count (0-0/1-0) Strikes:</span>
+              <span id="tally-early-str" class="font-bold text-white">0.0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Dugout Actions Card -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-md space-y-2">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">DUGOUT CONTROLS:</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="clearBases()" class="py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-lg transition border border-gray-700">
+              Clear Bases
+            </button>
+            <button onclick="addExtraHitterPrompt()" class="py-2 bg-gray-800 hover:bg-gray-700 text-emerald-400 font-bold text-xs rounded-lg transition border border-gray-700">
+              + Extra Hitter
+            </button>
+            <button onclick="undoLastPitch()" class="col-span-2 py-2 bg-gray-800 hover:bg-amber-600/20 text-amber-300 border border-gray-700 hover:border-amber-500/40 font-black text-xs rounded-lg transition flex items-center justify-center space-x-1">
+              <i data-lucide="undo" class="w-3.5 h-3.5"></i>
+              <span>Undo Last Pitch</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: SCOUTING & CUES HUB ==================== -->
+    <div id="view-scouting" class="hidden space-y-4">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-800 gap-2">
+          <div>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider">PRE-GAME SCOUTING & TENDENCY DOSSIER</h2>
+            <p class="text-xs text-gray-400">Notes and quick-tag tendencies auto-surface when each player is active.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="scouting-player-select" onchange="loadPlayerScoutingProfile(this.value)" class="bg-gray-950 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-emerald-400 outline-none">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <!-- Preset Analytical Tags -->
+          <div class="space-y-3">
+            <span class="text-xs font-bold text-gray-300 uppercase block">ANALYTICAL QUICK TAGS:</span>
+            
+            <div>
+              <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Fastball Tendencies:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="toggleScoutTag('Chase IVB Up')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Chase IVB Up</button>
+                <button onclick="toggleScoutTag('Late on High Velo (92+)')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Late on 92+</button>
+                <button onclick="toggleScoutTag('Rolls over Sinker Down')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Rolls over Sinker</button>
+                <button onclick="toggleScoutTag('Crushes Flat VAA')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-red-600/30 border border-gray-700">Crushes Flat VAA</button>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Breaking Ball Tendencies:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="toggleScoutTag('Chases SL Down & Away')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Chases SL Down & Away</button>
+                <button onclick="toggleScoutTag('Freezes on Backdoor CB')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Freezes Backdoor CB</button>
+                <button onclick="toggleScoutTag('Spits on Early Sweep')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-amber-600/30 border border-gray-700">Spits on Early Sweep</button>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Approach & Counts:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="toggleScoutTag('Ambush 1st Pitch FB')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-red-600/30 border border-gray-700">Ambush 1st Pitch</button>
+                <button onclick="toggleScoutTag('Passivity in 1-1 Counts')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-emerald-600/30 border border-gray-700">Passive 1-1</button>
+                <button onclick="toggleScoutTag('Protective 2-Strike Swing')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-purple-600/30 border border-gray-700">Protective 2-Strikes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Freeform Notes & Cues -->
+          <div class="space-y-2">
+            <span class="text-xs font-bold text-gray-300 uppercase block">CUSTOM SCOUTING NOTES & MECHANICAL CUES:</span>
+            <textarea id="scouting-text-input" oninput="saveCurrentScoutingText(this.value)" rows="8" placeholder="Enter custom scouting notes, grip cues, or attack plans for this player..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-xs text-gray-200 outline-none focus:border-emerald-500 custom-scrollbar"></textarea>
+            <div class="flex justify-between items-center text-[10px] text-gray-500">
+              <span>Auto-saves immediately to local database.</span>
+              <span id="scout-save-status" class="text-emerald-400 font-bold">Saved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: LINEUP & ROSTER ==================== -->
+    <div id="view-roster" class="hidden space-y-4">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
+          <div>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & BENCH</h2>
+            <p class="text-xs text-gray-400">Reorder, substitute, or add 10–12 hitters for scrimmage play.</p>
+          </div>
+          <button onclick="addExtraHitterPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span>Add Extra Hitter</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Batting Order List -->
+          <div>
+            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER (CLICK TO SUB):</span>
+            <div id="roster-lineup-list" class="space-y-1.5">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Quick Vision Lineup Card Sync Simulator -->
+          <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-2.5">
+            <span class="text-xs font-bold text-white uppercase flex items-center">
+              <i data-lucide="camera" class="w-4 h-4 text-emerald-400 mr-1.5"></i> SNAP LINEUP CARD SYNC
+            </span>
+            <p class="text-xs text-gray-400">Upload a pre-game roster CSV or snap a photo of the dugout card to fuzzy-match names.</p>
+            <div class="border-2 border-dashed border-gray-800 hover:border-gray-700 rounded-lg p-6 text-center cursor-pointer">
+              <i data-lucide="file-up" class="w-8 h-8 mx-auto text-gray-500 mb-2"></i>
+              <span class="text-xs font-bold text-gray-300 block">Drop Opponent Roster CSV or Photo</span>
+              <span class="text-[10px] text-gray-500">Supports TrackMan, TruMedia, or Carbon Card Photos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: COMPLETE PITCH LOG ==================== -->
+    <div id="view-gamelog" class="hidden space-y-4">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
+          <div>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider">GAME PITCH-BY-PITCH LOG</h2>
+            <p class="text-xs text-gray-400">Full audit trail formatted for TrackMan/TruMedia export.</p>
+          </div>
+          <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download CSV</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto max-h-96 custom-scrollbar">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-gray-950 text-gray-400 border-b border-gray-800 sticky top-0">
+              <tr>
+                <th class="p-2">#</th>
+                <th class="p-2">INN</th>
+                <th class="p-2">PITCHER</th>
+                <th class="p-2">BATTER</th>
+                <th class="p-2">PITCH</th>
+                <th class="p-2">CALL</th>
+                <th class="p-2">COUNT</th>
+                <th class="p-2">ZONE</th>
+                <th class="p-2">1-1 WIN?</th>
+              </tr>
+            </thead>
+            <tbody id="gamelog-table-body" class="divide-y divide-gray-800 text-gray-200">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FLOATING QUICK-UNDO & OUT NOTIFICATION BANNER -->
+  <div id="quick-action-toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-gray-700 text-white px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center space-x-3 hidden transition-all duration-300">
+    <div id="toast-icon-box" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+    <span id="toast-text" class="text-xs font-bold font-mono">Pitch logged: 4S - Called Strike (0-1)</span>
+    <button onclick="undoLastPitch()" class="bg-gray-800 hover:bg-amber-600/30 text-amber-300 border border-gray-700 text-xs font-black px-2.5 py-1 rounded-lg transition">
+      Undo
+    </button>
+  </div>
+
+  <!-- MODAL: IN PLAY OUTCOME SELECTION -->
+  <div id="modal-in-play" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-4 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+        <h3 class="text-sm font-black text-white uppercase tracking-wider">IN-PLAY BATTED BALL RESULT</h3>
+        <button onclick="closeInPlayModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Hit Trajectory -->
+      <div class="space-y-1">
+        <span class="text-[10px] text-gray-400 font-bold uppercase">TRAJECTORY:</span>
+        <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
+          <button onclick="selectTrajectory('GroundBall')" id="traj-GB" class="py-2 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 hover:bg-emerald-600/30">GB</button>
+          <button onclick="selectTrajectory('LineDrive')" id="traj-LD" class="py-2 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 hover:bg-emerald-600/30">LD</button>
+          <button onclick="selectTrajectory('FlyBall')" id="traj-FB" class="py-2 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 hover:bg-emerald-600/30">FB</button>
+          <button onclick="selectTrajectory('Popup')" id="traj-PU" class="py-2 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 hover:bg-emerald-600/30">POP</button>
+        </div>
+      </div>
+
+      <!-- Play Outcome -->
+      <div class="space-y-1">
+        <span class="text-[10px] text-gray-400 font-bold uppercase">OUTCOME:</span>
+        <div class="grid grid-cols-3 gap-1.5 text-xs font-bold">
+          <button onclick="commitInPlay('Out', true)" class="py-2.5 bg-rose-950/80 hover:bg-rose-900 text-rose-200 rounded-lg border border-rose-700">OUT</button>
+          <button onclick="commitInPlay('Single', false)" class="py-2.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-200 rounded-lg border border-emerald-700">1B (Single)</button>
+          <button onclick="commitInPlay('Double', false)" class="py-2.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-200 rounded-lg border border-emerald-700">2B (Double)</button>
+          <button onclick="commitInPlay('Triple', false)" class="py-2.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-200 rounded-lg border border-emerald-700">3B (Triple)</button>
+          <button onclick="commitInPlay('HomeRun', false)" class="py-2.5 bg-amber-950/80 hover:bg-amber-900 text-amber-200 rounded-lg border border-amber-700">HOME RUN</button>
+          <button onclick="commitInPlay('Error', false)" class="py-2.5 bg-gray-800 text-gray-300 rounded-lg border border-gray-700">Error (ROE)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PINCH HITTER / LINEUP SUBSTITUTION -->
+  <div id="modal-sub" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+        <h3 class="text-sm font-black text-white uppercase tracking-wider">PINCH HITTER / BENCH SUB</h3>
+        <button onclick="closeSubModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs text-gray-400">Select replacement for <strong id="sub-target-name" class="text-white">Smith, John</strong>:</span>
+        <div id="bench-player-list" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC WITH ROBUST LOCALSTORAGE WRITE-BEHIND -->
+  <script>
+    // INITIAL DEFAULT STATE
+    const DEFAULT_APP_STATE = {
+      gameInfo: {
+        date: new Date().toISOString().split('T')[0],
+        opponent: 'Fall Scrimmage',
+        inning: 1,
+        isTop: true,
+        outs: 0,
+        balls: 0,
+        strikes: 0,
+        currentPitcherIndex: 0,
+        currentBatterIndex: 0
+      },
+      pitchers: [
+        { id: 1, name: "Robb, Carson", throws: "Right", notes: "Keep ring finger knuckle leading on changeup for sub-zero IVB." },
+        { id: 2, name: "Toups, Nik", throws: "Left", notes: "Sinker 94-95 with 17in run. Attack early down." },
+        { id: 3, name: "Spencer, Patrick", throws: "Right", notes: "Slider 2900+ RPM sweeper. Out-pitch with 2 strikes." },
+        { id: 4, name: "Freche, Logan", throws: "Right", notes: "Heater up to 95.2. Cutter 91-92 off fastball tunnel." },
+        { id: 5, name: "Gray, Dalton", throws: "Right", notes: "18in IVB heater. Live at top of strike zone." }
+      ],
+      lineup: [
+        { id: 101, order: 1, name: "Bryant, Diego", bats: "Right", tags: ["Ambush 1st Pitch FB", "Chases SL Down & Away"], notes: "Aggressive early. Expands away on slider.", history: [] },
+        { id: 102, order: 2, name: "McCranie, Alex", bats: "Right", tags: ["Chase IVB Up", "Passive 1-1"], notes: "Can't touch high fastballs with carry.", history: [] },
+        { id: 103, order: 3, name: "Williams, Tyler", bats: "Left", tags: ["Rolls over Sinker Down"], notes: "Heavy pull-side tendency against sinkers.", history: [] },
+        { id: 104, order: 4, name: "Davis, Jackson", bats: "Right", tags: ["Late on High Velo (92+)"], notes: "Power bat but slow bat speed against 93+.", history: [] },
+        { id: 105, order: 5, name: "Martinez, Carlos", bats: "Switch", tags: ["Freezes on Backdoor CB"], notes: "Takes 2-strike breaking balls looking.", history: [] },
+        { id: 106, order: 6, name: "Johnson, Brett", bats: "Left", tags: ["Chases SL Down & Away"], notes: "Vulnerable to left-on-left sweepers.", history: [] },
+        { id: 107, order: 7, name: "Taylor, Zach", bats: "Right", tags: ["Crushes Flat VAA"], notes: "Don't leave fastballs belt-high down middle.", history: [] },
+        { id: 108, order: 8, name: "Anderson, Luke", bats: "Right", tags: ["Protective 2-Strike Swing"], notes: "Fouls off pitches; elevate to finish.", history: [] },
+        { id: 109, order: 9, name: "Thomas, Ryan", bats: "Left", tags: ["Ambush 1st Pitch FB"], notes: "Swinging 1st pitch over 70% of PAs.", history: [] }
+      ],
+      bench: [
+        { id: 201, name: "Benoit, Cade", bats: "Right", tags: ["Rolls over Sinker Down"], notes: "Contact bat off bench." },
+        { id: 202, name: "Gautreaux, Mason", bats: "Left", tags: ["Chase IVB Up"], notes: "Left-handed pinch hitter." }
+      ],
+      pitches: []
+    };
+
+    // CURRENT LIVE RUNTIME STATE (LOADED FROM STORAGE OR DEFAULT)
+    let state = loadPersistedState();
+
+    let activePitchType = '4S';
+    let activeZone = 5;
+    let activeZoneDesc = 'Heart (Zone 5)';
+    let selectedTrajectory = 'GroundBall';
+    let toastTimeout = null;
+
+    // PERSISTENCE ENGINE
+    function loadPersistedState() {
+      try {
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {
+        console.warn("Storage load error, fallback to defaults", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE', JSON.stringify(state));
+        flashSavedIndicator();
+      } catch (e) {
+        console.error("Storage save failed", e);
+      }
+    }
+
+    function flashSavedIndicator() {
+      const ind = document.getElementById('storage-indicator');
+      if (ind) {
+        ind.classList.remove('text-emerald-400');
+        ind.classList.add('text-white');
+        setTimeout(() => {
+          ind.classList.remove('text-white');
+          ind.classList.add('text-emerald-400');
+        }, 300);
+      }
+    }
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      populatePitcherSelect();
+      populateScoutingSelect();
+      renderAllViews();
+    });
+
+    function populatePitcherSelect() {
+      const sel = document.getElementById('pitcher-select');
+      sel.innerHTML = state.pitchers.map((p, idx) => 
+        `<option value="${idx}" ${idx === state.gameInfo.currentPitcherIndex ? 'selected' : ''}>${p.name} (${p.throws[0]}HP)</option>`
+      ).join('');
+    }
+
+    function populateScoutingSelect() {
+      const sel = document.getElementById('scouting-player-select');
+      sel.innerHTML = `
+        <optgroup label="Lineup Hitters">
+          ${state.lineup.map(b => `<option value="batter-${b.id}">#${b.order} ${b.name} (${b.bats})</option>`).join('')}
+        </optgroup>
+        <optgroup label="Pitchers">
+          ${state.pitchers.map(p => `<option value="pitcher-${p.id}">${p.name} (${p.throws})</option>`).join('')}
+        </optgroup>
+      `;
+    }
+
+    function switchPitcher(idx) {
+      state.gameInfo.currentPitcherIndex = parseInt(idx);
+      saveState();
+      renderAllViews();
+    }
+
+    // ZONE & PITCH SELECTION
+    function selectPitchType(pt) {
+      activePitchType = pt;
+      ['4S', 'SI', 'CT', 'SL', 'CB', 'CH', 'SPL'].forEach(t => {
+        const btn = document.getElementById(`pt-${t}`);
+        if (!btn) return;
+        if (t === pt) {
+          btn.className = "py-2 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition";
+        } else {
+          btn.className = "py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition";
+        }
+      });
+    }
+
+    function selectZone(zoneNum, customDesc) {
+      activeZone = zoneNum;
+      activeZoneDesc = customDesc || `Zone ${zoneNum}`;
+      document.getElementById('selected-loc-label').innerText = `Location: ${activeZoneDesc}`;
+
+      const pin = document.getElementById('zone-pitch-pin');
+      if (zoneNum <= 9) {
+        const target = document.getElementById(`zone-${zoneNum}`);
+        if (target && pin) {
+          const rect = target.getBoundingClientRect();
+          const parent = document.getElementById('interactive-strike-zone').getBoundingClientRect();
+          pin.style.left = `${(target.offsetLeft + target.offsetWidth / 2)}px`;
+          pin.style.top = `${(target.offsetTop + target.offsetHeight / 2)}px`;
+          pin.classList.remove('hidden');
+        }
+      } else {
+        if (pin) pin.classList.add('hidden');
+      }
+    }
+
+    // CORE RECORDING ENGINE WITH AUTOMATIC 3-OUT INNING FLIP
+    function recordPitch(call, inPlayData = null) {
+      const pitcher = state.pitchers[state.gameInfo.currentPitcherIndex];
+      const batter = state.lineup[state.gameInfo.currentBatterIndex];
+
+      const currentBalls = state.gameInfo.balls;
+      const currentStrikes = state.gameInfo.strikes;
+      const currentOuts = state.gameInfo.outs;
+
+      const is1_1Count = (currentBalls === 1 && currentStrikes === 1);
+      let is1_1Win = null;
+
+      if (is1_1Count) {
+        if (['StrikeCalled', 'StrikeSwinging', 'FoulBall'].includes(call)) {
+          is1_1Win = true; // Got to 1-2
+        } else if (call === 'InPlay' && inPlayData && inPlayData.isOut) {
+          is1_1Win = true; // In-play out in 1-1
+        } else if (call === 'BallCalled' || call === 'HitByPitch' || (call === 'InPlay' && inPlayData && !inPlayData.isOut)) {
+          is1_1Win = false; // Fell behind 2-1 or allowed hit
+        }
+      }
+
+      const pitchRecord = {
+        pitchNo: state.pitches.length + 1,
+        inning: state.gameInfo.inning,
+        isTop: state.gameInfo.isTop,
+        outsBefore: currentOuts,
+        ballsBefore: currentBalls,
+        strikesBefore: currentStrikes,
+        pitcherId: pitcher.id,
+        pitcherName: pitcher.name,
+        pitcherThrows: pitcher.throws,
+        batterId: batter.id,
+        batterName: batter.name,
+        batterSide: batter.bats,
+        pitchType: activePitchType,
+        pitchCall: call,
+        zone: activeZone,
+        zoneDesc: activeZoneDesc,
+        is1_1Count: is1_1Count,
+        is1_1Win: is1_1Win,
+        hitType: inPlayData ? inPlayData.trajectory : 'Undefined',
+        playResult: inPlayData ? inPlayData.outcome : 'Undefined',
+        timestamp: new Date().toLocaleTimeString()
+      };
+
+      state.pitches.push(pitchRecord);
+
+      // Advance Counts & Out Logic
+      let nextBalls = currentBalls;
+      let nextStrikes = currentStrikes;
+      let nextOuts = currentOuts;
+      let paEnded = false;
+      let paSummary = "";
+
+      if (call === 'BallCalled') {
+        nextBalls++;
+        if (nextBalls >= 4) {
+          paEnded = true;
+          paSummary = "Walk (BB)";
+        }
+      } else if (call === 'StrikeCalled') {
+        nextStrikes++;
+        if (nextStrikes >= 3) {
+          paEnded = true;
+          nextOuts++;
+          paSummary = "Strikeout (Looking)";
+        }
+      } else if (call === 'StrikeSwinging') {
+        nextStrikes++;
+        if (nextStrikes >= 3) {
+          paEnded = true;
+          nextOuts++;
+          paSummary = "Strikeout (Swinging)";
+        }
+      } else if (call === 'FoulBall') {
+        if (nextStrikes < 2) nextStrikes++;
+      } else if (call === 'HitByPitch') {
+        paEnded = true;
+        paSummary = "Hit By Pitch (HBP)";
+      } else if (call === 'InPlay') {
+        paEnded = true;
+        if (inPlayData.isOut) {
+          nextOuts++;
+          paSummary = `${inPlayData.trajectory} Out`;
+        } else {
+          paSummary = `${inPlayData.trajectory} (${inPlayData.outcome})`;
+        }
+      }
+
+      // SHOW QUICK UNDO TOAST
+      showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
+
+      // AUTOMATIC 3 OUTS INNING FLIP
+      if (nextOuts >= 3) {
+        state.gameInfo.outs = 0;
+        state.gameInfo.balls = 0;
+        state.gameInfo.strikes = 0;
+
+        if (state.gameInfo.isTop) {
+          state.gameInfo.isTop = false; // Move to bottom half
+        } else {
+          state.gameInfo.isTop = true;
+          state.gameInfo.inning++; // Advance full inning
+        }
+
+        if (paEnded) {
+          batter.history.push({
+            inning: pitchRecord.inning,
+            result: paSummary
+          });
+          advanceToNextBatter();
+        }
+
+        showQuickToast(`3 OUTS! Half-Inning Over $\\rightarrow$ Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
+      } else {
+        state.gameInfo.outs = nextOuts;
+        if (paEnded) {
+          state.gameInfo.balls = 0;
+          state.gameInfo.strikes = 0;
+          batter.history.push({
+            inning: pitchRecord.inning,
+            result: paSummary
+          });
+          advanceToNextBatter();
+        } else {
+          state.gameInfo.balls = nextBalls;
+          state.gameInfo.strikes = nextStrikes;
+        }
+      }
+
+      saveState();
+      renderAllViews();
+    }
+
+    function advanceToNextBatter() {
+      state.gameInfo.currentBatterIndex = (state.gameInfo.currentBatterIndex + 1) % state.lineup.length;
+    }
+
+    // IN-PLAY MODAL HANDLING
+    function openInPlayModal() {
+      document.getElementById('modal-in-play').classList.remove('hidden');
+    }
+    function closeInPlayModal() {
+      document.getElementById('modal-in-play').classList.add('hidden');
+    }
+    function selectTrajectory(traj) {
+      selectedTrajectory = traj;
+      ['GB', 'LD', 'FB', 'PU'].forEach(k => {
+        const btn = document.getElementById(`traj-${k}`);
+        if (!btn) return;
+        btn.className = "py-2 bg-gray-800 text-gray-200 rounded-lg border border-gray-700 hover:bg-emerald-600/30";
+      });
+      const activeMap = { 'GroundBall': 'GB', 'LineDrive': 'LD', 'FlyBall': 'FB', 'Popup': 'PU' };
+      const btn = document.getElementById(`traj-${activeMap[traj]}`);
+      if (btn) btn.className = "py-2 bg-emerald-600 text-white rounded-lg border border-emerald-400 font-black";
+    }
+    function commitInPlay(outcome, isOut) {
+      closeInPlayModal();
+      recordPitch('InPlay', {
+        trajectory: selectedTrajectory,
+        outcome: outcome,
+        isOut: isOut
+      });
+    }
+
+    // SCRIMMAGE CONTROLS
+    function rollInning() {
+      state.gameInfo.outs = 0;
+      state.gameInfo.balls = 0;
+      state.gameInfo.strikes = 0;
+      if (state.gameInfo.isTop) {
+        state.gameInfo.isTop = false;
+      } else {
+        state.gameInfo.isTop = true;
+        state.gameInfo.inning++;
+      }
+      advanceToNextBatter();
+      saveState();
+      renderAllViews();
+      showQuickToast(`Rolled Inning $\\rightarrow$ Now in ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`);
+    }
+
+    function clearBases() {
+      state.gameInfo.balls = 0;
+      state.gameInfo.strikes = 0;
+      saveState();
+      renderAllViews();
+      showQuickToast(`Count reset to 0-0`);
+    }
+
+    function addExtraHitterPrompt() {
+      const name = prompt("Enter extra hitter name (e.g. 'Miller, Chris'):");
+      if (!name) return;
+      const bats = prompt("Enter hitting side ('Right', 'Left', or 'Switch'):", "Right") || "Right";
+      const newBatter = {
+        id: 300 + state.lineup.length,
+        order: state.lineup.length + 1,
+        name: name.trim(),
+        bats: bats.trim(),
+        tags: ["Ambush 1st Pitch FB"],
+        notes: "Scrimmage extra hitter.",
+        history: []
+      };
+      state.lineup.push(newBatter);
+      saveState();
+      populateScoutingSelect();
+      renderAllViews();
+      showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
+    }
+
+    // UNDO FUNCTIONALITY
+    function undoLastPitch() {
+      if (state.pitches.length === 0) return;
+      const last = state.pitches.pop();
+      state.gameInfo.inning = last.inning;
+      state.gameInfo.isTop = last.isTop;
+      state.gameInfo.outs = last.outsBefore;
+      state.gameInfo.balls = last.ballsBefore;
+      state.gameInfo.strikes = last.strikesBefore;
+
+      // Find batter index
+      const bIdx = state.lineup.findIndex(b => b.id === last.batterId);
+      if (bIdx !== -1) {
+        state.gameInfo.currentBatterIndex = bIdx;
+      }
+
+      saveState();
+      renderAllViews();
+      showQuickToast(`Reverted pitch #${last.pitchNo}`);
+    }
+
+    function showQuickToast(msg, isAlert = false) {
+      const toast = document.getElementById('quick-action-toast');
+      const text = document.getElementById('toast-text');
+      const dot = document.getElementById('toast-icon-box');
+      if (!toast || !text) return;
+
+      text.innerText = msg;
+      dot.className = isAlert ? "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" : "w-2.5 h-2.5 rounded-full bg-emerald-400";
+      toast.classList.remove('hidden');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 5000);
+    }
+
+    // RENDER LOGIC
+    function renderAllViews() {
+      renderHUD();
+      renderCurrentBatter();
+      renderCurrentSequence();
+      renderArsenalTally();
+      renderLineupManager();
+      renderGameLog();
+    }
+
+    function renderHUD() {
+      const g = state.gameInfo;
+      const pitcher = state.pitchers[g.currentPitcherIndex];
+
+      document.getElementById('inning-text').innerText = formatInningOrdinal(g.inning);
+      document.getElementById('inning-side-icon').innerText = g.isTop ? '▲ TOP' : '▼ BOT';
+      document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
+
+      // Outs
+      document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
+      document.getElementById('out-dot-2').className = g.outs >= 2 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
+
+      // Pitcher stats
+      const pitcherPitches = state.pitches.filter(p => p.pitcherId === pitcher.id);
+      const innPitches = pitcherPitches.filter(p => p.inning === g.inning && p.isTop === g.isTop);
+
+      document.getElementById('hud-total-pitches').innerText = pitcherPitches.length;
+      document.getElementById('hud-inn-pitches').innerText = innPitches.length;
+
+      const strikes = pitcherPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      const balls = pitcherPitches.filter(p => ['BallCalled', 'HitByPitch'].includes(p.pitchCall)).length;
+      const strPct = pitcherPitches.length > 0 ? ((strikes / pitcherPitches.length) * 100).toFixed(1) : "0.0";
+
+      document.getElementById('hud-strike-pct').innerText = `${strPct}%`;
+      document.getElementById('hud-strikes').innerText = strikes;
+      document.getElementById('hud-balls').innerText = balls;
+
+      // 1-1 Count Win%
+      const oneOnePitches = pitcherPitches.filter(p => p.is1_1Count);
+      const oneOneWins = oneOnePitches.filter(p => p.is1_1Win === true).length;
+      const oneOneWinPct = oneOnePitches.length > 0 ? ((oneOneWins / oneOnePitches.length) * 100).toFixed(1) : "0.0";
+
+      document.getElementById('hud-1-1-win-pct').innerText = `${oneOneWinPct}%`;
+      document.getElementById('hud-1-1-wins').innerText = oneOneWins;
+      document.getElementById('hud-1-1-total').innerText = oneOnePitches.length;
+
+      const card1_1 = document.getElementById('stat-1-1-card');
+      if (g.balls === 1 && g.strikes === 1) {
+        card1_1.className = "bg-amber-950/90 border border-amber-500 rounded-lg p-1.5 leverage-pulse";
+      } else {
+        card1_1.className = "bg-gray-950/70 border border-gray-800 rounded-lg p-1.5";
+      }
+
+      // FPS %
+      const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
+      const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      const fpsPct = firstPitches.length > 0 ? ((fpsStrikes / firstPitches.length) * 100).toFixed(1) : "0.0";
+      document.getElementById('hud-fps-pct').innerText = `${fpsPct}%`;
+
+      // Whiff %
+      const swings = pitcherPitches.filter(p => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      const whiffs = pitcherPitches.filter(p => p.pitchCall === 'StrikeSwinging').length;
+      const whiffPct = swings > 0 ? ((whiffs / swings) * 100).toFixed(1) : "0.0";
+      document.getElementById('hud-whiff-pct').innerText = `${whiffPct}%`;
+      document.getElementById('hud-whiff-count').innerText = whiffs;
+      document.getElementById('hud-swing-count').innerText = swings;
+      document.getElementById('tab-pitch-count').innerText = state.pitches.length;
+    }
+
+    function renderCurrentBatter() {
+      const b = state.lineup[state.gameInfo.currentBatterIndex];
+      document.getElementById('batter-order-num').innerText = `#${b.order}`;
+      document.getElementById('batter-name').innerText = b.name;
+      document.getElementById('batter-side-badge').innerText = `${b.bats[0]}HH`;
+
+      const lastAb = b.history.length > 0 ? b.history[b.history.length - 1] : null;
+      document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
+
+      // Tags
+      const tagsContainer = document.getElementById('batter-scouting-tags');
+      tagsContainer.innerHTML = (b.tags || []).map(t => `<span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">${t}</span>`).join('');
+      document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
+    }
+
+    function renderCurrentSequence() {
+      const b = state.lineup[state.gameInfo.currentBatterIndex];
+      const p = state.pitchers[state.gameInfo.currentPitcherIndex];
+      // Filter pitches against current batter in current half-inning PA
+      const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
+
+      document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
+      const container = document.getElementById('sequence-list');
+      if (currentAbPitches.length === 0) {
+        container.innerHTML = `<div class="text-[11px] text-gray-500 italic text-center py-3">No pitches thrown this at-bat</div>`;
+        return;
+      }
+
+      container.innerHTML = currentAbPitches.map((pt, idx) => `
+        <div class="flex items-center justify-between p-1.5 rounded bg-gray-950 border border-gray-800/80">
+          <div class="flex items-center space-x-2">
+            <span class="text-[10px] font-mono text-gray-500">#${idx + 1}</span>
+            <span class="text-xs font-black text-emerald-400">${pt.pitchType}</span>
+            <span class="text-[11px] text-gray-300 font-medium">${formatCallName(pt.pitchCall)}</span>
+          </div>
+          <div class="flex items-center space-x-1.5 text-[10px] font-mono text-gray-400">
+            <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
+            <span class="text-gray-600">|</span>
+            <span class="text-gray-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderArsenalTally() {
+      const p = state.pitchers[state.gameInfo.currentPitcherIndex];
+      document.getElementById('tally-pitcher-label').innerText = `${p.name} (${p.throws[0]}HP)`;
+
+      const pitcherPitches = state.pitches.filter(pt => pt.pitcherId === p.id);
+      const types = ['4S', 'SI', 'CT', 'SL', 'CB', 'CH', 'SPL'];
+      const tbody = document.getElementById('arsenal-table-body');
+
+      let topWeapon = "None";
+      let maxWhiffs = -1;
+
+      tbody.innerHTML = types.map(t => {
+        const matching = pitcherPitches.filter(pt => pt.pitchType === t);
+        const count = matching.length;
+        if (count === 0) {
+          return `
+            <tr class="text-gray-600 hover:bg-gray-800/20">
+              <td class="py-1 font-bold">${t}</td>
+              <td class="py-1 text-center font-bold">0</td>
+              <td class="py-1 text-center">-</td>
+              <td class="py-1 text-center">-</td>
+              <td class="py-1 text-center">-</td>
+            </tr>
+          `;
+        }
+        const strikes = matching.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+        const strPct = ((strikes / count) * 100).toFixed(0);
+
+        const swings = matching.filter(pt => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+        const whiffs = matching.filter(pt => pt.pitchCall === 'StrikeSwinging').length;
+        const whiffPct = swings > 0 ? ((whiffs / swings) * 100).toFixed(0) : "0";
+
+        const calledStrikes = matching.filter(pt => pt.pitchCall === 'StrikeCalled').length;
+        const cswPct = (((whiffs + calledStrikes) / count) * 100).toFixed(0);
+
+        if (whiffs > maxWhiffs && whiffs > 0) {
+          maxWhiffs = whiffs;
+          topWeapon = `${t} (${whiffs} Whiff${whiffs > 1 ? 's' : ''} / ${whiffPct}%)`;
+        }
+
+        return `
+          <tr class="text-gray-300 hover:bg-gray-800/40">
+            <td class="py-1.5 font-bold text-emerald-400">${t}</td>
+            <td class="py-1.5 text-center font-bold text-white">${count}</td>
+            <td class="py-1.5 text-center">${strPct}%</td>
+            <td class="py-1.5 text-center text-purple-400 font-bold">${whiffPct}% <span class="text-[9px] text-gray-500">(${whiffs})</span></td>
+            <td class="py-1.5 text-center text-amber-400 font-bold">${cswPct}%</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
+
+      // In zone rate
+      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 9).length;
+      document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
+
+      // Early count strikes
+      const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
+      const earlyStr = earlyPitches.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+      document.getElementById('tally-early-str').innerText = earlyPitches.length > 0 ? `${((earlyStr / earlyPitches.length) * 100).toFixed(1)}%` : "0.0%";
+    }
+
+    function renderLineupManager() {
+      const container = document.getElementById('roster-lineup-list');
+      container.innerHTML = state.lineup.map((b, idx) => `
+        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-950 border ${idx === state.gameInfo.currentBatterIndex ? 'border-emerald-500 bg-emerald-950/20' : 'border-gray-800'}">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-black font-mono text-gray-500">#${b.order}</span>
+            <span class="text-xs font-bold text-white">${b.name}</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${b.bats}</span>
+          </div>
+          <button onclick="openSubModalFor(${b.id})" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold px-2 py-0.5 rounded bg-gray-900 border border-gray-700">
+            Sub
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderGameLog() {
+      const tbody = document.getElementById('gamelog-table-body');
+      if (state.pitches.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500 italic">No pitches recorded yet</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
+        <tr class="hover:bg-gray-800/40">
+          <td class="p-2 text-gray-500">${pt.pitchNo}</td>
+          <td class="p-2">${pt.isTop ? 'T' : 'B'}${pt.inning}</td>
+          <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
+          <td class="p-2">${pt.batterName.split(',')[0]}</td>
+          <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
+          <td class="p-2">${formatCallName(pt.pitchCall)}</td>
+          <td class="p-2 font-bold">${pt.ballsBefore}-${pt.strikesBefore}</td>
+          <td class="p-2 text-gray-400">${pt.zoneDesc.split(' ')[0]}</td>
+          <td class="p-2 ${pt.is1_1Win === true ? 'text-emerald-400 font-bold' : (pt.is1_1Win === false ? 'text-rose-400 font-bold' : 'text-gray-600')}">
+            ${pt.is1_1Win === true ? 'WIN' : (pt.is1_1Win === false ? 'LOSS' : '-')}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // SUB MODAL
+    let currentSubTargetId = null;
+    function openSubModal() {
+      const b = state.lineup[state.gameInfo.currentBatterIndex];
+      openSubModalFor(b.id);
+    }
+    function openSubModalFor(batterId) {
+      currentSubTargetId = batterId;
+      const target = state.lineup.find(b => b.id === batterId);
+      document.getElementById('sub-target-name').innerText = target.name;
+
+      const list = document.getElementById('bench-player-list');
+      if (state.bench.length === 0) {
+        list.innerHTML = `<p class="text-xs text-gray-500 italic p-2">No bench players available</p>`;
+      } else {
+        list.innerHTML = state.bench.map(bp => `
+          <button onclick="commitSub(${bp.id})" class="w-full text-left p-2 rounded bg-gray-950 hover:bg-emerald-600/20 border border-gray-800 flex justify-between items-center text-xs">
+            <span class="font-bold text-white">${bp.name}</span>
+            <span class="text-gray-400 font-mono">${bp.bats}</span>
+          </button>
+        `).join('');
+      }
+      document.getElementById('modal-sub').classList.remove('hidden');
+    }
+    function closeSubModal() {
+      document.getElementById('modal-sub').classList.add('hidden');
+    }
+    function commitSub(benchId) {
+      const benchIdx = state.bench.findIndex(b => b.id === benchId);
+      const lineupIdx = state.lineup.findIndex(b => b.id === currentSubTargetId);
+      if (benchIdx !== -1 && lineupIdx !== -1) {
+        const oldHitter = state.lineup[lineupIdx];
+        const newHitter = state.bench[benchIdx];
+
+        newHitter.order = oldHitter.order;
+        newHitter.history = oldHitter.history;
+
+        state.lineup[lineupIdx] = newHitter;
+        state.bench.splice(benchIdx, 1);
+        state.bench.push(oldHitter);
+
+        saveState();
+        closeSubModal();
+        renderAllViews();
+        showQuickToast(`Substituted: ${newHitter.name} for ${oldHitter.name}`);
+      }
+    }
+
+    // TAB SWITCHING
+    function switchTab(tabId) {
+      ['charting', 'scouting', 'roster', 'gamelog'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          btn.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 font-bold text-xs";
+        } else {
+          view.classList.add('hidden');
+          btn.className = "py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 font-bold text-xs";
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // SCOUTING TAB CONTROLS
+    function loadPlayerScoutingProfile(val) {
+      const [type, idStr] = val.split('-');
+      const id = parseInt(idStr);
+      let p = (type === 'batter') ? state.lineup.find(b => b.id === id) : state.pitchers.find(pi => pi.id === id);
+      if (p) {
+        document.getElementById('scouting-text-input').value = p.notes || "";
+      }
+    }
+
+    function saveCurrentScoutingText(text) {
+      const val = document.getElementById('scouting-player-select').value;
+      const [type, idStr] = val.split('-');
+      const id = parseInt(idStr);
+      let p = (type === 'batter') ? state.lineup.find(b => b.id === id) : state.pitchers.find(pi => pi.id === id);
+      if (p) {
+        p.notes = text;
+        saveState();
+        renderCurrentBatter();
+      }
+    }
+
+    function toggleScoutTag(tagName) {
+      const val = document.getElementById('scouting-player-select').value;
+      const [type, idStr] = val.split('-');
+      if (type !== 'batter') {
+        alert("Quick tags are configured for hitters");
+        return;
+      }
+      const b = state.lineup.find(x => x.id === parseInt(idStr));
+      if (!b) return;
+      if (!b.tags) b.tags = [];
+      const idx = b.tags.indexOf(tagName);
+      if (idx === -1) {
+        b.tags.push(tagName);
+      } else {
+        b.tags.splice(idx, 1);
+      }
+      saveState();
+      renderCurrentBatter();
+      showQuickToast(`Updated scouting tags for ${b.name}`);
+    }
+
+    // CSV EXPORT ENGINE (TrackMan / TruMedia Compatible Schema)
+    function exportToCSV() {
+      if (state.pitches.length === 0) {
+        alert("No pitches to export yet!");
+        return;
+      }
+
+      const headers = [
+        "PitchNo", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
+        "Pitcher", "PitcherThrows", "Batter", "BatterSide",
+        "PitchType", "PitchCall", "TaggedHitType", "PlayResult",
+        "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win", "Timestamp"
+      ];
+
+      const rows = state.pitches.map(p => [
+        p.pitchNo,
+        p.inning,
+        p.isTop ? "Top" : "Bottom",
+        p.outsBefore,
+        p.ballsBefore,
+        p.strikesBefore,
+        `"${p.pitcherName}"`,
+        p.pitcherThrows,
+        `"${p.batterName}"`,
+        p.batterSide,
+        p.pitchType,
+        p.pitchCall,
+        p.hitType,
+        p.playResult,
+        p.zone,
+        `"${p.zoneDesc}"`,
+        p.is1_1Count ? 1 : 0,
+        p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : ""),
+        `"${p.timestamp}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Dugout_Pitch_Track_${state.gameInfo.date}_Inn${state.gameInfo.inning}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function confirmResetGame() {
+      if (confirm("Reset current game data and start a new session? (Ensure you downloaded the CSV if you need it!)")) {
+        state = JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
+        saveState();
+        renderAllViews();
+        showQuickToast("Started fresh game session");
+      }
+    }
+
+    // UTILITIES
+    function formatCallName(call) {
+      const map = {
+        'BallCalled': 'Ball',
+        'StrikeCalled': 'Called Str',
+        'StrikeSwinging': 'Whiff',
+        'FoulBall': 'Foul',
+        'HitByPitch': 'HBP',
+        'InPlay': 'In Play'
+      };
+      return map[call] || call;
+    }
+
+    function formatInningOrdinal(n) {
+      const s = ["th", "st", "nd", "rd"], v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+  </script>
+</body>
+</html>
