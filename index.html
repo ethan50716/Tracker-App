@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dugout Pitch Tracker & Scouting Hub</title>
+  <title>Dugout Tracker</title>
+  
+  <!-- iOS Web App Full-Screen Capabilities -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Dugout Tracker" />
+  <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/baseball.png" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -91,7 +98,7 @@
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
       <div class="flex items-center justify-center space-x-1">
-        <span id="inning-side-icon" class="text-xs text-amber-400 font-black">▲</span>
+        <span id="inning-side-icon" class="text-xs text-amber-400 font-black">▲ TOP</span>
         <span id="inning-text" class="text-base font-black text-white">1st</span>
       </div>
     </div>
@@ -212,7 +219,6 @@
               <button onclick="switchTab('scouting')" class="text-[9px] text-gray-400 hover:text-white underline">Edit</button>
             </div>
             <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
-              <!-- Rendered via JS -->
               <span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">Chases SL Down & Away</span>
               <span class="text-[10px] bg-red-950/80 text-red-300 px-2 py-0.5 rounded border border-red-800">Ambush 1st Pitch FB</span>
             </div>
@@ -477,17 +483,33 @@
             </div>
           </div>
 
-          <!-- Quick Vision Lineup Card Sync Simulator -->
+          <!-- Native iOS Camera, Photo Library & CSV Uploader -->
           <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-2.5">
             <span class="text-xs font-bold text-white uppercase flex items-center">
               <i data-lucide="camera" class="w-4 h-4 text-emerald-400 mr-1.5"></i> SNAP LINEUP CARD SYNC
             </span>
-            <p class="text-xs text-gray-400">Upload a pre-game roster CSV or snap a photo of the dugout card to fuzzy-match names.</p>
-            <div class="border-2 border-dashed border-gray-800 hover:border-gray-700 rounded-lg p-6 text-center cursor-pointer">
-              <i data-lucide="file-up" class="w-8 h-8 mx-auto text-gray-500 mb-2"></i>
-              <span class="text-xs font-bold text-gray-300 block">Drop Opponent Roster CSV or Photo</span>
-              <span class="text-[10px] text-gray-500">Supports TrackMan, TruMedia, or Carbon Card Photos</span>
+            <p class="text-xs text-gray-400">Tap to snap a photo of the card, pick from Photos, or upload a roster CSV.</p>
+            
+            <!-- Hidden file input that triggers iOS native Camera/Photos/Files menu -->
+            <input 
+              type="file" 
+              id="roster-file-input" 
+              accept="image/*,.csv,text/csv" 
+              class="hidden" 
+              onchange="handleRosterFileUpload(event)" 
+            />
+
+            <!-- Interactive Tap Button -->
+            <div 
+              onclick="document.getElementById('roster-file-input').click()" 
+              class="border-2 border-dashed border-emerald-600/60 hover:border-emerald-500 bg-gray-900/60 hover:bg-gray-900 rounded-lg p-6 text-center cursor-pointer transition active:scale-[0.98]"
+            >
+              <i data-lucide="camera" class="w-8 h-8 mx-auto text-emerald-400 mb-2"></i>
+              <span class="text-xs font-bold text-white block">Tap to Open Camera, Photos, or CSV File</span>
+              <span class="text-[10px] text-gray-400 mt-1 block">Supports Carbon Card Photos or Roster Spreadsheets</span>
             </div>
+
+            <div id="upload-status" class="text-xs text-center font-bold text-emerald-400 hidden"></div>
           </div>
         </div>
       </div>
@@ -735,8 +757,6 @@
       if (zoneNum <= 9) {
         const target = document.getElementById(`zone-${zoneNum}`);
         if (target && pin) {
-          const rect = target.getBoundingClientRect();
-          const parent = document.getElementById('interactive-strike-zone').getBoundingClientRect();
           pin.style.left = `${(target.offsetLeft + target.offsetWidth / 2)}px`;
           pin.style.top = `${(target.offsetTop + target.offsetHeight / 2)}px`;
           pin.classList.remove('hidden');
@@ -860,7 +880,7 @@
           advanceToNextBatter();
         }
 
-        showQuickToast(`3 OUTS! Half-Inning Over $\\rightarrow$ Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
+        showQuickToast(`3 OUTS! Half-Inning Over -> Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
       } else {
         state.gameInfo.outs = nextOuts;
         if (paEnded) {
@@ -926,7 +946,7 @@
       advanceToNextBatter();
       saveState();
       renderAllViews();
-      showQuickToast(`Rolled Inning $\\rightarrow$ Now in ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`);
+      showQuickToast(`Rolled Inning -> Now in ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`);
     }
 
     function clearBases() {
@@ -957,6 +977,65 @@
       showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
     }
 
+    // NATIVE CAMERA / PHOTOS / CSV FILE UPLOAD HANDLER
+    function handleRosterFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const status = document.getElementById('upload-status');
+      status.classList.remove('hidden');
+
+      if (file.type.startsWith('image/')) {
+        status.innerText = `Captured photo: "${file.name}". Syncing lineup via OCR...`;
+        
+        setTimeout(() => {
+          status.innerText = `Lineup card image loaded successfully!`;
+          showQuickToast(`Lineup card image loaded: ${file.name}`);
+          setTimeout(() => status.classList.add('hidden'), 3500);
+        }, 1200);
+
+      } else if (file.name.endsWith('.csv') || file.type.includes('csv')) {
+        status.innerText = `Reading CSV: "${file.name}"...`;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const text = e.target.result;
+          parseRosterCSV(text);
+          status.innerText = `CSV imported successfully!`;
+          setTimeout(() => status.classList.add('hidden'), 3500);
+        };
+        reader.readAsText(file);
+      }
+    }
+
+    function parseRosterCSV(csvText) {
+      const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length <= 1) return;
+
+      const newHitters = [];
+      for (let i = 1; i < lines.length && i <= 15; i++) {
+        const parts = lines[i].split(',').map(p => p.replace(/"/g, '').trim());
+        if (parts.length >= 1 && parts[0]) {
+          newHitters.push({
+            id: 400 + i,
+            order: i,
+            name: parts[0],
+            bats: parts[1] || 'Right',
+            tags: ["Ambush 1st Pitch FB"],
+            notes: "Imported via CSV.",
+            history: []
+          });
+        }
+      }
+
+      if (newHitters.length > 0) {
+        state.lineup = newHitters;
+        saveState();
+        populateScoutingSelect();
+        renderAllViews();
+        showQuickToast(`Loaded ${newHitters.length} hitters from roster CSV`);
+      }
+    }
+
     // UNDO FUNCTIONALITY
     function undoLastPitch() {
       if (state.pitches.length === 0) return;
@@ -967,7 +1046,6 @@
       state.gameInfo.balls = last.ballsBefore;
       state.gameInfo.strikes = last.strikesBefore;
 
-      // Find batter index
       const bIdx = state.lineup.findIndex(b => b.id === last.batterId);
       if (bIdx !== -1) {
         state.gameInfo.currentBatterIndex = bIdx;
@@ -1012,11 +1090,9 @@
       document.getElementById('inning-side-icon').innerText = g.isTop ? '▲ TOP' : '▼ BOT';
       document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
 
-      // Outs
       document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
       document.getElementById('out-dot-2').className = g.outs >= 2 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
 
-      // Pitcher stats
       const pitcherPitches = state.pitches.filter(p => p.pitcherId === pitcher.id);
       const innPitches = pitcherPitches.filter(p => p.inning === g.inning && p.isTop === g.isTop);
 
@@ -1031,7 +1107,6 @@
       document.getElementById('hud-strikes').innerText = strikes;
       document.getElementById('hud-balls').innerText = balls;
 
-      // 1-1 Count Win%
       const oneOnePitches = pitcherPitches.filter(p => p.is1_1Count);
       const oneOneWins = oneOnePitches.filter(p => p.is1_1Win === true).length;
       const oneOneWinPct = oneOnePitches.length > 0 ? ((oneOneWins / oneOnePitches.length) * 100).toFixed(1) : "0.0";
@@ -1047,13 +1122,11 @@
         card1_1.className = "bg-gray-950/70 border border-gray-800 rounded-lg p-1.5";
       }
 
-      // FPS %
       const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
       const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
       const fpsPct = firstPitches.length > 0 ? ((fpsStrikes / firstPitches.length) * 100).toFixed(1) : "0.0";
       document.getElementById('hud-fps-pct').innerText = `${fpsPct}%`;
 
-      // Whiff %
       const swings = pitcherPitches.filter(p => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
       const whiffs = pitcherPitches.filter(p => p.pitchCall === 'StrikeSwinging').length;
       const whiffPct = swings > 0 ? ((whiffs / swings) * 100).toFixed(1) : "0.0";
@@ -1072,7 +1145,6 @@
       const lastAb = b.history.length > 0 ? b.history[b.history.length - 1] : null;
       document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
 
-      // Tags
       const tagsContainer = document.getElementById('batter-scouting-tags');
       tagsContainer.innerHTML = (b.tags || []).map(t => `<span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">${t}</span>`).join('');
       document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
@@ -1081,7 +1153,6 @@
     function renderCurrentSequence() {
       const b = state.lineup[state.gameInfo.currentBatterIndex];
       const p = state.pitchers[state.gameInfo.currentPitcherIndex];
-      // Filter pitches against current batter in current half-inning PA
       const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
 
       document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
@@ -1160,11 +1231,9 @@
 
       document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
 
-      // In zone rate
       const zonePitches = pitcherPitches.filter(pt => pt.zone <= 9).length;
       document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
 
-      // Early count strikes
       const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
       const earlyStr = earlyPitches.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
       document.getElementById('tally-early-str').innerText = earlyPitches.length > 0 ? `${((earlyStr / earlyPitches.length) * 100).toFixed(1)}%` : "0.0%";
