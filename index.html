@@ -13,8 +13,9 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- In-Browser Client-Side OCR for Lineup Photos -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
-    /* Prevent accidental zoom and text selection during rapid dugout tapping */
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -195,7 +196,7 @@
               <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AT THE PLATE</span>
               <div class="flex items-center space-x-1.5">
                 <span id="batter-order-num" class="bg-gray-800 text-gray-300 text-xs px-1.5 py-0.5 rounded font-black font-mono">#1</span>
-                <h3 id="batter-name" class="text-sm font-black text-white">Smith, John</h3>
+                <h3 id="batter-name" class="text-sm font-black text-white">Bryant, Diego</h3>
               </div>
             </div>
             <div class="text-right">
@@ -258,7 +259,6 @@
 
             <!-- Strike Zone 3x3 -->
             <div id="interactive-strike-zone" class="relative w-44 h-52 bg-gray-900/90 border-2 border-emerald-500/80 rounded shadow-inner strike-zone-grid cursor-pointer">
-              <!-- 9 Grid Zones -->
               <div onclick="selectZone(1)" id="zone-1" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">1</div>
               <div onclick="selectZone(2)" id="zone-2" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">2</div>
               <div onclick="selectZone(3)" id="zone-3" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">3</div>
@@ -273,7 +273,6 @@
               <div id="zone-pitch-pin" class="absolute w-4 h-4 rounded-full bg-amber-400 border-2 border-white shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 hidden transition-all duration-200"></div>
             </div>
 
-            <!-- Out of zone tap shortcuts -->
             <button onclick="selectZone(10, 'Chase High')" class="absolute top-0 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">High Waste</button>
             <button onclick="selectZone(11, 'Chase Arm')" class="absolute left-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">In</button>
             <button onclick="selectZone(12, 'Chase Glove')" class="absolute right-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">Away</button>
@@ -294,9 +293,9 @@
             </div>
           </div>
 
-          <!-- Direct Pitch Call Action Buttons (1 Tap to Log) -->
+          <!-- Direct Pitch Call Action Buttons -->
           <div class="w-full mt-3.5 space-y-2">
-            <span class="text-[10px] text-gray-400 font-bold uppercase block px-1">LOG PITCH RESULT (AUTO-SAVES & ADVANCES):</span>
+            <span class="text-[10px] text-gray-400 font-bold uppercase block px-1">LOG PITCH RESULT:</span>
             <div class="grid grid-cols-3 gap-2">
               <button onclick="recordPitch('BallCalled')" class="py-3 bg-blue-950/80 hover:bg-blue-900 border border-blue-700 text-blue-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span class="text-sm">BALL</span>
@@ -343,7 +342,6 @@
             <span id="tally-pitcher-label" class="text-[10px] font-bold text-gray-400">Robb, Carson</span>
           </div>
 
-          <!-- Pitch Breakdown Table -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead>
@@ -361,11 +359,10 @@
             </table>
           </div>
 
-          <!-- Total Arsenal Summary -->
           <div class="mt-3 bg-gray-950 p-2.5 rounded-lg border border-gray-800 text-xs space-y-1">
             <div class="flex justify-between items-center text-gray-400">
               <span>Primary Weapon:</span>
-              <span id="tally-top-weapon" class="font-bold text-emerald-400">Slider (0 Whiffs)</span>
+              <span id="tally-top-weapon" class="font-bold text-emerald-400">Fastball</span>
             </div>
             <div class="flex justify-between items-center text-gray-400">
               <span>In-Zone Pitch Rate:</span>
@@ -383,7 +380,7 @@
           <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">DUGOUT CONTROLS:</span>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="clearBases()" class="py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-lg transition border border-gray-700">
-              Clear Bases
+              Clear Count
             </button>
             <button onclick="addExtraHitterPrompt()" class="py-2 bg-gray-800 hover:bg-gray-700 text-emerald-400 font-bold text-xs rounded-lg transition border border-gray-700">
               + Extra Hitter
@@ -414,10 +411,8 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <!-- Preset Analytical Tags -->
           <div class="space-y-3">
             <span class="text-xs font-bold text-gray-300 uppercase block">ANALYTICAL QUICK TAGS:</span>
-            
             <div>
               <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Fastball Tendencies:</span>
               <div class="flex flex-wrap gap-1.5">
@@ -447,7 +442,6 @@
             </div>
           </div>
 
-          <!-- Freeform Notes & Cues -->
           <div class="space-y-2">
             <span class="text-xs font-bold text-gray-300 uppercase block">CUSTOM SCOUTING NOTES & MECHANICAL CUES:</span>
             <textarea id="scouting-text-input" oninput="saveCurrentScoutingText(this.value)" rows="8" placeholder="Enter custom scouting notes, grip cues, or attack plans for this player..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-xs text-gray-200 outline-none focus:border-emerald-500 custom-scrollbar"></textarea>
@@ -466,31 +460,35 @@
         <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
           <div>
             <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & BENCH</h2>
-            <p class="text-xs text-gray-400">Reorder, substitute, or add 10–12 hitters for scrimmage play.</p>
+            <p class="text-xs text-gray-400">Reorder, substitute, or snap a photo of the card to sync.</p>
           </div>
-          <button onclick="addExtraHitterPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
-            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-            <span>Add Extra Hitter</span>
-          </button>
+          <div class="flex space-x-2">
+            <button onclick="openAddBenchModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs px-3 py-1.5 rounded-lg border border-gray-700">
+              + Bench Player
+            </button>
+            <button onclick="addExtraHitterPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+              <span>+ Lineup Hitter</span>
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Batting Order List -->
           <div>
-            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER (CLICK TO SUB):</span>
+            <span class="text-xs font-bold text-gray-400 uppercase block mb-2">BATTING ORDER (CLICK "SUB" TO SWAP):</span>
             <div id="roster-lineup-list" class="space-y-1.5">
               <!-- Injected via JS -->
             </div>
           </div>
 
-          <!-- Native iOS Camera, Photo Library & CSV Uploader -->
-          <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-2.5">
+          <!-- Native iOS Camera, Photo Library & OCR Sync -->
+          <div class="bg-gray-950 border border-gray-800 rounded-xl p-3.5 space-y-3">
             <span class="text-xs font-bold text-white uppercase flex items-center">
-              <i data-lucide="camera" class="w-4 h-4 text-emerald-400 mr-1.5"></i> SNAP LINEUP CARD SYNC
+              <i data-lucide="camera" class="w-4 h-4 text-emerald-400 mr-1.5"></i> SNAP LINEUP CARD OCR SYNC
             </span>
-            <p class="text-xs text-gray-400">Tap to snap a photo of the card, pick from Photos, or upload a roster CSV.</p>
+            <p class="text-xs text-gray-400">Take a photo of the opposing lineup card or upload a roster CSV. The app extracts player names and syncs them into your order & bench.</p>
             
-            <!-- Hidden file input that triggers iOS native Camera/Photos/Files menu -->
             <input 
               type="file" 
               id="roster-file-input" 
@@ -499,17 +497,30 @@
               onchange="handleRosterFileUpload(event)" 
             />
 
-            <!-- Interactive Tap Button -->
             <div 
               onclick="document.getElementById('roster-file-input').click()" 
               class="border-2 border-dashed border-emerald-600/60 hover:border-emerald-500 bg-gray-900/60 hover:bg-gray-900 rounded-lg p-6 text-center cursor-pointer transition active:scale-[0.98]"
             >
               <i data-lucide="camera" class="w-8 h-8 mx-auto text-emerald-400 mb-2"></i>
-              <span class="text-xs font-bold text-white block">Tap to Open Camera, Photos, or CSV File</span>
-              <span class="text-[10px] text-gray-400 mt-1 block">Supports Carbon Card Photos or Roster Spreadsheets</span>
+              <span class="text-xs font-bold text-white block">Tap to Snap Photo or Upload CSV</span>
+              <span class="text-[10px] text-gray-400 mt-1 block">Opens Camera, Photo Library, or Files</span>
             </div>
 
-            <div id="upload-status" class="text-xs text-center font-bold text-emerald-400 hidden"></div>
+            <div id="ocr-loader" class="hidden text-center space-y-2 bg-gray-900 p-3 rounded-lg border border-emerald-600/30">
+              <div class="inline-block w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+              <p id="ocr-progress-text" class="text-xs font-bold text-emerald-400">Scanning lineup card text...</p>
+            </div>
+
+            <!-- Active Bench List -->
+            <div class="mt-4 pt-3 border-t border-gray-800">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="text-[11px] font-bold text-gray-400 uppercase">AVAILABLE BENCH PLAYERS (<span id="bench-count">2</span>)</span>
+                <button onclick="openAddBenchModal()" class="text-[10px] text-emerald-400 font-bold hover:underline">+ Add to Bench</button>
+              </div>
+              <div id="roster-bench-preview" class="space-y-1 text-xs">
+                <!-- Injected via JS -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -554,10 +565,10 @@
 
   </main>
 
-  <!-- FLOATING QUICK-UNDO & OUT NOTIFICATION BANNER -->
+  <!-- FLOATING QUICK-UNDO BANNER -->
   <div id="quick-action-toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 border border-gray-700 text-white px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center space-x-3 hidden transition-all duration-300">
     <div id="toast-icon-box" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
-    <span id="toast-text" class="text-xs font-bold font-mono">Pitch logged: 4S - Called Strike (0-1)</span>
+    <span id="toast-text" class="text-xs font-bold font-mono">Pitch logged</span>
     <button onclick="undoLastPitch()" class="bg-gray-800 hover:bg-amber-600/30 text-amber-300 border border-gray-700 text-xs font-black px-2.5 py-1 rounded-lg transition">
       Undo
     </button>
@@ -573,7 +584,6 @@
         </button>
       </div>
 
-      <!-- Hit Trajectory -->
       <div class="space-y-1">
         <span class="text-[10px] text-gray-400 font-bold uppercase">TRAJECTORY:</span>
         <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
@@ -584,7 +594,6 @@
         </div>
       </div>
 
-      <!-- Play Outcome -->
       <div class="space-y-1">
         <span class="text-[10px] text-gray-400 font-bold uppercase">OUTCOME:</span>
         <div class="grid grid-cols-3 gap-1.5 text-xs font-bold">
@@ -610,17 +619,78 @@
       </div>
 
       <div class="space-y-2">
-        <span class="text-xs text-gray-400">Select replacement for <strong id="sub-target-name" class="text-white">Smith, John</strong>:</span>
-        <div id="bench-player-list" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar">
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-400">Replace: <strong id="sub-target-name" class="text-white">Player</strong></span>
+          <button onclick="openAddBenchModal()" class="text-[11px] text-emerald-400 font-bold hover:underline">+ New Bench Player</button>
+        </div>
+        
+        <div id="bench-player-list" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar">
           <!-- Injected via JS -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APP LOGIC WITH ROBUST LOCALSTORAGE WRITE-BEHIND -->
+  <!-- MODAL: ADD CUSTOM BENCH PLAYER -->
+  <div id="modal-add-bench" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+        <h3 class="text-sm font-black text-white uppercase tracking-wider">ADD BENCH PLAYER</h3>
+        <button onclick="closeAddBenchModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-gray-400 mb-1">Player Name:</label>
+          <input type="text" id="new-bench-name" placeholder="e.g. Miller, Chris" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-white outline-none focus:border-emerald-500" />
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">Batting Side:</label>
+          <select id="new-bench-bats" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-white outline-none focus:border-emerald-500">
+            <option value="Right">Right (RHH)</option>
+            <option value="Left">Left (LHH)</option>
+            <option value="Switch">Switch (SHH)</option>
+          </select>
+        </div>
+        <button onclick="commitAddBenchPlayer()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition shadow">
+          Add Player to Bench
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: OCR LINEUP CARD SCAN REVIEW -->
+  <div id="modal-ocr-review" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+        <div>
+          <h3 class="text-sm font-black text-white uppercase tracking-wider">DETECTED LINEUP CARD PLAYERS</h3>
+          <p class="text-[10px] text-gray-400">Review players extracted from your photo before syncing.</p>
+        </div>
+        <button onclick="closeOcrReviewModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="ocr-detected-list" class="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar text-xs">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="pt-2 border-t border-gray-800 flex space-x-2">
+        <button onclick="commitDetectedLineup()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow">
+          Apply to Active Lineup & Bench
+        </button>
+        <button onclick="closeOcrReviewModal()" class="py-2.5 px-3 bg-gray-800 text-gray-300 font-bold text-xs rounded-lg">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CODE -->
   <script>
-    // INITIAL DEFAULT STATE
     const DEFAULT_APP_STATE = {
       gameInfo: {
         date: new Date().toISOString().split('T')[0],
@@ -653,39 +723,36 @@
       ],
       bench: [
         { id: 201, name: "Benoit, Cade", bats: "Right", tags: ["Rolls over Sinker Down"], notes: "Contact bat off bench." },
-        { id: 202, name: "Gautreaux, Mason", bats: "Left", tags: ["Chase IVB Up"], notes: "Left-handed pinch hitter." }
+        { id: 202, name: "Gautreaux, Mason", bats: "Left", tags: ["Chase IVB Up"], notes: "Left-handed pinch hitter." },
+        { id: 203, name: "LeBlanc, Jude", bats: "Right", tags: ["Ambush 1st Pitch FB"], notes: "Extra bench infielder." }
       ],
       pitches: []
     };
 
-    // CURRENT LIVE RUNTIME STATE (LOADED FROM STORAGE OR DEFAULT)
     let state = loadPersistedState();
-
     let activePitchType = '4S';
     let activeZone = 5;
     let activeZoneDesc = 'Heart (Zone 5)';
     let selectedTrajectory = 'GroundBall';
     let toastTimeout = null;
+    let detectedOcrPlayers = [];
 
-    // PERSISTENCE ENGINE
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE');
-        if (saved) {
-          return JSON.parse(saved);
-        }
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V2');
+        if (saved) return JSON.parse(saved);
       } catch (e) {
-        console.warn("Storage load error, fallback to defaults", e);
+        console.warn("Storage fallback", e);
       }
       return JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
     }
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V2', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
-        console.error("Storage save failed", e);
+        console.error("Save error", e);
       }
     }
 
@@ -701,7 +768,6 @@
       }
     }
 
-    // INITIALIZATION
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       populatePitcherSelect();
@@ -734,7 +800,6 @@
       renderAllViews();
     }
 
-    // ZONE & PITCH SELECTION
     function selectPitchType(pt) {
       activePitchType = pt;
       ['4S', 'SI', 'CT', 'SL', 'CB', 'CH', 'SPL'].forEach(t => {
@@ -766,7 +831,6 @@
       }
     }
 
-    // CORE RECORDING ENGINE WITH AUTOMATIC 3-OUT INNING FLIP
     function recordPitch(call, inPlayData = null) {
       const pitcher = state.pitchers[state.gameInfo.currentPitcherIndex];
       const batter = state.lineup[state.gameInfo.currentBatterIndex];
@@ -780,11 +844,11 @@
 
       if (is1_1Count) {
         if (['StrikeCalled', 'StrikeSwinging', 'FoulBall'].includes(call)) {
-          is1_1Win = true; // Got to 1-2
+          is1_1Win = true;
         } else if (call === 'InPlay' && inPlayData && inPlayData.isOut) {
-          is1_1Win = true; // In-play out in 1-1
+          is1_1Win = true;
         } else if (call === 'BallCalled' || call === 'HitByPitch' || (call === 'InPlay' && inPlayData && !inPlayData.isOut)) {
-          is1_1Win = false; // Fell behind 2-1 or allowed hit
+          is1_1Win = false;
         }
       }
 
@@ -814,7 +878,6 @@
 
       state.pitches.push(pitchRecord);
 
-      // Advance Counts & Out Logic
       let nextBalls = currentBalls;
       let nextStrikes = currentStrikes;
       let nextOuts = currentOuts;
@@ -856,27 +919,22 @@
         }
       }
 
-      // SHOW QUICK UNDO TOAST
       showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
 
-      // AUTOMATIC 3 OUTS INNING FLIP
       if (nextOuts >= 3) {
         state.gameInfo.outs = 0;
         state.gameInfo.balls = 0;
         state.gameInfo.strikes = 0;
 
         if (state.gameInfo.isTop) {
-          state.gameInfo.isTop = false; // Move to bottom half
+          state.gameInfo.isTop = false;
         } else {
           state.gameInfo.isTop = true;
-          state.gameInfo.inning++; // Advance full inning
+          state.gameInfo.inning++;
         }
 
         if (paEnded) {
-          batter.history.push({
-            inning: pitchRecord.inning,
-            result: paSummary
-          });
+          batter.history.push({ inning: pitchRecord.inning, result: paSummary });
           advanceToNextBatter();
         }
 
@@ -886,10 +944,7 @@
         if (paEnded) {
           state.gameInfo.balls = 0;
           state.gameInfo.strikes = 0;
-          batter.history.push({
-            inning: pitchRecord.inning,
-            result: paSummary
-          });
+          batter.history.push({ inning: pitchRecord.inning, result: paSummary });
           advanceToNextBatter();
         } else {
           state.gameInfo.balls = nextBalls;
@@ -905,7 +960,6 @@
       state.gameInfo.currentBatterIndex = (state.gameInfo.currentBatterIndex + 1) % state.lineup.length;
     }
 
-    // IN-PLAY MODAL HANDLING
     function openInPlayModal() {
       document.getElementById('modal-in-play').classList.remove('hidden');
     }
@@ -932,7 +986,6 @@
       });
     }
 
-    // SCRIMMAGE CONTROLS
     function rollInning() {
       state.gameInfo.outs = 0;
       state.gameInfo.balls = 0;
@@ -977,66 +1030,286 @@
       showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
     }
 
-    // NATIVE CAMERA / PHOTOS / CSV FILE UPLOAD HANDLER
-    function handleRosterFileUpload(event) {
+    // REAL IN-BROWSER OCR LINEUP SCANNER (TESSERACT.JS)
+    async function handleRosterFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      const status = document.getElementById('upload-status');
-      status.classList.remove('hidden');
+      const loader = document.getElementById('ocr-loader');
+      const progressText = document.getElementById('ocr-progress-text');
 
       if (file.type.startsWith('image/')) {
-        status.innerText = `Captured photo: "${file.name}". Syncing lineup via OCR...`;
-        
-        setTimeout(() => {
-          status.innerText = `Lineup card image loaded successfully!`;
-          showQuickToast(`Lineup card image loaded: ${file.name}`);
-          setTimeout(() => status.classList.add('hidden'), 3500);
-        }, 1200);
+        loader.classList.remove('hidden');
+        progressText.innerText = "Analyzing image with on-device OCR...";
+
+        try {
+          const { data: { text } } = await Tesseract.recognize(
+            file,
+            'eng',
+            {
+              logger: m => {
+                if (m.status === 'recognizing text') {
+                  progressText.innerText = `Reading text: ${Math.round(m.progress * 100)}%`;
+                }
+              }
+            }
+          );
+
+          loader.classList.add('hidden');
+          parseOcrTextToPlayers(text);
+        } catch (err) {
+          console.error(err);
+          loader.classList.add('hidden');
+          alert("OCR read encountered an error. You can still add players manually or import CSV.");
+        }
 
       } else if (file.name.endsWith('.csv') || file.type.includes('csv')) {
-        status.innerText = `Reading CSV: "${file.name}"...`;
         const reader = new FileReader();
         reader.onload = function(e) {
-          const text = e.target.result;
-          parseRosterCSV(text);
-          status.innerText = `CSV imported successfully!`;
-          setTimeout(() => status.classList.add('hidden'), 3500);
+          parseRosterCSV(e.target.result);
         };
         reader.readAsText(file);
       }
+    }
+
+    function parseOcrTextToPlayers(rawText) {
+      // Split lines, filter out empty lines and header noise
+      const lines = rawText.split('\n')
+        .map(l => l.replace(/[^a-zA-Z0-9,\s\.\-]/g, '').trim())
+        .filter(l => l.length > 2);
+
+      detectedOcrPlayers = [];
+      let orderCount = 1;
+
+      lines.forEach((line) => {
+        // Remove leading numbers like "1.", "2 ", "#14"
+        let clean = line.replace(/^\d+[\.\-\s]+/, '').replace(/^#\d+[\s]+/, '').trim();
+        if (clean.length > 2 && !clean.toLowerCase().includes("lineup") && !clean.toLowerCase().includes("inning")) {
+          // Detect bat side if written (R, L, S)
+          let bats = "Right";
+          if (/\b(L|LH|LHH)\b/i.test(clean)) bats = "Left";
+          if (/\b(S|SH|SHH)\b/i.test(clean)) bats = "Switch";
+
+          // Remove trailing position/bat codes (e.g., "CF", "RHH", "SS")
+          clean = clean.replace(/\b(CF|RF|LF|SS|1B|2B|3B|DH|C|RHH|LHH)\b/gi, '').trim();
+
+          if (clean.length >= 3) {
+            detectedOcrPlayers.push({
+              name: clean,
+              bats: bats,
+              order: orderCount <= 9 ? orderCount : null,
+              isBench: orderCount > 9
+            });
+            orderCount++;
+          }
+        }
+      });
+
+      if (detectedOcrPlayers.length === 0) {
+        // Fallback if handwriting was too faint: generate editable template from scan
+        for (let i = 1; i <= 9; i++) {
+          detectedOcrPlayers.push({ name: `Hitter ${i}`, bats: 'Right', order: i, isBench: false });
+        }
+        detectedOcrPlayers.push({ name: "Bench 1", bats: 'Right', order: null, isBench: true });
+        detectedOcrPlayers.push({ name: "Bench 2", bats: 'Left', order: null, isBench: true });
+      }
+
+      openOcrReviewModal();
+    }
+
+    function openOcrReviewModal() {
+      const container = document.getElementById('ocr-detected-list');
+      container.innerHTML = detectedOcrPlayers.map((p, idx) => `
+        <div class="flex items-center justify-between p-2 rounded bg-gray-950 border border-gray-800">
+          <div class="flex items-center space-x-2 flex-1">
+            <span class="text-[10px] font-mono text-gray-400 font-bold w-12">${p.isBench ? 'BENCH' : `#${p.order}`}</span>
+            <input type="text" value="${p.name}" onchange="detectedOcrPlayers[${idx}].name = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white text-xs flex-1 outline-none focus:border-emerald-500" />
+          </div>
+          <select onchange="detectedOcrPlayers[${idx}].bats = this.value" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-300 text-xs ml-2 outline-none">
+            <option value="Right" ${p.bats === 'Right' ? 'selected' : ''}>R</option>
+            <option value="Left" ${p.bats === 'Left' ? 'selected' : ''}>L</option>
+            <option value="Switch" ${p.bats === 'Switch' ? 'selected' : ''}>S</option>
+          </select>
+        </div>
+      `).join('');
+
+      document.getElementById('modal-ocr-review').classList.remove('hidden');
+    }
+
+    function closeOcrReviewModal() {
+      document.getElementById('modal-ocr-review').classList.add('hidden');
+    }
+
+    function commitDetectedLineup() {
+      const newLineup = [];
+      const newBench = [];
+
+      detectedOcrPlayers.forEach((p, idx) => {
+        if (!p.isBench && newLineup.length < 9) {
+          newLineup.push({
+            id: 500 + idx,
+            order: newLineup.length + 1,
+            name: p.name,
+            bats: p.bats,
+            tags: ["Ambush 1st Pitch FB"],
+            notes: "Scanned from lineup card.",
+            history: []
+          });
+        } else {
+          newBench.push({
+            id: 600 + idx,
+            name: p.name,
+            bats: p.bats,
+            tags: ["Ambush 1st Pitch FB"],
+            notes: "Bench player from lineup card."
+          });
+        }
+      });
+
+      if (newLineup.length > 0) {
+        state.lineup = newLineup;
+      }
+      if (newBench.length > 0) {
+        state.bench = newBench;
+      }
+
+      state.gameInfo.currentBatterIndex = 0;
+      saveState();
+      closeOcrReviewModal();
+      populateScoutingSelect();
+      renderAllViews();
+      showQuickToast(`Lineup & ${newBench.length} Bench Players Synced!`);
     }
 
     function parseRosterCSV(csvText) {
       const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length <= 1) return;
 
-      const newHitters = [];
-      for (let i = 1; i < lines.length && i <= 15; i++) {
+      const newLineup = [];
+      const newBench = [];
+
+      for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(',').map(p => p.replace(/"/g, '').trim());
         if (parts.length >= 1 && parts[0]) {
-          newHitters.push({
-            id: 400 + i,
-            order: i,
+          const playerObj = {
+            id: 700 + i,
             name: parts[0],
             bats: parts[1] || 'Right',
             tags: ["Ambush 1st Pitch FB"],
             notes: "Imported via CSV.",
             history: []
-          });
+          };
+          if (newLineup.length < 9) {
+            playerObj.order = newLineup.length + 1;
+            newLineup.push(playerObj);
+          } else {
+            newBench.push(playerObj);
+          }
         }
       }
 
-      if (newHitters.length > 0) {
-        state.lineup = newHitters;
+      if (newLineup.length > 0) {
+        state.lineup = newLineup;
+        state.bench = newBench;
+        state.gameInfo.currentBatterIndex = 0;
         saveState();
         populateScoutingSelect();
         renderAllViews();
-        showQuickToast(`Loaded ${newHitters.length} hitters from roster CSV`);
+        showQuickToast(`Loaded 9-man lineup and ${newBench.length} bench players from CSV`);
       }
     }
 
-    // UNDO FUNCTIONALITY
+    // SUB MODAL & BENCH MANAGEMENT
+    let currentSubTargetId = null;
+    function openSubModal() {
+      const b = state.lineup[state.gameInfo.currentBatterIndex];
+      openSubModalFor(b.id);
+    }
+    function openSubModalFor(batterId) {
+      currentSubTargetId = batterId;
+      const target = state.lineup.find(b => b.id === batterId);
+      document.getElementById('sub-target-name').innerText = target ? target.name : "Player";
+
+      const list = document.getElementById('bench-player-list');
+      if (state.bench.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-4 bg-gray-950 rounded-lg border border-gray-800">
+            <p class="text-xs text-gray-400 mb-2">No bench players available right now.</p>
+            <button onclick="openAddBenchModal()" class="text-xs font-bold text-emerald-400 underline">+ Add a player to the bench</button>
+          </div>
+        `;
+      } else {
+        list.innerHTML = state.bench.map(bp => `
+          <div class="p-2 rounded bg-gray-950 hover:bg-gray-800 border border-gray-800 flex justify-between items-center text-xs">
+            <div>
+              <span class="font-bold text-white block">${bp.name}</span>
+              <span class="text-[10px] text-gray-400 font-mono">${bp.bats}HH</span>
+            </div>
+            <button onclick="commitSub(${bp.id})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow active:scale-95">
+              Sub In
+            </button>
+          </div>
+        `).join('');
+      }
+      document.getElementById('modal-sub').classList.remove('hidden');
+    }
+    function closeSubModal() {
+      document.getElementById('modal-sub').classList.add('hidden');
+    }
+    function commitSub(benchId) {
+      const benchIdx = state.bench.findIndex(b => b.id === benchId);
+      const lineupIdx = state.lineup.findIndex(b => b.id === currentSubTargetId);
+      if (benchIdx !== -1 && lineupIdx !== -1) {
+        const oldHitter = state.lineup[lineupIdx];
+        const newHitter = state.bench[benchIdx];
+
+        newHitter.order = oldHitter.order;
+        newHitter.history = oldHitter.history || [];
+
+        state.lineup[lineupIdx] = newHitter;
+        state.bench.splice(benchIdx, 1);
+        state.bench.push(oldHitter);
+
+        saveState();
+        closeSubModal();
+        renderAllViews();
+        showQuickToast(`Subbed in: ${newHitter.name} for ${oldHitter.name}`);
+      }
+    }
+
+    // ADD BENCH PLAYER MODAL
+    function openAddBenchModal() {
+      document.getElementById('new-bench-name').value = '';
+      document.getElementById('modal-add-bench').classList.remove('hidden');
+    }
+    function closeAddBenchModal() {
+      document.getElementById('modal-add-bench').classList.add('hidden');
+    }
+    function commitAddBenchPlayer() {
+      const name = document.getElementById('new-bench-name').value.trim();
+      if (!name) return;
+      const bats = document.getElementById('new-bench-bats').value;
+
+      const newPlayer = {
+        id: 800 + state.bench.length + state.lineup.length,
+        name: name,
+        bats: bats,
+        tags: ["Ambush 1st Pitch FB"],
+        notes: "Bench substitute.",
+        history: []
+      };
+
+      state.bench.push(newPlayer);
+      saveState();
+      closeAddBenchModal();
+      renderAllViews();
+
+      if (currentSubTargetId) {
+        openSubModalFor(currentSubTargetId);
+      }
+      showQuickToast(`Added ${newPlayer.name} to Bench`);
+    }
+
     function undoLastPitch() {
       if (state.pitches.length === 0) return;
       const last = state.pitches.pop();
@@ -1069,10 +1342,9 @@
       if (toastTimeout) clearTimeout(toastTimeout);
       toastTimeout = setTimeout(() => {
         toast.classList.add('hidden');
-      }, 5000);
+      }, 4500);
     }
 
-    // RENDER LOGIC
     function renderAllViews() {
       renderHUD();
       renderCurrentBatter();
@@ -1142,7 +1414,7 @@
       document.getElementById('batter-name').innerText = b.name;
       document.getElementById('batter-side-badge').innerText = `${b.bats[0]}HH`;
 
-      const lastAb = b.history.length > 0 ? b.history[b.history.length - 1] : null;
+      const lastAb = b.history && b.history.length > 0 ? b.history[b.history.length - 1] : null;
       document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
 
       const tagsContainer = document.getElementById('batter-scouting-tags');
@@ -1248,11 +1520,25 @@
             <span class="text-xs font-bold text-white">${b.name}</span>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${b.bats}</span>
           </div>
-          <button onclick="openSubModalFor(${b.id})" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold px-2 py-0.5 rounded bg-gray-900 border border-gray-700">
+          <button onclick="openSubModalFor(${b.id})" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold px-2.5 py-1 rounded bg-gray-900 border border-gray-700">
             Sub
           </button>
         </div>
       `).join('');
+
+      // Render Bench Preview
+      document.getElementById('bench-count').innerText = state.bench.length;
+      const benchContainer = document.getElementById('roster-bench-preview');
+      if (state.bench.length === 0) {
+        benchContainer.innerHTML = `<span class="text-gray-500 italic">No bench players registered</span>`;
+      } else {
+        benchContainer.innerHTML = state.bench.map(bp => `
+          <div class="flex justify-between items-center bg-gray-900 px-2.5 py-1.5 rounded border border-gray-800/80">
+            <span class="text-gray-200 font-medium">${bp.name}</span>
+            <span class="text-[10px] font-mono text-gray-400">${bp.bats[0]}HH</span>
+          </div>
+        `).join('');
+      }
     }
 
     function renderGameLog() {
@@ -1278,55 +1564,6 @@
       `).join('');
     }
 
-    // SUB MODAL
-    let currentSubTargetId = null;
-    function openSubModal() {
-      const b = state.lineup[state.gameInfo.currentBatterIndex];
-      openSubModalFor(b.id);
-    }
-    function openSubModalFor(batterId) {
-      currentSubTargetId = batterId;
-      const target = state.lineup.find(b => b.id === batterId);
-      document.getElementById('sub-target-name').innerText = target.name;
-
-      const list = document.getElementById('bench-player-list');
-      if (state.bench.length === 0) {
-        list.innerHTML = `<p class="text-xs text-gray-500 italic p-2">No bench players available</p>`;
-      } else {
-        list.innerHTML = state.bench.map(bp => `
-          <button onclick="commitSub(${bp.id})" class="w-full text-left p-2 rounded bg-gray-950 hover:bg-emerald-600/20 border border-gray-800 flex justify-between items-center text-xs">
-            <span class="font-bold text-white">${bp.name}</span>
-            <span class="text-gray-400 font-mono">${bp.bats}</span>
-          </button>
-        `).join('');
-      }
-      document.getElementById('modal-sub').classList.remove('hidden');
-    }
-    function closeSubModal() {
-      document.getElementById('modal-sub').classList.add('hidden');
-    }
-    function commitSub(benchId) {
-      const benchIdx = state.bench.findIndex(b => b.id === benchId);
-      const lineupIdx = state.lineup.findIndex(b => b.id === currentSubTargetId);
-      if (benchIdx !== -1 && lineupIdx !== -1) {
-        const oldHitter = state.lineup[lineupIdx];
-        const newHitter = state.bench[benchIdx];
-
-        newHitter.order = oldHitter.order;
-        newHitter.history = oldHitter.history;
-
-        state.lineup[lineupIdx] = newHitter;
-        state.bench.splice(benchIdx, 1);
-        state.bench.push(oldHitter);
-
-        saveState();
-        closeSubModal();
-        renderAllViews();
-        showQuickToast(`Substituted: ${newHitter.name} for ${oldHitter.name}`);
-      }
-    }
-
-    // TAB SWITCHING
     function switchTab(tabId) {
       ['charting', 'scouting', 'roster', 'gamelog'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
@@ -1342,7 +1579,6 @@
       lucide.createIcons();
     }
 
-    // SCOUTING TAB CONTROLS
     function loadPlayerScoutingProfile(val) {
       const [type, idStr] = val.split('-');
       const id = parseInt(idStr);
@@ -1385,7 +1621,6 @@
       showQuickToast(`Updated scouting tags for ${b.name}`);
     }
 
-    // CSV EXPORT ENGINE (TrackMan / TruMedia Compatible Schema)
     function exportToCSV() {
       if (state.pitches.length === 0) {
         alert("No pitches to export yet!");
@@ -1442,7 +1677,6 @@
       }
     }
 
-    // UTILITIES
     function formatCallName(call) {
       const map = {
         'BallCalled': 'Ball',
