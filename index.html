@@ -186,11 +186,11 @@
               <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AT THE PLATE</span>
               <div class="flex items-center space-x-1.5">
                 <span id="batter-order-num" class="bg-gray-800 text-gray-300 text-xs px-1.5 py-0.5 rounded font-black font-mono">#1</span>
-                <h3 id="batter-name" class="text-sm font-black text-white">Bryant, Diego</h3>
+                <h3 id="batter-name" class="text-sm font-black text-white">#5 Champagne</h3>
               </div>
             </div>
             <div class="text-right">
-              <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">RHH</span>
+              <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">LHH</span>
               <button onclick="openSubModal()" class="block text-[10px] text-emerald-400 hover:underline mt-1 font-bold">Sub / PH</button>
             </div>
           </div>
@@ -199,7 +199,7 @@
           <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
-              <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.345 / .448 / .678 • 7 HR</span>
+              <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.384 / .470 / .520 • 4 HR • 11 SB</span>
             </div>
             <div id="batter-archetype-badges" class="flex flex-wrap gap-1">
             </div>
@@ -222,7 +222,7 @@
             <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
             </div>
             <p id="batter-scouting-notes" class="text-[11px] text-gray-300 italic bg-gray-950/60 p-2 rounded border border-gray-800/60">
-              Struggles with IVB carry at letters. Will expand on 2 strikes down-and-away.
+              Plus runner. C/INF (Fr.) Dutchtown HS. Aggressive contact bat.
             </p>
           </div>
         </div>
@@ -451,7 +451,7 @@
         <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
           <div>
             <h2 class="text-sm font-black text-white uppercase tracking-wider">ACTIVE BATTING ORDER & STATS</h2>
-            <p class="text-xs text-gray-400">Upload PDF stat packet, paste copied tables from iOS Live Text, or drop a CSV.</p>
+            <p class="text-xs text-gray-400">Jones College Bobcats lineup and bench loaded. Reorder, substitute, or sync live.</p>
           </div>
           <div class="flex space-x-2">
             <button onclick="openQuickPasteModal()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
@@ -517,7 +517,7 @@
             <!-- Active Bench List -->
             <div class="mt-4 pt-3 border-t border-gray-800">
               <div class="flex justify-between items-center mb-1.5">
-                <span class="text-[11px] font-bold text-gray-400 uppercase">AVAILABLE BENCH PLAYERS (<span id="bench-count">2</span>)</span>
+                <span class="text-[11px] font-bold text-gray-400 uppercase">AVAILABLE BENCH PLAYERS (<span id="bench-count">12</span>)</span>
                 <button onclick="openAddBenchModal()" class="text-[10px] text-emerald-400 font-bold hover:underline">+ Add to Bench</button>
               </div>
               <div id="roster-bench-preview" class="space-y-1 text-xs">
@@ -661,7 +661,7 @@
     </div>
   </div>
 
-  <!-- MODAL: QUICK PASTE ROSTER / STATS TABLE (IOS LIVE TEXT COMPATIBLE) -->
+  <!-- MODAL: QUICK PASTE ROSTER / STATS TABLE -->
   <div id="modal-quick-paste" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
@@ -675,7 +675,7 @@
       </div>
 
       <div class="space-y-2 text-xs">
-        <textarea id="quick-paste-textarea" rows="8" placeholder="Paste table text here... (e.g. copied from NCAA stats page, Sidearm stats, or iOS Live Text)&#10;&#10;Example:&#10;14 Bryant, Diego .345 7 HR 12 SB&#10;5 McCranie, Alex .220 1 HR 1 SB&#10;9 Williams, Tyler .310 0 HR 15 SB" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-white text-xs outline-none focus:border-emerald-500 custom-scrollbar font-mono"></textarea>
+        <textarea id="quick-paste-textarea" rows="8" placeholder="Paste table text here... (e.g. copied from NCAA stats page, Sidearm stats, or iOS Live Text)" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-white text-xs outline-none focus:border-emerald-500 custom-scrollbar font-mono"></textarea>
         <button onclick="commitQuickPasteText()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition shadow">
           Parse & Sync Lineup
         </button>
@@ -715,7 +715,7 @@
     const DEFAULT_APP_STATE = {
       gameInfo: {
         date: new Date().toISOString().split('T')[0],
-        opponent: 'Fall Scrimmage',
+        opponent: 'Jones College Bobcats',
         inning: 1,
         isTop: true,
         outs: 0,
@@ -725,89 +725,164 @@
         currentBatterIndex: 0
       },
       pitchers: [
-        { id: 1, name: "Robb, Carson", throws: "Right", notes: "Keep ring finger knuckle leading on changeup for sub-zero IVB." },
-        { id: 2, name: "Toups, Nik", throws: "Left", notes: "Sinker 94-95 with 17in run. Attack early down." },
-        { id: 3, name: "Spencer, Patrick", throws: "Right", notes: "Slider 2900+ RPM sweeper. Out-pitch with 2 strikes." },
-        { id: 4, name: "Freche, Logan", throws: "Right", notes: "Heater up to 95.2. Cutter 91-92 off fastball tunnel." },
-        { id: 5, name: "Gray, Dalton", throws: "Right", notes: "18in IVB heater. Live at top of strike zone." }
+        { id: 1, name: "Robb, Carson", throws: "Right", notes: "Attack top/bottom of zone. Establish FB early." },
+        { id: 2, name: "Toups, Nik", throws: "Left", notes: "Heavy sinker 94-95 with 17in run. Work down for weak ground contact." },
+        { id: 3, name: "Fabre, Larson", throws: "Left", notes: "Deceptive slot; arm-side run and sweeping breaking ball." },
+        { id: 4, name: "Spencer, Patrick", throws: "Right", notes: "2900+ RPM sweeper. Out-pitch with 2 strikes away." },
+        { id: 5, name: "Freche, Logan", throws: "Right", notes: "Heater up to 95+; 91-92 cutter tunneled off fastball lane." },
+        { id: 6, name: "Gray, Dalton", throws: "Right", notes: "High IVB carry; ride heater at the top of zone." },
+        { id: 7, name: "Todoroski, Tristan", throws: "Right", notes: "Zone pounder; mix breaking ball early in counts." },
+        { id: 8, name: "Lobell, Blake", throws: "Right", notes: "Sink/slider mix; works down and induces ground balls." },
+        { id: 9, name: "Ambrose, Chase", throws: "Right", notes: "High pitchability strike-thrower with firm offspeed." },
+        { id: 10, name: "Thorn, Jacob", throws: "Right", notes: "High-leverage arm; swing-and-miss stuff." },
+        { id: 11, name: "Marse, Sam", throws: "Right", notes: "Fastball/changeup tunnel; fills zone with confidence." },
+        { id: 12, name: "Shaffer, Levi", throws: "Right", notes: "Power mix; aggressive in the strike zone." },
+        { id: 13, name: "Demopulos, Braxton", throws: "Right", notes: "Sharp late break; out-pitch below the knees." },
+        { id: 14, name: "Marcotte, Riley", throws: "Left", notes: "Tough left-handed angle; backdoor and backfoot spin." },
+        { id: 15, name: "Webb, Truitt", throws: "Right", notes: "Pounds the zone; competitive FB/CH mix." },
+        { id: 16, name: "Simmons, Sawyer", throws: "Right", notes: "Heavy run on heater; commands east-to-west." },
+        { id: 17, name: "Minichino, Austin", throws: "Right", notes: "Quality three-pitch mix with strikeout capability." },
+        { id: 18, name: "Amedee, Drake", throws: "Right", notes: "Attacks early count; works ahead." },
+        { id: 19, name: "Mills", throws: "Right", notes: "Power arm out of bullpen." },
+        { id: 20, name: "Bullock", throws: "Right", notes: "Aggressive strike-thrower." }
       ],
       lineup: [
         { 
-          id: 101, order: 1, name: "Bryant, Diego", bats: "Right",
-          stats: { avg: ".345", obp: ".448", slg: ".678", hr: 7, sb: 12 },
-          archetypes: ["RUNNER", "POWER THREAT"],
-          tags: ["Ambush 1st Pitch FB", "Chases SL Down & Away"], 
-          notes: "Aggressive early. Expands away on slider.", history: [] 
-        },
-        { 
-          id: 102, order: 2, name: "McCranie, Alex", bats: "Right",
-          stats: { avg: ".220", obp: ".303", slg: ".294", hr: 1, sb: 1 },
-          archetypes: ["HIGH K RISK"],
-          tags: ["Chase IVB Up", "Passive 1-1"], 
-          notes: "Can't touch high fastballs with carry.", history: [] 
-        },
-        { 
-          id: 103, order: 3, name: "Williams, Tyler", bats: "Left",
-          stats: { avg: ".310", obp: ".386", slg: ".390", hr: 0, sb: 15 },
+          id: 501, order: 1, name: "#5 Champagne", bats: "Left",
+          stats: { avg: ".384", obp: ".470", slg: ".520", hr: 4, sb: 11 },
           archetypes: ["RUNNER", "CONTACT"],
-          tags: ["Rolls over Sinker Down"], 
-          notes: "Heavy pull-side tendency against sinkers.", history: [] 
+          tags: ["Ambush 1st Pitch FB", "Plus Runner"], 
+          notes: "Plus runner (11-13 SB). Dutchtown HS. Aggressive contact bat (.384, 21 2B).", history: [] 
         },
         { 
-          id: 104, order: 4, name: "Davis, Jackson", bats: "Right",
-          stats: { avg: ".265", obp: ".340", slg: ".614", hr: 8, sb: 0 },
-          archetypes: ["POWER THREAT"],
-          tags: ["Late on High Velo (92+)"], 
-          notes: "Power bat but slow bat speed against 93+.", history: [] 
+          id: 502, order: 2, name: "#14 Theriot", bats: "Right",
+          stats: { avg: ".317", obp: ".420", slg: ".390", hr: 1, sb: 10 },
+          archetypes: ["RUNNER", "CONTACT"],
+          tags: ["Plus Runner", "High OBP (29 BB)"], 
+          notes: "Hahnville HS. Plus runner / high OBP (29 BB, 10 SB). Takes walks, runs well.", history: [] 
         },
         { 
-          id: 105, order: 5, name: "Martinez, Carlos", bats: "Switch",
-          stats: { avg: ".285", obp: ".360", slg: ".430", hr: 3, sb: 4 },
+          id: 503, order: 3, name: "#28 Russell", bats: "Left",
+          stats: { avg: ".371", obp: ".480", slg: ".680", hr: 15, sb: 4 },
+          archetypes: ["POWER THREAT", "CONTACT"],
+          tags: ["Middle of Order Power", "Crushes Flat VAA"], 
+          notes: "Southern Miss transfer / Madison Central. 15 HR, 70 RBI, 45 BB. Huge power threat.", history: [] 
+        },
+        { 
+          id: 504, order: 4, name: "#26 Ainsworth", bats: "Right",
+          stats: { avg: ".360", obp: ".450", slg: ".650", hr: 15, sb: 3 },
+          archetypes: ["POWER THREAT", "CONTACT"],
+          tags: ["Run Producer", "Extra Base Threat"], 
+          notes: "Madison Central HS. 15 HR, 70 RBI, 32 BB. Punishes mistakes over heart of plate.", history: [] 
+        },
+        { 
+          id: 505, order: 5, name: "#16 Hutchinson", bats: "Left",
+          stats: { avg: ".307", obp: ".455", slg: ".410", hr: 2, sb: 8 },
+          archetypes: ["CONTACT", "RUNNER"],
+          tags: ["Elite Eye (48 BB)", "Active Runner"], 
+          notes: "Madison Central HS. Elite eye (48 BB against 27 K). Active on base paths (8 SB).", history: [] 
+        },
+        { 
+          id: 506, order: 6, name: "#17 Quick", bats: "Right",
+          stats: { avg: ".333", obp: ".400", slg: ".440", hr: 3, sb: 3 },
           archetypes: ["CONTACT"],
-          tags: ["Freezes on Backdoor CB"], 
-          notes: "Takes 2-strike breaking balls looking.", history: [] 
+          tags: ["Solid Contact", "Protective 2-Strikes"], 
+          notes: "Germantown HS catcher. Solid contact bat (.333, 27 RBI, 17 K in 162 AB).", history: [] 
         },
         { 
-          id: 106, order: 6, name: "Johnson, Brett", bats: "Left",
-          stats: { avg: ".240", obp: ".315", slg: ".360", hr: 2, sb: 2 },
-          archetypes: [],
-          tags: ["Chases SL Down & Away"], 
-          notes: "Vulnerable to left-on-left sweepers.", history: [] 
+          id: 507, order: 7, name: "#11 Reeves, G.", bats: "Right",
+          stats: { avg: ".314", obp: ".370", slg: ".480", hr: 4, sb: 5 },
+          archetypes: ["CONTACT", "POWER THREAT"],
+          tags: ["Extra Base Threat", "Active Runner"], 
+          notes: "George County HS. 14 doubles, 4 HR, 38 RBI. Aggressive extra-base gap hitter.", history: [] 
         },
         { 
-          id: 107, order: 7, name: "Taylor, Zach", bats: "Right",
-          stats: { avg: ".290", obp: ".370", slg: ".520", hr: 6, sb: 1 },
-          archetypes: ["POWER THREAT"],
-          tags: ["Crushes Flat VAA"], 
-          notes: "Don't leave fastballs belt-high down middle.", history: [] 
+          id: 508, order: 8, name: "#4 Guidry", bats: "Right",
+          stats: { avg: ".288", obp: ".390", slg: ".410", hr: 4, sb: 13 },
+          archetypes: ["RUNNER"],
+          tags: ["Lead Base Stealer", "Speed Threat"], 
+          notes: "Parkview Baptist HS. Lead base stealer (13-16 SB). 29 BB, 4 HR. Speed threat.", history: [] 
         },
         { 
-          id: 108, order: 8, name: "Anderson, Luke", bats: "Right",
-          stats: { avg: ".230", obp: ".320", slg: ".310", hr: 1, sb: 3 },
-          archetypes: [],
-          tags: ["Protective 2-Strike Swing"], 
-          notes: "Fouls off pitches; elevate to finish.", history: [] 
-        },
-        { 
-          id: 109, order: 9, name: "Thomas, Ryan", bats: "Left",
-          stats: { avg: ".305", obp: ".400", slg: ".420", hr: 2, sb: 9 },
-          archetypes: ["RUNNER", "CONTACT"],
-          tags: ["Ambush 1st Pitch FB"], 
-          notes: "Swinging 1st pitch over 70% of PAs.", history: [] 
+          id: 509, order: 9, name: "#24 Graham", bats: "Left",
+          stats: { avg: ".342", obp: ".410", slg: ".540", hr: 3, sb: 5 },
+          archetypes: ["CONTACT"],
+          tags: ["Efficient Base Stealer", "Two-Way Option"], 
+          notes: "Wayne County HS. P/INF. Efficient base stealer (5-5 SB), .342 AVG, 3 HR in 76 AB.", history: [] 
         }
       ],
       bench: [
         { 
-          id: 201, name: "Benoit, Cade", bats: "Right", 
-          stats: { avg: ".260", obp: ".310", slg: ".340", hr: 1, sb: 1 },
+          id: 601, name: "#8 Smith, D.", bats: "Right", 
+          stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 },
           archetypes: [],
-          tags: ["Rolls over Sinker Down"], notes: "Contact bat off bench." 
+          tags: ["Rolls over Sinker Down"], notes: "West Jones HS. INF option off bench (79 AB, 4 2B, 16 RBI)." 
         },
         { 
-          id: 202, name: "Gautreaux, Mason", bats: "Left", 
-          stats: { avg: ".315", obp: ".390", slg: ".580", hr: 5, sb: 2 },
-          archetypes: ["POWER THREAT"],
-          tags: ["Chase IVB Up"], notes: "Left-handed power off bench." 
+          id: 602, name: "#2 Wheat", bats: "Right", 
+          stats: { avg: ".304", obp: ".420", slg: ".410", hr: 1, sb: 4 },
+          archetypes: ["CONTACT", "RUNNER"],
+          tags: ["Solid Eye (12 BB)"], notes: "Oak Grove HS. 4-4 SB, 12 BB/12 K in 56 AB." 
+        },
+        { 
+          id: 603, name: "#18 Haney", bats: "Right", 
+          stats: { avg: ".385", obp: ".410", slg: ".500", hr: 0, sb: 1 },
+          archetypes: ["CONTACT"],
+          tags: ["Two-Way Option"], notes: "Columbia HS. P/OF. .385 in 26 AB (3 2B, 6 RBI)." 
+        },
+        { 
+          id: 604, name: "#3 Smith, B.", bats: "Right", 
+          stats: { avg: ".364", obp: ".550", slg: ".550", hr: 1, sb: 4 },
+          archetypes: ["RUNNER", "CONTACT"],
+          tags: ["High OBP (16 BB)"], notes: "Florence HS. 16 BB in 22 AB, 4-5 SB." 
+        },
+        { 
+          id: 605, name: "#35 Bellanger", bats: "Right", 
+          stats: { avg: ".333", obp: ".500", slg: ".333", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Backup C"], notes: "Gulfport HS. Backup C (6 AB, 3 RBI, 2 BB, 0 K)." 
+        },
+        { 
+          id: 606, name: "#23 Rhodes", bats: "Right", 
+          stats: { avg: ".276", obp: ".320", slg: ".450", hr: 1, sb: 0 },
+          archetypes: [],
+          tags: ["Late on High Velo (92+)"], notes: "St. Stanislaus HS. 29 AB, 3 2B, 1 HR." 
+        },
+        { 
+          id: 607, name: "#13 Cassard", bats: "Left", 
+          stats: { avg: ".250", obp: ".380", slg: ".500", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Chase IVB Up"], notes: "Live Oak HS. Left-handed OF bat. 16 AB, 4 2B, 20 RBI, 4 BB." 
+        },
+        { 
+          id: 608, name: "#9 Piper", bats: "Right", 
+          stats: { avg: ".143", obp: ".200", slg: ".180", hr: 0, sb: 0 },
+          archetypes: ["HIGH K RISK"],
+          tags: ["Chases SL Down & Away"], notes: "West Jones HS. OF reserve." 
+        },
+        { 
+          id: 609, name: "#34 Long", bats: "Right", 
+          stats: { avg: ".130", obp: ".260", slg: ".220", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Backup C"], notes: "Holmes CC / Sumrall HS. Catcher reserve." 
+        },
+        { 
+          id: 610, name: "#6 Keyes", bats: "Right", 
+          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Bench Reserve"], notes: "Brandon HS. OF redshirt freshman." 
+        },
+        { 
+          id: 611, name: "#7 Holliday", bats: "Right", 
+          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Bench Reserve"], notes: "Pisgah HS. OF freshman." 
+        },
+        { 
+          id: 612, name: "#21 Oakley", bats: "Left", 
+          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
+          archetypes: [],
+          tags: ["Bench Reserve"], notes: "Hartfield Academy HS. Utility freshman." 
         }
       ],
       pitches: []
@@ -823,7 +898,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V4');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V5');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -833,7 +908,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V4', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V5', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -869,10 +944,13 @@
     function populateScoutingSelect() {
       const sel = document.getElementById('scouting-player-select');
       sel.innerHTML = `
-        <optgroup label="Lineup Hitters">
+        <optgroup label="Lineup Hitters (Jones College)">
           ${state.lineup.map(b => `<option value="batter-${b.id}">#${b.order} ${b.name} (${b.bats})</option>`).join('')}
         </optgroup>
-        <optgroup label="Pitchers">
+        <optgroup label="Bench Hitters (Jones College)">
+          ${state.bench.map(b => `<option value="batter-${b.id}">${b.name} (${b.bats})</option>`).join('')}
+        </optgroup>
+        <optgroup label="SLU Pitchers">
           ${state.pitchers.map(p => `<option value="pitcher-${p.id}">${p.name} (${p.throws})</option>`).join('')}
         </optgroup>
       `;
@@ -1097,18 +1175,18 @@
     }
 
     function addExtraHitterPrompt() {
-      const name = prompt("Enter extra hitter name (e.g. 'Miller, Chris'):");
+      const name = prompt("Enter extra hitter name (e.g. '#99 Henderson'):");
       if (!name) return;
       const bats = prompt("Enter hitting side ('Right', 'Left', or 'Switch'):", "Right") || "Right";
       const newBatter = {
-        id: 300 + state.lineup.length,
+        id: 700 + state.lineup.length,
         order: state.lineup.length + 1,
         name: name.trim(),
         bats: bats.trim(),
         stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
         archetypes: [],
         tags: ["Ambush 1st Pitch FB"],
-        notes: "Scrimmage extra hitter.",
+        notes: "Game extra hitter.",
         history: []
       };
       state.lineup.push(newBatter);
@@ -1139,7 +1217,6 @@
             const page = await pdf.getPage(pageNum);
             const textContent = await page.getTextContent();
             
-            // Group text items by Y coordinate (within 4 pixels tolerance) to maintain table rows!
             const rowMap = new Map();
             textContent.items.forEach(item => {
               const y = Math.round(item.transform[5] / 4) * 4;
@@ -1147,7 +1224,6 @@
               rowMap.get(y).push({ x: item.transform[4], text: item.str });
             });
 
-            // Sort rows top-to-bottom (PDF Y goes up from bottom)
             const sortedYs = Array.from(rowMap.keys()).sort((a, b) => b - a);
             sortedYs.forEach(y => {
               const rowItems = rowMap.get(y).sort((a, b) => a.x - b.x);
@@ -1165,7 +1241,7 @@
         }
 
       } else if (file.type.startsWith('image/')) {
-        progressText.innerText = "Analyzing screenshot... (Tip: using 'Quick-Paste' with iOS Live Text is faster)";
+        progressText.innerText = "Analyzing screenshot...";
         try {
           const { data: { text } } = await Tesseract.recognize(
             file,
@@ -1196,7 +1272,6 @@
       }
     }
 
-    // ==================== ROBUST TABLE LINE PARSER ====================
     function parseReconstructedLines(lines) {
       stagedParsedPlayers = [];
       let orderIndex = 1;
@@ -1205,7 +1280,6 @@
         let line = rawLine.trim();
         if (line.length < 5 || line.toLowerCase().includes("overall statistics") || line.toLowerCase().includes("team leaders")) return;
 
-        // Check if line contains a batting average (.XXX) or slash tokens
         const avgMatch = line.match(/(?:\s|^)(\.\d{3}|\d\.\d{3})(?:\s|$)/);
         if (avgMatch) {
           const tokens = line.split(/\s+/);
@@ -1215,25 +1289,22 @@
           let sb = 0;
           let bats = "Right";
 
-          // Extract names and numbers
           tokens.forEach((t, idx) => {
             if (/^[A-Za-z]+,?[A-Za-z]*$/.test(t) && !['AVG', 'GP', 'AB', 'R', 'H', 'HR', 'RBI', 'SLG', 'OBP', 'SO', 'BB'].includes(t.toUpperCase())) {
               nameTokens.push(t);
             } else if (/^\d+-\d+$/.test(t)) {
-              // Stolen base pattern like "12-14"
               const sbParts = t.split('-');
               const val = parseInt(sbParts[0]);
               if (val >= 0 && val <= 50) sb = val;
             } else if (!isNaN(t) && idx > 4) {
               const val = parseInt(t);
-              // Possible HR count
               if (val > 0 && val <= 40 && hr === 0) {
                 hr = val;
               }
             }
           });
 
-          let fullName = nameTokens.join(' ').replace(/[^a-zA-Z,\s]/g, '').trim();
+          let fullName = nameTokens.join(' ').replace(/[^a-zA-Z,\s#]/g, '').trim();
           if (fullName.length >= 3) {
             const archetypes = determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb);
             stagedParsedPlayers.push({
@@ -1249,26 +1320,11 @@
         }
       });
 
-      // If parsing failed to find structured lines, provide editable template
-      if (stagedParsedPlayers.length === 0) {
-        for (let i = 1; i <= 9; i++) {
-          const sampleHr = (i === 3 || i === 4) ? 6 : 1;
-          const sampleSb = (i === 1 || i === 9) ? 12 : 1;
-          stagedParsedPlayers.push({
-            name: `Player ${i}`,
-            bats: i % 2 === 0 ? "Left" : "Right",
-            stats: { avg: i === 1 ? ".340" : ".260", obp: ".350", slg: sampleHr > 4 ? ".580" : ".360", hr: sampleHr, sb: sampleSb },
-            archetypes: determineArchetypes(i === 1 ? 0.340 : 0.260, sampleHr > 4 ? 0.580 : 0.360, sampleHr, sampleSb),
-            order: i,
-            isBench: false
-          });
-        }
+      if (stagedParsedPlayers.length > 0) {
+        openSyncReviewModal();
       }
-
-      openSyncReviewModal();
     }
 
-    // ==================== QUICK PASTE TABLE MODAL ====================
     function openQuickPasteModal() {
       document.getElementById('quick-paste-textarea').value = '';
       document.getElementById('modal-quick-paste').classList.remove('hidden');
@@ -1283,7 +1339,6 @@
       parseReconstructedLines(text.split('\n'));
     }
 
-    // ==================== ARCHETYPE CLASSIFICATION ====================
     function determineArchetypes(avg, slg, hr, sb) {
       const list = [];
       if (sb >= 5) list.push("RUNNER");
@@ -1302,7 +1357,7 @@
       } else {
         p.archetypes.splice(idx, 1);
       }
-      openSyncReviewModal(); // Re-render modal with updated state
+      openSyncReviewModal();
     }
 
     function openSyncReviewModal() {
@@ -1329,7 +1384,6 @@
               <span>SB:</span>
               <input type="number" value="${p.stats.sb}" onchange="stagedParsedPlayers[${idx}].stats.sb = parseInt(this.value)||0" class="w-10 bg-gray-900 border border-gray-700 rounded px-1 text-cyan-400 text-center" />
             </div>
-            <!-- Clickable Archetype Chips -->
             <div class="flex space-x-1">
               <button onclick="togglePlayerArchetype(${idx}, 'RUNNER')" class="text-[9px] font-black px-1.5 py-0.5 rounded border transition ${p.archetypes.includes('RUNNER') ? 'bg-cyan-950 text-cyan-300 border-cyan-600' : 'bg-gray-900 text-gray-500 border-gray-800'}">🏃 RUNNER</button>
               <button onclick="togglePlayerArchetype(${idx}, 'POWER THREAT')" class="text-[9px] font-black px-1.5 py-0.5 rounded border transition ${p.archetypes.includes('POWER THREAT') ? 'bg-red-950 text-red-300 border-red-600' : 'bg-gray-900 text-gray-500 border-gray-800'}">💣 POWER</button>
@@ -1352,7 +1406,7 @@
 
       stagedParsedPlayers.forEach((p, idx) => {
         const playerObj = {
-          id: 900 + idx,
+          id: 950 + idx,
           name: p.name,
           bats: p.bats,
           stats: p.stats,
@@ -1397,7 +1451,7 @@
           const archetypes = determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb);
 
           const playerObj = {
-            id: 700 + i,
+            id: 850 + i,
             name: parts[0],
             bats: parts[1] || 'Right',
             stats: { avg: avg, obp: ".340", slg: ".400", hr: hr, sb: sb },
@@ -1442,7 +1496,6 @@
       }).join('');
     }
 
-    // SUB MODAL & BENCH
     let currentSubTargetId = null;
     function openSubModal() {
       const b = state.lineup[state.gameInfo.currentBatterIndex];
@@ -1782,7 +1835,7 @@
           <div class="flex justify-between items-center bg-gray-900 px-2.5 py-1.5 rounded border border-gray-800/80">
             <div>
               <span class="text-gray-200 font-medium">${bp.name} (${bp.bats[0]}HH)</span>
-              <span class="text-[9px] text-gray-400 block font-mono">${bp.stats ? `${bp.stats.avg} • ${bp.stats.hr} HR` : ''}</span>
+              <span class="text-[9px] text-gray-400 block font-mono">${bp.stats ? `${bp.stats.avg} • ${bp.stats.hr} HR • ${bp.stats.sb || 0} SB` : ''}</span>
             </div>
             <div class="flex space-x-1">
               ${renderArchetypeBadges(bp.archetypes)}
@@ -1833,7 +1886,7 @@
     function loadPlayerScoutingProfile(val) {
       const [type, idStr] = val.split('-');
       const id = parseInt(idStr);
-      let p = (type === 'batter') ? state.lineup.find(b => b.id === id) : state.pitchers.find(pi => pi.id === id);
+      let p = (type === 'batter') ? (state.lineup.find(b => b.id === id) || state.bench.find(b => b.id === id)) : state.pitchers.find(pi => pi.id === id);
       if (p) {
         document.getElementById('scouting-text-input').value = p.notes || "";
       }
@@ -1843,7 +1896,7 @@
       const val = document.getElementById('scouting-player-select').value;
       const [type, idStr] = val.split('-');
       const id = parseInt(idStr);
-      let p = (type === 'batter') ? state.lineup.find(b => b.id === id) : state.pitchers.find(pi => pi.id === id);
+      let p = (type === 'batter') ? (state.lineup.find(b => b.id === id) || state.bench.find(b => b.id === id)) : state.pitchers.find(pi => pi.id === id);
       if (p) {
         p.notes = text;
         saveState();
@@ -1858,7 +1911,7 @@
         alert("Quick tags are configured for hitters");
         return;
       }
-      const b = state.lineup.find(x => x.id === parseInt(idStr));
+      const b = state.lineup.find(x => x.id === parseInt(idStr)) || state.bench.find(x => x.id === parseInt(idStr));
       if (!b) return;
       if (!b.tags) b.tags = [];
       const idx = b.tags.indexOf(tagName);
