@@ -24,6 +24,11 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+    .strike-zone-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
     .custom-scrollbar::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -78,6 +83,11 @@
       <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow">
         <i data-lucide="download" class="w-3.5 h-3.5"></i>
         <span>TrackMan CSV</span>
+      </button>
+
+      <!-- FULL SCREEN TOGGLE BUTTON -->
+      <button onclick="toggleFullScreen()" title="Toggle Full Screen (Hide Safari Bar)" class="p-1.5 bg-gray-800 hover:bg-emerald-600/30 text-gray-300 hover:text-emerald-400 border border-gray-700 rounded-lg transition active:scale-95">
+        <i data-lucide="maximize" id="fullscreen-icon" class="w-4 h-4"></i>
       </button>
 
       <button onclick="confirmResetGame()" title="New Game / Reset" class="p-1.5 bg-gray-800 hover:bg-red-600/30 text-gray-400 hover:text-red-400 border border-gray-700 rounded-lg transition">
@@ -244,7 +254,7 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <!-- STRIKE ZONE INTERFACE WITH CLEAN, PROPORTIONAL TEXT -->
+          <!-- STRIKE ZONE INTERFACE -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-gray-950 border border-gray-800 rounded-2xl p-2.5 flex flex-col items-center justify-center space-y-2 shadow-inner">
             
             <!-- OUTSIDE 1: CHASE HIGH -->
@@ -860,7 +870,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V8');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V9');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -870,7 +880,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V8', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V9', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -896,6 +906,42 @@
       selectZone(1, 'Up-In (Zone 1)');
       renderAllViews();
     });
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+    function toggleFullScreen() {
+      const doc = document.documentElement;
+      const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+
+      if (!isFull) {
+        if (doc.requestFullscreen) {
+          doc.requestFullscreen().catch(() => showPwaHomeScreenTip());
+        } else if (doc.webkitRequestFullscreen) {
+          doc.webkitRequestFullscreen();
+        } else {
+          showPwaHomeScreenTip();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    function updateFullscreenIcon() {
+      const icon = document.getElementById('fullscreen-icon');
+      if (!icon) return;
+      const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+      icon.setAttribute('data-lucide', isFull ? 'minimize' : 'maximize');
+      lucide.createIcons();
+    }
+
+    function showPwaHomeScreenTip() {
+      alert("To remove the Safari address and tab bar permanently on iPad:\n\n1. Tap the Share button (square with arrow up) at the top right of Safari.\n2. Tap 'Add to Home Screen'.\n3. Open Dugout Tracker from your iPad Home Screen.");
+    }
 
     function populatePitcherSelect() {
       const sel = document.getElementById('pitcher-select');
@@ -938,7 +984,6 @@
       });
     }
 
-    // PERSISTENT COMPACT STRIKE ZONE FONT CONTROLLER
     function selectZone(zoneNum, customDesc) {
       activeZone = zoneNum;
       activeZoneDesc = customDesc || `Zone ${zoneNum}`;
