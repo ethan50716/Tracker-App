@@ -52,7 +52,7 @@
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans antialiased overflow-x-hidden">
 
   <!-- TOP APP BAR -->
-  <header class="bg-gray-900 border-b border-gray-800 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-lg">
+  <header class="bg-gray-900 border-b border-gray-800 px-4 py-2.5 sticky top-0 z-40 flex flex-col sm:flex-row sm:items-center justify-between shadow-lg gap-2">
     <div class="flex items-center space-x-3">
       <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30">
         <i data-lucide="activity" class="w-5 h-5"></i>
@@ -61,28 +61,34 @@
         <div class="flex items-center space-x-2">
           <h1 class="text-sm font-black tracking-wider uppercase text-white">DUGOUT ANALYTICS</h1>
           <span id="storage-indicator" class="flex items-center text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-mono">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span> AUTO-SAVED
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span> SAVED
           </span>
         </div>
-        <p class="text-[11px] text-gray-400 font-medium"><span id="header-matchup">SLU vs Opponent</span></p>
+        <!-- GLOBAL MATCHUP SELECTORS -->
+        <div class="flex items-center space-x-1.5 mt-0.5">
+          <span class="text-[10px] text-gray-400 font-bold uppercase">Mound:</span>
+          <select id="header-pitching-team" onchange="changeActivePitchingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
+          <span class="text-[10px] text-gray-500 font-bold uppercase ml-1">Plate:</span>
+          <select id="header-batting-team" onchange="changeActiveBattingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-amber-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center space-x-2">
-      <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1">
-        <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">MOUND:</span>
-        <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer">
+    <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+      <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1 whitespace-nowrap">
+        <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">PITCHER:</span>
+        <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer max-w-[120px] truncate">
         </select>
       </div>
 
-      <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95">
+      <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95 whitespace-nowrap">
         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
         <span>Roll Inning</span>
       </button>
 
-      <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow">
+      <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow whitespace-nowrap">
         <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span>TrackMan CSV</span>
+        <span>CSV</span>
       </button>
 
       <!-- FULL SCREEN TOGGLE BUTTON -->
@@ -158,20 +164,20 @@
   </section>
 
   <!-- NAVIGATION TABS -->
-  <nav class="bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold">
-    <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5">
+  <nav class="bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold overflow-x-auto custom-scrollbar">
+    <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 whitespace-nowrap">
       <i data-lucide="crosshair" class="w-4 h-4"></i>
-      <span>LIVE CHARTING & TALLY</span>
+      <span>LIVE CHARTING</span>
     </button>
-    <button onclick="switchTab('scouting')" id="tab-btn-scouting" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+    <button onclick="switchTab('scouting')" id="tab-btn-scouting" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
       <i data-lucide="book-open" class="w-4 h-4"></i>
-      <span>SCOUTING & CUES HUB</span>
+      <span>SCOUTING HUB</span>
     </button>
-    <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+    <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
       <i data-lucide="users" class="w-4 h-4"></i>
       <span>TEAMS & ROSTERS</span>
     </button>
-    <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5">
+    <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
       <i data-lucide="list" class="w-4 h-4"></i>
       <span>PITCH LOG (<span id="tab-pitch-count">0</span>)</span>
     </button>
@@ -191,7 +197,7 @@
               <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AT THE PLATE</span>
               <div class="flex items-center space-x-1.5">
                 <span id="batter-order-num" class="bg-gray-800 text-gray-300 text-xs px-1.5 py-0.5 rounded font-black font-mono">#1</span>
-                <h3 id="batter-name" class="text-sm font-black text-white">#5 Champagne</h3>
+                <h3 id="batter-name" class="text-sm font-black text-white">Champagne</h3>
               </div>
             </div>
             <div class="text-right">
@@ -204,16 +210,15 @@
           <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
-              <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.384 / .470 / .520 • 4 HR • 11 SB</span>
+              <span id="batter-statline" class="text-[10px] font-mono text-emerald-400 font-bold">.000 / .000 / .000</span>
             </div>
-            <div id="batter-archetype-badges" class="flex flex-wrap gap-1">
-            </div>
+            <div id="batter-archetype-badges" class="flex flex-wrap gap-1"></div>
           </div>
 
           <!-- Previous At-Bat Result -->
           <div class="bg-gray-950 rounded-lg p-2 border border-gray-800/80 mb-2.5">
             <span class="text-[9px] text-gray-400 font-bold uppercase block mb-0.5">PREVIOUS AT-BAT:</span>
-            <p id="batter-last-ab" class="text-xs font-semibold text-amber-300">No prior plate appearances today</p>
+            <p id="batter-last-ab" class="text-xs font-semibold text-amber-300">No prior plate appearances</p>
           </div>
 
           <!-- Live Scouting Cues Overlay -->
@@ -224,10 +229,9 @@
               </span>
               <button onclick="switchTab('scouting')" class="text-[9px] text-gray-400 hover:text-white underline">Edit</button>
             </div>
-            <div id="batter-scouting-tags" class="flex flex-wrap gap-1">
-            </div>
+            <div id="batter-scouting-tags" class="flex flex-wrap gap-1"></div>
             <p id="batter-scouting-notes" class="text-[11px] text-gray-300 italic bg-gray-950/60 p-2 rounded border border-gray-800/60">
-              Plus runner. C/INF (Fr.) Dutchtown HS. Aggressive contact bat.
+              No notes available.
             </p>
           </div>
         </div>
@@ -244,33 +248,26 @@
         </div>
       </div>
 
-      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & OPTIMIZED STRIKE ZONE -->
+      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE -->
       <div class="lg:col-span-5 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-2 px-1">
             <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
-              <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 mr-1"></i> TAP LOCATION (OR CHOOSE CALL)
+              <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 mr-1"></i> PITCH LOCATION
             </span>
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
           <!-- STRIKE ZONE INTERFACE -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-gray-950 border border-gray-800 rounded-2xl p-2.5 flex flex-col items-center justify-center space-y-2 shadow-inner">
-            
-            <!-- OUTSIDE 1: CHASE HIGH -->
             <button onclick="selectZone(5, 'Chase High')" id="zone-btn-5" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
               ▲ Chase High / Waste
             </button>
-
-            <!-- MIDDLE ROW: CHASE IN - 2X2 IN-ZONE - CHASE AWAY -->
             <div class="w-full flex items-stretch space-x-2">
-              <!-- OUTSIDE 2: CHASE ARM / IN -->
               <button onclick="selectZone(6, 'Chase In (Arm)')" id="zone-btn-6" class="w-16 sm:w-20 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[10px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
                 <span>◀ In</span>
                 <span class="text-[9px] text-gray-400 font-medium">(Arm)</span>
               </button>
-
-              <!-- 2x2 IN-ZONE GRID -->
               <div class="relative flex-1 grid grid-cols-2 grid-rows-2 gap-1.5 h-44 bg-gray-900/90 border-2 border-emerald-500/80 rounded-2xl p-1.5 shadow-inner">
                 <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="bg-gray-800/90 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5">
                   <span id="zone-label-1" class="text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight">Up-In</span>
@@ -289,15 +286,11 @@
                   <span id="zone-sub-4" class="text-[10px] font-mono text-gray-400 mt-0.5">Zone 4</span>
                 </button>
               </div>
-
-              <!-- OUTSIDE 3: CHASE GLOVE / AWAY -->
               <button onclick="selectZone(7, 'Chase Away (Glove)')" id="zone-btn-7" class="w-16 sm:w-20 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[10px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
                 <span>Away ▶</span>
                 <span class="text-[9px] text-gray-400 font-medium">(Glove)</span>
               </button>
             </div>
-
-            <!-- OUTSIDE 4: CHASE DIRT -->
             <button onclick="selectZone(8, 'Chase Dirt / Below')" id="zone-btn-8" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
               ▼ Chase Dirt / Below
             </button>
@@ -325,27 +318,22 @@
                 <span class="text-sm">BALL</span>
                 <span class="text-[9px] text-blue-400 font-normal">Take / Dirt</span>
               </button>
-
               <button onclick="recordPitch('StrikeCalled')" class="py-3 bg-amber-950/80 hover:bg-amber-900 border border-amber-600 text-amber-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span class="text-sm">CALLED STR</span>
                 <span class="text-[9px] text-amber-400 font-normal">Looking</span>
               </button>
-
               <button onclick="recordPitch('StrikeSwinging')" class="py-3 bg-purple-950/80 hover:bg-purple-900 border border-purple-600 text-purple-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span class="text-sm">WHIFF</span>
                 <span class="text-[9px] text-purple-400 font-normal">Swinging Strike</span>
               </button>
-
               <button onclick="recordPitch('FoulBall')" class="py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span>FOUL</span>
                 <span class="text-[9px] text-gray-400 font-normal">2-Strike Hold</span>
               </button>
-
               <button onclick="openInPlayModal()" class="py-2.5 bg-emerald-900/80 hover:bg-emerald-800 border border-emerald-600 text-emerald-200 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span class="text-sm">IN PLAY</span>
                 <span class="text-[9px] text-emerald-300 font-normal">Hit / Out / Error</span>
               </button>
-
               <button onclick="recordPitch('HitByPitch')" class="py-2.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-700 text-rose-300 font-black text-xs rounded-xl shadow active:scale-95 flex flex-col items-center justify-center">
                 <span>HBP</span>
                 <span class="text-[9px] text-rose-400 font-normal">Hit By Pitch</span>
@@ -355,7 +343,7 @@
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: LIVE ARSENAL PITCH TALLY & CSW BREAKDOWN -->
+      <!-- RIGHT COLUMN: LIVE ARSENAL PITCH TALLY -->
       <div class="lg:col-span-4 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
@@ -415,7 +403,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- ==================== TAB 2: SCOUTING & CUES HUB ==================== -->
@@ -444,7 +431,6 @@
                 <button onclick="toggleScoutTag('Crushes Flat VAA')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-red-600/30 border border-gray-700">Crushes Flat VAA</button>
               </div>
             </div>
-
             <div>
               <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Breaking Ball Tendencies:</span>
               <div class="flex flex-wrap gap-1.5">
@@ -453,7 +439,6 @@
                 <button onclick="toggleScoutTag('Spits on Early Sweep')" class="scout-tag-btn px-2.5 py-1 text-xs rounded bg-gray-800 text-gray-300 hover:bg-amber-600/30 border border-gray-700">Spits on Early Sweep</button>
               </div>
             </div>
-
             <div>
               <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1">Approach & Counts:</span>
               <div class="flex flex-wrap gap-1.5">
@@ -463,9 +448,8 @@
               </div>
             </div>
           </div>
-
           <div class="space-y-2">
-            <span class="text-xs font-bold text-gray-300 uppercase block">CUSTOM SCOUTING NOTES & MECHANICAL CUES:</span>
+            <span class="text-xs font-bold text-gray-300 uppercase block">CUSTOM SCOUTING NOTES & CUES:</span>
             <textarea id="scouting-text-input" oninput="saveCurrentScoutingText(this.value)" rows="8" placeholder="Enter custom scouting notes, grip cues, or attack plans for this player..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-xs text-gray-200 outline-none focus:border-emerald-500 custom-scrollbar"></textarea>
             <div class="flex justify-between items-center text-[10px] text-gray-500">
               <span>Auto-saves immediately to local database.</span>
@@ -483,19 +467,11 @@
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md mb-4">
         <div class="flex flex-col md:flex-row justify-between items-center gap-3">
           <div class="flex items-center space-x-3 w-full md:w-auto">
-             <span class="text-xs font-bold text-gray-400 uppercase">MANAGE TEAM:</span>
+             <span class="text-xs font-bold text-gray-400 uppercase">EDIT ROSTER FOR:</span>
              <select id="team-manager-select" onchange="changeManagedTeam(this.value)" class="bg-gray-950 border border-gray-700 text-emerald-400 text-sm font-bold px-3 py-1.5 rounded-lg outline-none cursor-pointer flex-1">
              </select>
              <button onclick="createNewTeamPrompt()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg border border-gray-700 whitespace-nowrap">
                + New Team
-             </button>
-          </div>
-          <div class="flex items-center space-x-2 w-full md:w-auto">
-             <button onclick="setAsPitchingTeam()" class="flex-1 md:flex-none bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-600 text-emerald-200 font-bold text-xs px-3 py-1.5 rounded-lg shadow">
-               Set as Active Pitching (Mound)
-             </button>
-             <button onclick="setAsBattingTeam()" class="flex-1 md:flex-none bg-amber-900/60 hover:bg-amber-800 border border-amber-600 text-amber-200 font-bold text-xs px-3 py-1.5 rounded-lg shadow">
-               Set as Active Opponent (Plate)
              </button>
           </div>
         </div>
@@ -507,8 +483,8 @@
           <div class="flex justify-between items-center border-b border-gray-800 pb-2">
             <h3 class="text-sm font-black text-white uppercase">TEAM HITTERS</h3>
             <div class="space-x-1">
-              <button onclick="openPlayerFormModal('lineup')" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-2.5 py-1 rounded border border-gray-700">+ Add Lineup</button>
-              <button onclick="openPlayerFormModal('bench')" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-2.5 py-1 rounded border border-gray-700">+ Add Bench</button>
+              <button onclick="openPlayerFormModal('lineup')" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-2.5 py-1 rounded border border-gray-700 shadow">+ Add Lineup</button>
+              <button onclick="openPlayerFormModal('bench')" class="text-xs bg-gray-800 hover:bg-gray-700 text-white px-2.5 py-1 rounded border border-gray-700 shadow">+ Add Bench</button>
             </div>
           </div>
           
@@ -538,13 +514,13 @@
           <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-white uppercase flex items-center">
-                <i data-lucide="file-text" class="w-4 h-4 text-emerald-400 mr-1.5"></i> PRE-GAME DATA INGESTION
+                <i data-lucide="file-text" class="w-4 h-4 text-emerald-400 mr-1.5"></i> DATA INGESTION
               </span>
               <button onclick="openQuickPasteModal()" class="text-[10px] bg-gray-800 px-2 py-1 rounded border border-gray-700 text-emerald-400 font-bold">Paste Text</button>
             </div>
             
             <p class="text-xs text-gray-400">
-              Upload opposing team <strong>PDF Stat Packets</strong>, screenshots, or roster CSV spreadsheets to auto-fill the currently managed team.
+              Upload opposing team <strong>PDF Stat Packets</strong>, screenshots, or CSVs to auto-fill the currently managed team.
             </p>
             
             <input type="file" id="roster-file-input" accept=".pdf,application/pdf,image/*,.csv,text/csv" class="hidden" onchange="handleUnifiedFileUpload(event)" />
@@ -611,7 +587,6 @@
 
   <!-- MODAL: IN PLAY OUTCOME SELECTION -->
   <div id="modal-in-play" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <!-- (Unchanged structure) -->
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-4 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
         <h3 class="text-sm font-black text-white uppercase tracking-wider">IN-PLAY BATTED BALL RESULT</h3>
@@ -656,7 +631,7 @@
       <div class="space-y-2">
         <div class="flex justify-between items-center">
           <span class="text-xs text-gray-400">Replace: <strong id="sub-target-name" class="text-white">Player</strong></span>
-          <button onclick="closeSubModal(); openPlayerFormModal('bench')" class="text-[11px] text-emerald-400 font-bold hover:underline">+ New Bench Player</button>
+          <button onclick="closeSubModal(); switchTab('roster'); openPlayerFormModal('bench')" class="text-[11px] text-emerald-400 font-bold hover:underline">+ New Bench Player</button>
         </div>
         <div id="bench-player-list" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar">
         </div>
@@ -664,7 +639,7 @@
     </div>
   </div>
 
-  <!-- MODAL: UNIVERSAL PLAYER ADD / EDIT (REPLACES ADD BENCH) -->
+  <!-- MODAL: UNIVERSAL PLAYER ADD / EDIT -->
   <div id="modal-player-form" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -677,7 +652,8 @@
       <div class="space-y-3 text-xs">
         <input type="hidden" id="form-player-id" value="" />
         
-        <div class="grid grid-cols-3 gap-3">
+        <!-- ROW 1: Settings -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="col-span-1">
             <label class="block text-gray-400 mb-1 font-bold">Role:</label>
             <select id="form-player-role" onchange="togglePlayerFormFields()" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none">
@@ -691,17 +667,25 @@
             <input type="text" id="form-player-num" placeholder="e.g. 5" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none" />
           </div>
           <div class="col-span-1">
-            <label class="block text-gray-400 mb-1 font-bold">Throws/Bats:</label>
-            <select id="form-player-hand" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none">
-              <option value="Right">Right (R)</option>
-              <option value="Left">Left (L)</option>
-              <option value="Switch">Switch (S)</option>
+            <label class="block text-gray-400 mb-1 font-bold">Throws:</label>
+            <select id="form-player-throws" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none">
+              <option value="Right">Right</option>
+              <option value="Left">Left</option>
+              <option value="Switch">Switch</option>
+            </select>
+          </div>
+          <div class="col-span-1">
+            <label class="block text-gray-400 mb-1 font-bold">Bats:</label>
+            <select id="form-player-bats" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none">
+              <option value="Right">Right</option>
+              <option value="Left">Left</option>
+              <option value="Switch">Switch</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-gray-400 mb-1 font-bold">Player Last Name:</label>
+          <label class="block text-gray-400 mb-1 font-bold">Player Name:</label>
           <input type="text" id="form-player-name" placeholder="e.g. Champagne" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-white outline-none" />
         </div>
 
@@ -750,7 +734,6 @@
 
   <!-- MODAL: QUICK PASTE ROSTER / STATS TABLE -->
   <div id="modal-quick-paste" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <!-- Unchanged structure internally, but parser will map to currently managed team -->
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-2">
         <div>
@@ -796,7 +779,7 @@
 
   <!-- JAVASCRIPT APPLICATION CODE -->
   <script>
-    // V10: Re-architected for multi-team and roster management
+    // V11: Separated Throws/Bats, Restored Pitchers, added Global Matchup Headers
     const DEFAULT_APP_STATE = {
       gameInfo: {
         date: new Date().toISOString().split('T')[0],
@@ -815,9 +798,26 @@
           id: 'slu',
           name: 'Southeastern Louisiana',
           pitchers: [
-            { id: 1, name: "Robb, Carson", throws: "Right", notes: "Attack top/bottom of zone. Establish FB early." },
-            { id: 2, name: "Toups, Nik", throws: "Left", notes: "Heavy sinker 94-95 with 17in run." },
-            { id: 3, name: "Fabre, Larson", throws: "Left", notes: "Deceptive slot; arm-side run and sweeper." }
+            { id: 1, name: "Robb, Carson", throws: "Right", bats: "Right", notes: "Attack top/bottom of zone. Establish FB early." },
+            { id: 2, name: "Toups, Nik", throws: "Left", bats: "Left", notes: "Heavy sinker 94-95 with 17in run. Work down for weak ground contact." },
+            { id: 3, name: "Fabre, Larson", throws: "Left", bats: "Left", notes: "Deceptive slot; arm-side run and sweeping breaking ball." },
+            { id: 4, name: "Spencer, Patrick", throws: "Right", bats: "Right", notes: "2900+ RPM sweeper. Out-pitch with 2 strikes away." },
+            { id: 5, name: "Freche, Logan", throws: "Right", bats: "Right", notes: "Heater up to 95+; 91-92 cutter tunneled off fastball lane." },
+            { id: 6, name: "Gray, Dalton", throws: "Right", bats: "Right", notes: "High IVB carry; ride heater at the top of zone." },
+            { id: 7, name: "Todoroski, Tristan", throws: "Right", bats: "Right", notes: "Zone pounder; mix breaking ball early in counts." },
+            { id: 8, name: "Lobell, Blake", throws: "Right", bats: "Right", notes: "Sink/slider mix; works down and induces ground balls." },
+            { id: 9, name: "Ambrose, Chase", throws: "Right", bats: "Right", notes: "High pitchability strike-thrower with firm offspeed." },
+            { id: 10, name: "Thorn, Jacob", throws: "Right", bats: "Right", notes: "High-leverage arm; swing-and-miss stuff." },
+            { id: 11, name: "Marse, Sam", throws: "Right", bats: "Right", notes: "Fastball/changeup tunnel; fills zone with confidence." },
+            { id: 12, name: "Shaffer, Levi", throws: "Right", bats: "Right", notes: "Power mix; aggressive in the strike zone." },
+            { id: 13, name: "Demopulos, Braxton", throws: "Right", bats: "Right", notes: "Sharp late break; out-pitch below the knees." },
+            { id: 14, name: "Marcotte, Riley", throws: "Left", bats: "Left", notes: "Tough left-handed angle; backdoor and backfoot spin." },
+            { id: 15, name: "Webb, Truitt", throws: "Right", bats: "Right", notes: "Pounds the zone; competitive FB/CH mix." },
+            { id: 16, name: "Simmons, Sawyer", throws: "Right", bats: "Right", notes: "Heavy run on heater; commands east-to-west." },
+            { id: 17, name: "Minichino, Austin", throws: "Right", bats: "Right", notes: "Quality three-pitch mix with strikeout capability." },
+            { id: 18, name: "Amedee, Drake", throws: "Right", bats: "Right", notes: "Attacks early count; works ahead." },
+            { id: 19, name: "Mills", throws: "Right", bats: "Right", notes: "Power arm out of bullpen." },
+            { id: 20, name: "Bullock", throws: "Right", bats: "Right", notes: "Aggressive strike-thrower." }
           ],
           lineup: [],
           bench: []
@@ -827,12 +827,29 @@
           name: 'Jones College Bobcats',
           pitchers: [],
           lineup: [
-            { id: 501, order: 1, name: "#5 Champagne", bats: "Left", stats: { avg: ".384", obp: ".470", slg: ".520", hr: 4, sb: 11 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Ambush 1st Pitch FB"], notes: "Plus runner.", history: [] },
-            { id: 502, order: 2, name: "#14 Theriot", bats: "Right", stats: { avg: ".317", obp: ".420", slg: ".390", hr: 1, sb: 10 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Plus Runner"], notes: "Hahnville HS.", history: [] },
-            { id: 503, order: 3, name: "#28 Russell", bats: "Left", stats: { avg: ".371", obp: ".480", slg: ".680", hr: 15, sb: 4 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Middle of Order Power"], notes: "Huge power threat.", history: [] }
+            { id: 501, order: 1, name: "#5 Champagne", throws: "Right", bats: "Left", stats: { avg: ".384", obp: ".470", slg: ".520", hr: 4, sb: 11 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Ambush 1st Pitch FB", "Plus Runner"], notes: "Plus runner (11-13 SB). Dutchtown HS. Aggressive contact bat (.384, 21 2B).", history: [] },
+            { id: 502, order: 2, name: "#14 Theriot", throws: "Right", bats: "Right", stats: { avg: ".317", obp: ".420", slg: ".390", hr: 1, sb: 10 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Plus Runner", "High OBP (29 BB)"], notes: "Hahnville HS. Plus runner / high OBP (29 BB, 10 SB). Takes walks, runs well.", history: [] },
+            { id: 503, order: 3, name: "#28 Russell", throws: "Right", bats: "Left", stats: { avg: ".371", obp: ".480", slg: ".680", hr: 15, sb: 4 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Middle of Order Power", "Crushes Flat VAA"], notes: "Southern Miss transfer / Madison Central. 15 HR, 70 RBI, 45 BB. Huge power threat.", history: [] },
+            { id: 504, order: 4, name: "#26 Ainsworth", throws: "Right", bats: "Right", stats: { avg: ".360", obp: ".450", slg: ".650", hr: 15, sb: 3 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Run Producer", "Extra Base Threat"], notes: "Madison Central HS. 15 HR, 70 RBI, 32 BB. Punishes mistakes over heart of plate.", history: [] },
+            { id: 505, order: 5, name: "#16 Hutchinson", throws: "Left", bats: "Left", stats: { avg: ".307", obp: ".455", slg: ".410", hr: 2, sb: 8 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Elite Eye (48 BB)", "Active Runner"], notes: "Madison Central HS. Elite eye (48 BB against 27 K). Active on base paths (8 SB).", history: [] },
+            { id: 506, order: 6, name: "#17 Quick", throws: "Right", bats: "Right", stats: { avg: ".333", obp: ".400", slg: ".440", hr: 3, sb: 3 }, archetypes: ["CONTACT"], tags: ["Solid Contact", "Protective 2-Strikes"], notes: "Germantown HS catcher. Solid contact bat (.333, 27 RBI, 17 K in 162 AB).", history: [] },
+            { id: 507, order: 7, name: "#11 Reeves, G.", throws: "Right", bats: "Right", stats: { avg: ".314", obp: ".370", slg: ".480", hr: 4, sb: 5 }, archetypes: ["CONTACT", "POWER THREAT"], tags: ["Extra Base Threat", "Active Runner"], notes: "George County HS. 14 doubles, 4 HR, 38 RBI. Aggressive extra-base gap hitter.", history: [] },
+            { id: 508, order: 8, name: "#4 Guidry", throws: "Right", bats: "Right", stats: { avg: ".288", obp: ".390", slg: ".410", hr: 4, sb: 13 }, archetypes: ["RUNNER"], tags: ["Lead Base Stealer", "Speed Threat"], notes: "Parkview Baptist HS. Lead base stealer (13-16 SB). 29 BB, 4 HR. Speed threat.", history: [] },
+            { id: 509, order: 9, name: "#24 Graham", throws: "Left", bats: "Left", stats: { avg: ".342", obp: ".410", slg: ".540", hr: 3, sb: 5 }, archetypes: ["CONTACT"], tags: ["Efficient Base Stealer", "Two-Way Option"], notes: "Wayne County HS. P/INF. Efficient base stealer (5-5 SB), .342 AVG, 3 HR in 76 AB.", history: [] }
           ],
           bench: [
-            { id: 601, name: "#8 Smith, D.", bats: "Right", stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 }, archetypes: [], tags: ["Rolls over Sinker Down"], notes: "West Jones HS." }
+            { id: 601, name: "#8 Smith, D.", throws: "Right", bats: "Right", stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 }, archetypes: [], tags: ["Rolls over Sinker Down"], notes: "West Jones HS." },
+            { id: 602, name: "#2 Wheat", throws: "Right", bats: "Right", stats: { avg: ".304", obp: ".420", slg: ".410", hr: 1, sb: 4 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Solid Eye (12 BB)"], notes: "Oak Grove HS." },
+            { id: 603, name: "#18 Haney", throws: "Right", bats: "Right", stats: { avg: ".385", obp: ".410", slg: ".500", hr: 0, sb: 1 }, archetypes: ["CONTACT"], tags: ["Two-Way Option"], notes: "Columbia HS." },
+            { id: 604, name: "#3 Smith, B.", throws: "Right", bats: "Right", stats: { avg: ".364", obp: ".550", slg: ".550", hr: 1, sb: 4 }, archetypes: ["RUNNER", "CONTACT"], tags: ["High OBP (16 BB)"], notes: "Florence HS." },
+            { id: 605, name: "#35 Bellanger", throws: "Right", bats: "Right", stats: { avg: ".333", obp: ".500", slg: ".333", hr: 0, sb: 0 }, archetypes: [], tags: ["Backup C"], notes: "Gulfport HS." },
+            { id: 606, name: "#23 Rhodes", throws: "Right", bats: "Right", stats: { avg: ".276", obp: ".320", slg: ".450", hr: 1, sb: 0 }, archetypes: [], tags: ["Late on High Velo (92+)"], notes: "St. Stanislaus HS." },
+            { id: 607, name: "#13 Cassard", throws: "Left", bats: "Left", stats: { avg: ".250", obp: ".380", slg: ".500", hr: 0, sb: 0 }, archetypes: [], tags: ["Chase IVB Up"], notes: "Live Oak HS." },
+            { id: 608, name: "#9 Piper", throws: "Right", bats: "Right", stats: { avg: ".143", obp: ".200", slg: ".180", hr: 0, sb: 0 }, archetypes: ["HIGH K RISK"], tags: ["Chases SL Down & Away"], notes: "West Jones HS." },
+            { id: 609, name: "#34 Long", throws: "Right", bats: "Right", stats: { avg: ".130", obp: ".260", slg: ".220", hr: 0, sb: 0 }, archetypes: [], tags: ["Backup C"], notes: "Holmes CC." },
+            { id: 610, name: "#6 Keyes", throws: "Right", bats: "Right", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Brandon HS." },
+            { id: 611, name: "#7 Holliday", throws: "Right", bats: "Right", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Pisgah HS." },
+            { id: 612, name: "#21 Oakley", throws: "Left", bats: "Left", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Hartfield Academy HS." }
           ]
         }
       },
@@ -847,7 +864,6 @@
     let toastTimeout = null;
     let stagedParsedPlayers = [];
     
-    // Team Manager state
     let managingTeamId = state.gameInfo.battingTeamId || Object.keys(state.teams)[0];
     let editingPlayerId = null;
 
@@ -858,7 +874,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V10');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V11');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -868,7 +884,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V10', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V11', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -889,6 +905,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
+      populateGlobalTeamSelects();
       populateTeamManagerSelect();
       populatePitcherSelect();
       populateScoutingSelect();
@@ -919,7 +936,40 @@
       lucide.createIcons();
     }
 
-    // ---------------- TEAM MANAGER FUNCTIONS ---------------- //
+    // ---------------- GLOBAL TEAM MATCHUP FUNCTIONS ---------------- //
+    function populateGlobalTeamSelects() {
+      const pitchSel = document.getElementById('header-pitching-team');
+      const batSel = document.getElementById('header-batting-team');
+      
+      let optionsHtml = Object.values(state.teams).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+      
+      pitchSel.innerHTML = optionsHtml;
+      batSel.innerHTML = optionsHtml;
+      
+      pitchSel.value = state.gameInfo.pitchingTeamId;
+      batSel.value = state.gameInfo.battingTeamId;
+    }
+
+    function changeActivePitchingTeam(teamId) {
+      state.gameInfo.pitchingTeamId = teamId;
+      state.gameInfo.currentPitcherIndex = 0;
+      saveState();
+      populatePitcherSelect();
+      populateScoutingSelect();
+      renderAllViews();
+      showQuickToast(`Pitching Staff updated to ${state.teams[teamId].name}`);
+    }
+
+    function changeActiveBattingTeam(teamId) {
+      state.gameInfo.battingTeamId = teamId;
+      state.gameInfo.currentBatterIndex = 0;
+      saveState();
+      populateScoutingSelect();
+      renderAllViews();
+      showQuickToast(`Lineup updated to ${state.teams[teamId].name}`);
+    }
+
+    // ---------------- TEAM MANAGER FUNCTIONS (Roster Tab) ---------------- //
     function populateTeamManagerSelect() {
       const sel = document.getElementById('team-manager-select');
       sel.innerHTML = Object.values(state.teams).map(t => 
@@ -929,7 +979,7 @@
 
     function changeManagedTeam(teamId) {
       managingTeamId = teamId;
-      renderLineupManager(); // Update tab 3 UI
+      renderLineupManager();
     }
 
     function createNewTeamPrompt() {
@@ -939,43 +989,21 @@
       state.teams[tid] = { id: tid, name: tname, pitchers: [], lineup: [], bench: [] };
       managingTeamId = tid;
       saveState();
+      populateGlobalTeamSelects();
       populateTeamManagerSelect();
       renderAllViews();
       showQuickToast(`Created new team: ${tname}`);
     }
 
-    function setAsPitchingTeam() {
-      state.gameInfo.pitchingTeamId = managingTeamId;
-      state.gameInfo.currentPitcherIndex = 0;
-      saveState();
-      populatePitcherSelect();
-      populateScoutingSelect();
-      renderAllViews();
-      showQuickToast(`Set ${state.teams[managingTeamId].name} as Pitching Staff`);
-    }
-
-    function setAsBattingTeam() {
-      state.gameInfo.battingTeamId = managingTeamId;
-      state.gameInfo.currentBatterIndex = 0;
-      saveState();
-      populateScoutingSelect();
-      renderAllViews();
-      showQuickToast(`Set ${state.teams[managingTeamId].name} as Opponent`);
-    }
-
-    function updateHeaderMatchup() {
-      const pTeam = state.teams[state.gameInfo.pitchingTeamId];
-      const bTeam = state.teams[state.gameInfo.battingTeamId];
-      document.getElementById('header-matchup').innerText = `${pTeam?.name.substring(0,20) || 'Unknown'} (Mound) vs ${bTeam?.name.substring(0,20) || 'Unknown'} (Plate)`;
-    }
-
     // ---------------- PLAYER MODAL FORM ---------------- //
     function openPlayerFormModal(role, playerId = null) {
       editingPlayerId = playerId;
+      
       const formRole = document.getElementById('form-player-role');
       const formName = document.getElementById('form-player-name');
       const formNum = document.getElementById('form-player-num');
-      const formHand = document.getElementById('form-player-hand');
+      const formThrows = document.getElementById('form-player-throws');
+      const formBats = document.getElementById('form-player-bats');
       const formAvg = document.getElementById('form-player-avg');
       const formObp = document.getElementById('form-player-obp');
       const formSlg = document.getElementById('form-player-slg');
@@ -988,7 +1016,6 @@
 
       if (playerId) {
         document.getElementById('form-player-title').innerText = "EDIT PLAYER";
-        // Find player
         const t = state.teams[managingTeamId];
         let p = null;
         if (role === 'pitcher') p = t.pitchers.find(x => x.id === playerId);
@@ -996,7 +1023,6 @@
         else p = t.bench.find(x => x.id === playerId);
         
         if (p) {
-          // Parse "#14 Name" format
           const match = p.name.match(/^#(\d+)\s+(.*)$/);
           if (match) {
             formNum.value = match[1];
@@ -1006,7 +1032,8 @@
             formName.value = p.name;
           }
           
-          formHand.value = (role === 'pitcher') ? p.throws : p.bats;
+          formThrows.value = p.throws || "Right";
+          formBats.value = p.bats || "Right";
           formNotes.value = p.notes || "";
           
           if (role !== 'pitcher' && p.stats) {
@@ -1020,6 +1047,7 @@
       } else {
         document.getElementById('form-player-title').innerText = "ADD NEW PLAYER";
         formName.value = ""; formNum.value = ""; formNotes.value = "";
+        formThrows.value = "Right"; formBats.value = "Right";
         formAvg.value = ""; formObp.value = ""; formSlg.value = "";
         formHr.value = ""; formSb.value = "";
       }
@@ -1042,7 +1070,9 @@
       const role = document.getElementById('form-player-role').value;
       const num = document.getElementById('form-player-num').value.trim();
       const rawName = document.getElementById('form-player-name').value.trim();
-      const hand = document.getElementById('form-player-hand').value;
+      
+      const throwsVal = document.getElementById('form-player-throws').value;
+      const batsVal = document.getElementById('form-player-bats').value;
       const notes = document.getElementById('form-player-notes').value.trim();
       
       if (!rawName) { alert("Please enter a player name."); return; }
@@ -1052,11 +1082,12 @@
       let pObj = {
         id: editingPlayerId || Date.now() + Math.floor(Math.random() * 1000),
         name: displayName,
+        throws: throwsVal,
+        bats: batsVal,
         notes: notes
       };
       
       if (role === 'pitcher') {
-        pObj.throws = hand;
         if (editingPlayerId) {
           const idx = team.pitchers.findIndex(x => x.id === editingPlayerId);
           if (idx !== -1) team.pitchers[idx] = { ...team.pitchers[idx], ...pObj };
@@ -1064,7 +1095,6 @@
           team.pitchers.push(pObj);
         }
       } else {
-        pObj.bats = hand;
         pObj.stats = {
           avg: document.getElementById('form-player-avg').value || ".000",
           obp: document.getElementById('form-player-obp').value || ".000",
@@ -1077,7 +1107,6 @@
         
         let targetList = role === 'lineup' ? team.lineup : team.bench;
         if (editingPlayerId) {
-          // Find which list it currently exists in and remove it to handle Role swaps
           const oldLineupIdx = team.lineup.findIndex(x => x.id === editingPlayerId);
           const oldBenchIdx = team.bench.findIndex(x => x.id === editingPlayerId);
           
@@ -1089,7 +1118,6 @@
             if (role === 'lineup') team.bench.splice(oldBenchIdx, 1);
           }
           
-          // Re-insert into correct list
           if (role === 'lineup' && oldLineupIdx === -1) { pObj.order = team.lineup.length + 1; targetList.push(pObj); }
           else if (role === 'bench' && oldBenchIdx === -1) { targetList.push(pObj); }
           else if (role === 'lineup') { team.lineup[oldLineupIdx] = pObj; }
@@ -1211,7 +1239,7 @@
       const lineup = getActiveLineup();
       
       if (pitchers.length === 0 || lineup.length === 0) {
-        alert("You must add at least 1 pitcher and 1 batter to the active teams before logging pitches.");
+        alert("You must add at least 1 pitcher to the Mound team and 1 batter to the Plate team before logging pitches.");
         return;
       }
 
@@ -1351,7 +1379,11 @@
       showQuickToast(`Count reset to 0-0`);
     }
 
-    function addExtraHitterPrompt() { openPlayerFormModal('lineup'); }
+    function addExtraHitterPrompt() { 
+      switchTab('roster');
+      changeManagedTeam(state.gameInfo.battingTeamId);
+      openPlayerFormModal('lineup'); 
+    }
 
     // FILE UPLOAD AND INGESTION
     async function handleUnifiedFileUpload(event) {
@@ -1405,7 +1437,6 @@
         reader.readAsText(file);
       }
       
-      // Reset input so you can select the same file again if needed
       event.target.value = null;
     }
 
@@ -1437,7 +1468,7 @@
           let fullName = nameTokens.join(' ').replace(/[^a-zA-Z,\s#]/g, '').trim();
           if (fullName.length >= 3) {
             stagedParsedPlayers.push({
-              name: fullName, bats: bats,
+              name: fullName, bats: bats, throws: "Right",
               stats: { avg: avg, obp: ".350", slg: hr > 4 ? ".550" : ".380", hr: hr, sb: sb },
               archetypes: determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb),
               order: orderIndex <= 9 ? orderIndex : null,
@@ -1520,7 +1551,7 @@
       stagedParsedPlayers.forEach((p, idx) => {
         const playerObj = {
           id: Date.now() + idx,
-          name: p.name, bats: p.bats, stats: p.stats, archetypes: p.archetypes,
+          name: p.name, bats: p.bats, throws: p.throws, stats: p.stats, archetypes: p.archetypes,
           tags: ["Auto Ingest"], notes: `Imported Stats: ${p.stats.avg} AVG, ${p.stats.hr} HR`, history: []
         };
         if (!p.isBench && team.lineup.length < 9) {
@@ -1549,7 +1580,7 @@
           const avg = parts[2] || ".250", hr = parseInt(parts[3]) || 0, sb = parseInt(parts[4]) || 0;
           const playerObj = {
             id: Date.now() + i,
-            name: parts[0], bats: parts[1] || 'Right',
+            name: parts[0], bats: parts[1] || 'Right', throws: 'Right',
             stats: { avg: avg, obp: ".340", slg: ".400", hr: hr, sb: sb },
             archetypes: determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb),
             tags: [], notes: "Imported via CSV.", history: []
@@ -1591,7 +1622,7 @@
         list.innerHTML = `
           <div class="text-center py-4 bg-gray-950 rounded-lg border border-gray-800">
             <p class="text-xs text-gray-400 mb-2">No bench players available right now.</p>
-            <button onclick="closeSubModal(); switchTab('roster')" class="text-xs font-bold text-emerald-400 underline">Manage Team Roster</button>
+            <button onclick="closeSubModal(); switchTab('roster'); changeManagedTeam(state.gameInfo.battingTeamId); openPlayerFormModal('bench')" class="text-xs font-bold text-emerald-400 underline">Add player to active team</button>
           </div>
         `;
       } else {
@@ -1663,7 +1694,6 @@
     }
 
     function renderAllViews() {
-      updateHeaderMatchup();
       renderHUD();
       renderCurrentBatter();
       renderCurrentSequence();
@@ -1817,7 +1847,6 @@
       document.getElementById('tally-early-str').innerText = earlyPitches.length > 0 ? `${((earlyStr / earlyPitches.length) * 100).toFixed(1)}%` : "0.0%";
     }
 
-    // UPDATED TAB 3 RENDERER
     function renderLineupManager() {
       const team = state.teams[managingTeamId];
       if(!team) return;
@@ -1829,7 +1858,7 @@
             <div class="flex items-center space-x-2">
               <span class="text-[10px] font-black font-mono text-gray-500">#${b.order}</span>
               <span class="text-xs font-bold text-white">${b.name}</span>
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${b.bats[0]}HH</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${b.throws[0]}/B:${b.bats[0]}</span>
             </div>
           </div>
           <div class="flex items-center justify-between mt-1 pt-1 border-t border-gray-900 text-[9px]">
@@ -1843,7 +1872,7 @@
       bContainer.innerHTML = team.bench.map((b) => `
         <div onclick="openPlayerFormModal('bench', ${b.id})" class="p-2 rounded bg-gray-950 border border-gray-800 hover:border-emerald-500 cursor-pointer transition flex justify-between items-center text-[10px]">
           <div>
-            <span class="text-white font-bold">${b.name} <span class="text-gray-500">(${b.bats[0]}HH)</span></span>
+            <span class="text-white font-bold">${b.name} <span class="text-gray-500">(T:${b.throws[0]}/B:${b.bats[0]})</span></span>
           </div>
           <div class="flex space-x-1">${renderArchetypeBadges(b.archetypes)}</div>
         </div>
@@ -1853,7 +1882,7 @@
       pContainer.innerHTML = team.pitchers.map((p) => `
         <div onclick="openPlayerFormModal('pitcher', ${p.id})" class="p-2 rounded bg-gray-950 border border-gray-800 hover:border-emerald-500 cursor-pointer transition flex justify-between items-center text-[10px]">
           <span class="text-white font-bold">${p.name}</span>
-          <span class="font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">${p.throws[0]}HP</span>
+          <span class="font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${p.throws[0]}</span>
         </div>
       `).join('');
     }
@@ -1887,10 +1916,10 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (t === tabId) {
           view.classList.remove('hidden');
-          btn.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 font-bold text-xs";
+          btn.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap";
         } else {
           view.classList.add('hidden');
-          btn.className = "py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 font-bold text-xs";
+          btn.className = "py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap";
         }
       });
       lucide.createIcons();
@@ -1973,9 +2002,9 @@
 
     function confirmResetGame() {
       if (confirm("Reset current game tracking? (Ensure you downloaded the CSV first!)")) {
-        const oldTeams = JSON.parse(JSON.stringify(state.teams)); // preserve teams
+        const oldTeams = JSON.parse(JSON.stringify(state.teams));
         state = JSON.parse(JSON.stringify(DEFAULT_APP_STATE));
-        state.teams = oldTeams; // restore teams after wipe
+        state.teams = oldTeams; 
         saveState(); renderAllViews();
         showQuickToast("Started fresh game tracking session");
       }
