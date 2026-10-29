@@ -24,11 +24,6 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    .strike-zone-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-    }
     .custom-scrollbar::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -82,7 +77,7 @@
 
       <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow">
         <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span>Export CSV</span>
+        <span>TrackMan CSV</span>
       </button>
 
       <button onclick="confirmResetGame()" title="New Game / Reset" class="p-1.5 bg-gray-800 hover:bg-red-600/30 text-gray-400 hover:text-red-400 border border-gray-700 rounded-lg transition">
@@ -239,50 +234,75 @@
         </div>
       </div>
 
-      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & STRIKE ZONE -->
+      <!-- CENTER COLUMN: RAPID LOGGING INTERFACE & 4-QUADRANT STRIKE ZONE -->
       <div class="lg:col-span-5 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md flex flex-col items-center">
           <div class="w-full flex justify-between items-center mb-2 px-1">
             <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
               <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 mr-1"></i> TAP LOCATION (OR CHOOSE CALL)
             </span>
-            <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Zone: In-Zone (Heart)</span>
+            <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <div class="relative w-64 h-72 bg-gray-950 border-2 border-dashed border-gray-800 rounded-xl p-4 flex items-center justify-center">
-            <div class="absolute inset-2 border border-gray-800/60 rounded-lg pointer-events-none"></div>
+          <!-- SIMPLIFIED 4-INSIDE + 4-OUTSIDE ZONE INTERFACE -->
+          <div class="relative w-72 bg-gray-950 border border-gray-800 rounded-2xl p-3 flex flex-col items-center justify-center space-y-2 shadow-inner">
+            
+            <!-- OUTSIDE 1: CHASE HIGH -->
+            <button onclick="selectZone(5, 'Chase High')" id="zone-btn-5" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-400 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-lg text-xs font-bold uppercase tracking-wider transition active:scale-98">
+              ▲ Chase High / Waste
+            </button>
 
-            <div id="interactive-strike-zone" class="relative w-44 h-52 bg-gray-900/90 border-2 border-emerald-500/80 rounded shadow-inner strike-zone-grid cursor-pointer">
-              <div onclick="selectZone(1)" id="zone-1" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">1</div>
-              <div onclick="selectZone(2)" id="zone-2" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">2</div>
-              <div onclick="selectZone(3)" id="zone-3" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">3</div>
-              <div onclick="selectZone(4)" id="zone-4" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">4</div>
-              <div onclick="selectZone(5)" id="zone-5" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition bg-emerald-950/20 text-emerald-500/40">5</div>
-              <div onclick="selectZone(6)" id="zone-6" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">6</div>
-              <div onclick="selectZone(7)" id="zone-7" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">7</div>
-              <div onclick="selectZone(8)" id="zone-8" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">8</div>
-              <div onclick="selectZone(9)" id="zone-9" class="border border-gray-700/60 hover:bg-emerald-500/20 flex items-center justify-center text-[10px] font-mono text-gray-600 transition">9</div>
+            <!-- MIDDLE ROW: CHASE IN - 2X2 IN-ZONE - CHASE AWAY -->
+            <div class="w-full flex items-stretch space-x-2">
+              
+              <!-- OUTSIDE 2: CHASE ARM / IN -->
+              <button onclick="selectZone(6, 'Chase In (Arm)')" id="zone-btn-6" class="w-16 bg-gray-900 hover:bg-emerald-950/40 text-gray-400 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
+                ◀ In (Arm)
+              </button>
 
-              <div id="zone-pitch-pin" class="absolute w-4 h-4 rounded-full bg-amber-400 border-2 border-white shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 hidden transition-all duration-200"></div>
+              <!-- 2x2 IN-ZONE GRID (4 QUADRANTS) -->
+              <div class="relative flex-1 grid grid-cols-2 grid-rows-2 gap-1.5 h-44 bg-gray-900/90 border-2 border-emerald-500/80 rounded-xl p-1.5 shadow-inner">
+                <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="bg-gray-800/80 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg flex flex-col items-center justify-center text-xs font-black text-gray-300 active:scale-95 transition">
+                  <span class="text-emerald-400 text-sm">UP-IN</span>
+                  <span class="text-[9px] text-gray-500 font-mono">Zone 1</span>
+                </button>
+                <button onclick="selectZone(2, 'In-Zone Up-Away')" id="zone-btn-2" class="bg-gray-800/80 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg flex flex-col items-center justify-center text-xs font-black text-gray-300 active:scale-95 transition">
+                  <span class="text-emerald-400 text-sm">UP-AWAY</span>
+                  <span class="text-[9px] text-gray-500 font-mono">Zone 2</span>
+                </button>
+                <button onclick="selectZone(3, 'In-Zone Down-In')" id="zone-btn-3" class="bg-gray-800/80 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg flex flex-col items-center justify-center text-xs font-black text-gray-300 active:scale-95 transition">
+                  <span class="text-emerald-400 text-sm">DOWN-IN</span>
+                  <span class="text-[9px] text-gray-500 font-mono">Zone 3</span>
+                </button>
+                <button onclick="selectZone(4, 'In-Zone Down-Away')" id="zone-btn-4" class="bg-gray-800/80 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg flex flex-col items-center justify-center text-xs font-black text-gray-300 active:scale-95 transition">
+                  <span class="text-emerald-400 text-sm">DOWN-AWAY</span>
+                  <span class="text-[9px] text-gray-500 font-mono">Zone 4</span>
+                </button>
+              </div>
+
+              <!-- OUTSIDE 3: CHASE GLOVE / AWAY -->
+              <button onclick="selectZone(7, 'Chase Away (Glove)')" id="zone-btn-7" class="w-16 bg-gray-900 hover:bg-emerald-950/40 text-gray-400 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
+                Away (Glove) ▶
+              </button>
             </div>
 
-            <button onclick="selectZone(10, 'Chase High')" class="absolute top-0 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">High Waste</button>
-            <button onclick="selectZone(11, 'Chase Arm')" class="absolute left-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">In</button>
-            <button onclick="selectZone(12, 'Chase Glove')" class="absolute right-1 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">Away</button>
-            <button onclick="selectZone(13, 'Chase Dirt')" class="absolute bottom-0 text-[9px] text-gray-500 hover:text-gray-300 font-bold uppercase tracking-wider">Dirt</button>
+            <!-- OUTSIDE 4: CHASE DIRT -->
+            <button onclick="selectZone(8, 'Chase Dirt / Below')" id="zone-btn-8" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-400 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-lg text-xs font-bold uppercase tracking-wider transition active:scale-98">
+              ▼ Chase Dirt / Below
+            </button>
           </div>
 
           <!-- Pitch Selection Strip -->
           <div class="w-full mt-3">
             <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1.5 px-1">SELECT PITCH TYPE:</span>
             <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-              <button onclick="selectPitchType('4S')" id="pt-4S" class="py-2 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition">4S</button>
-              <button onclick="selectPitchType('SI')" id="pt-SI" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SI</button>
-              <button onclick="selectPitchType('CT')" id="pt-CT" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CT</button>
-              <button onclick="selectPitchType('SL')" id="pt-SL" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SL</button>
-              <button onclick="selectPitchType('CB')" id="pt-CB" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CB</button>
-              <button onclick="selectPitchType('CH')" id="pt-CH" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CH</button>
-              <button onclick="selectPitchType('SPL')" id="pt-SPL" class="py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SPL</button>
+              <button onclick="selectPitchType('4S')" id="pt-4S" class="py-2.5 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition">4S</button>
+              <button onclick="selectPitchType('SI')" id="pt-SI" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SI</button>
+              <button onclick="selectPitchType('CT')" id="pt-CT" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CT</button>
+              <button onclick="selectPitchType('SL')" id="pt-SL" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SL</button>
+              <button onclick="selectPitchType('CB')" id="pt-CB" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CB</button>
+              <button onclick="selectPitchType('CH')" id="pt-CH" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">CH</button>
+              <button onclick="selectPitchType('SPL')" id="pt-SPL" class="py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition">SPL</button>
             </div>
           </div>
 
@@ -367,7 +387,7 @@
           </div>
         </div>
 
-        <!-- Quick Dugout Actions Card -->
+        <!-- Quick Dugout Controls -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-md space-y-2">
           <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">DUGOUT CONTROLS:</span>
           <div class="grid grid-cols-2 gap-2">
@@ -534,11 +554,11 @@
         <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
           <div>
             <h2 class="text-sm font-black text-white uppercase tracking-wider">GAME PITCH-BY-PITCH LOG</h2>
-            <p class="text-xs text-gray-400">Full audit trail formatted for TrackMan/TruMedia export.</p>
+            <p class="text-xs text-gray-400">Full audit trail formatted for direct TrackMan / TruMedia synchronization.</p>
           </div>
           <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 shadow">
             <i data-lucide="download" class="w-3.5 h-3.5"></i>
-            <span>Download CSV</span>
+            <span>Export TrackMan CSV</span>
           </button>
         </div>
 
@@ -675,7 +695,7 @@
       </div>
 
       <div class="space-y-2 text-xs">
-        <textarea id="quick-paste-textarea" rows="8" placeholder="Paste table text here... (e.g. copied from NCAA stats page, Sidearm stats, or iOS Live Text)" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-white text-xs outline-none focus:border-emerald-500 custom-scrollbar font-mono"></textarea>
+        <textarea id="quick-paste-textarea" rows="8" placeholder="Paste table text here..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-white text-xs outline-none focus:border-emerald-500 custom-scrollbar font-mono"></textarea>
         <button onclick="commitQuickPasteText()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition shadow">
           Parse & Sync Lineup
         </button>
@@ -812,93 +832,33 @@
         }
       ],
       bench: [
-        { 
-          id: 601, name: "#8 Smith, D.", bats: "Right", 
-          stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Rolls over Sinker Down"], notes: "West Jones HS. INF option off bench (79 AB, 4 2B, 16 RBI)." 
-        },
-        { 
-          id: 602, name: "#2 Wheat", bats: "Right", 
-          stats: { avg: ".304", obp: ".420", slg: ".410", hr: 1, sb: 4 },
-          archetypes: ["CONTACT", "RUNNER"],
-          tags: ["Solid Eye (12 BB)"], notes: "Oak Grove HS. 4-4 SB, 12 BB/12 K in 56 AB." 
-        },
-        { 
-          id: 603, name: "#18 Haney", bats: "Right", 
-          stats: { avg: ".385", obp: ".410", slg: ".500", hr: 0, sb: 1 },
-          archetypes: ["CONTACT"],
-          tags: ["Two-Way Option"], notes: "Columbia HS. P/OF. .385 in 26 AB (3 2B, 6 RBI)." 
-        },
-        { 
-          id: 604, name: "#3 Smith, B.", bats: "Right", 
-          stats: { avg: ".364", obp: ".550", slg: ".550", hr: 1, sb: 4 },
-          archetypes: ["RUNNER", "CONTACT"],
-          tags: ["High OBP (16 BB)"], notes: "Florence HS. 16 BB in 22 AB, 4-5 SB." 
-        },
-        { 
-          id: 605, name: "#35 Bellanger", bats: "Right", 
-          stats: { avg: ".333", obp: ".500", slg: ".333", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Backup C"], notes: "Gulfport HS. Backup C (6 AB, 3 RBI, 2 BB, 0 K)." 
-        },
-        { 
-          id: 606, name: "#23 Rhodes", bats: "Right", 
-          stats: { avg: ".276", obp: ".320", slg: ".450", hr: 1, sb: 0 },
-          archetypes: [],
-          tags: ["Late on High Velo (92+)"], notes: "St. Stanislaus HS. 29 AB, 3 2B, 1 HR." 
-        },
-        { 
-          id: 607, name: "#13 Cassard", bats: "Left", 
-          stats: { avg: ".250", obp: ".380", slg: ".500", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Chase IVB Up"], notes: "Live Oak HS. Left-handed OF bat. 16 AB, 4 2B, 20 RBI, 4 BB." 
-        },
-        { 
-          id: 608, name: "#9 Piper", bats: "Right", 
-          stats: { avg: ".143", obp: ".200", slg: ".180", hr: 0, sb: 0 },
-          archetypes: ["HIGH K RISK"],
-          tags: ["Chases SL Down & Away"], notes: "West Jones HS. OF reserve." 
-        },
-        { 
-          id: 609, name: "#34 Long", bats: "Right", 
-          stats: { avg: ".130", obp: ".260", slg: ".220", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Backup C"], notes: "Holmes CC / Sumrall HS. Catcher reserve." 
-        },
-        { 
-          id: 610, name: "#6 Keyes", bats: "Right", 
-          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Bench Reserve"], notes: "Brandon HS. OF redshirt freshman." 
-        },
-        { 
-          id: 611, name: "#7 Holliday", bats: "Right", 
-          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Bench Reserve"], notes: "Pisgah HS. OF freshman." 
-        },
-        { 
-          id: 612, name: "#21 Oakley", bats: "Left", 
-          stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 },
-          archetypes: [],
-          tags: ["Bench Reserve"], notes: "Hartfield Academy HS. Utility freshman." 
-        }
+        { id: 601, name: "#8 Smith, D.", bats: "Right", stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 }, archetypes: [], tags: ["Rolls over Sinker Down"], notes: "West Jones HS." },
+        { id: 602, name: "#2 Wheat", bats: "Right", stats: { avg: ".304", obp: ".420", slg: ".410", hr: 1, sb: 4 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Solid Eye (12 BB)"], notes: "Oak Grove HS." },
+        { id: 603, name: "#18 Haney", bats: "Right", stats: { avg: ".385", obp: ".410", slg: ".500", hr: 0, sb: 1 }, archetypes: ["CONTACT"], tags: ["Two-Way Option"], notes: "Columbia HS." },
+        { id: 604, name: "#3 Smith, B.", bats: "Right", stats: { avg: ".364", obp: ".550", slg: ".550", hr: 1, sb: 4 }, archetypes: ["RUNNER", "CONTACT"], tags: ["High OBP (16 BB)"], notes: "Florence HS." },
+        { id: 605, name: "#35 Bellanger", bats: "Right", stats: { avg: ".333", obp: ".500", slg: ".333", hr: 0, sb: 0 }, archetypes: [], tags: ["Backup C"], notes: "Gulfport HS." },
+        { id: 606, name: "#23 Rhodes", bats: "Right", stats: { avg: ".276", obp: ".320", slg: ".450", hr: 1, sb: 0 }, archetypes: [], tags: ["Late on High Velo (92+)"], notes: "St. Stanislaus HS." },
+        { id: 607, name: "#13 Cassard", bats: "Left", stats: { avg: ".250", obp: ".380", slg: ".500", hr: 0, sb: 0 }, archetypes: [], tags: ["Chase IVB Up"], notes: "Live Oak HS." },
+        { id: 608, name: "#9 Piper", bats: "Right", stats: { avg: ".143", obp: ".200", slg: ".180", hr: 0, sb: 0 }, archetypes: ["HIGH K RISK"], tags: ["Chases SL Down & Away"], notes: "West Jones HS." },
+        { id: 609, name: "#34 Long", bats: "Right", stats: { avg: ".130", obp: ".260", slg: ".220", hr: 0, sb: 0 }, archetypes: [], tags: ["Backup C"], notes: "Holmes CC." },
+        { id: 610, name: "#6 Keyes", bats: "Right", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Brandon HS." },
+        { id: 611, name: "#7 Holliday", bats: "Right", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Pisgah HS." },
+        { id: 612, name: "#21 Oakley", bats: "Left", stats: { avg: ".000", obp: ".000", slg: ".000", hr: 0, sb: 0 }, archetypes: [], tags: ["Bench Reserve"], notes: "Hartfield Academy HS." }
       ],
       pitches: []
     };
 
     let state = loadPersistedState();
     let activePitchType = '4S';
-    let activeZone = 5;
-    let activeZoneDesc = 'Heart (Zone 5)';
+    let activeZone = 1;
+    let activeZoneDesc = 'Up-In (Zone 1)';
     let selectedTrajectory = 'GroundBall';
     let toastTimeout = null;
     let stagedParsedPlayers = [];
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V5');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V6');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -908,7 +868,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V5', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V6', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -931,6 +891,7 @@
       lucide.createIcons();
       populatePitcherSelect();
       populateScoutingSelect();
+      selectZone(1, 'Up-In (Zone 1)');
       renderAllViews();
     });
 
@@ -968,28 +929,41 @@
         const btn = document.getElementById(`pt-${t}`);
         if (!btn) return;
         if (t === pt) {
-          btn.className = "py-2 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition";
+          btn.className = "py-2.5 rounded-lg bg-emerald-600 text-white font-black text-xs border border-emerald-400 shadow active:scale-95 transition";
         } else {
-          btn.className = "py-2 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition";
+          btn.className = "py-2.5 rounded-lg bg-gray-800 text-gray-200 hover:bg-gray-700 font-black text-xs border border-gray-700 active:scale-95 transition";
         }
       });
     }
 
+    // SIMPLIFIED 4-INSIDE (1-4) & 4-OUTSIDE (5-8) SELECTION
     function selectZone(zoneNum, customDesc) {
       activeZone = zoneNum;
       activeZoneDesc = customDesc || `Zone ${zoneNum}`;
       document.getElementById('selected-loc-label').innerText = `Location: ${activeZoneDesc}`;
 
-      const pin = document.getElementById('zone-pitch-pin');
-      if (zoneNum <= 9) {
-        const target = document.getElementById(`zone-${zoneNum}`);
-        if (target && pin) {
-          pin.style.left = `${(target.offsetLeft + target.offsetWidth / 2)}px`;
-          pin.style.top = `${(target.offsetTop + target.offsetHeight / 2)}px`;
-          pin.classList.remove('hidden');
+      // Reset styles for all 8 buttons
+      for (let z = 1; z <= 8; z++) {
+        const btn = document.getElementById(`zone-btn-${z}`);
+        if (!btn) continue;
+
+        if (z <= 4) {
+          // Inside 4 quadrants
+          if (z === zoneNum) {
+            btn.className = "bg-emerald-600 border-2 border-emerald-300 rounded-lg flex flex-col items-center justify-center text-xs font-black text-white shadow-lg active:scale-95 transition";
+          } else {
+            btn.className = "bg-gray-800/80 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg flex flex-col items-center justify-center text-xs font-black text-gray-300 active:scale-95 transition";
+          }
+        } else {
+          // Outside 4 chase areas
+          if (z === zoneNum) {
+            btn.classList.remove('bg-gray-900', 'text-gray-400', 'border-gray-700/80');
+            btn.classList.add('bg-amber-600/30', 'text-amber-300', 'border-amber-500', 'border-solid');
+          } else {
+            btn.classList.remove('bg-amber-600/30', 'text-amber-300', 'border-amber-500', 'border-solid');
+            btn.classList.add('bg-gray-900', 'text-gray-400', 'border-gray-700/80');
+          }
         }
-      } else {
-        if (pin) pin.classList.add('hidden');
       }
     }
 
@@ -1014,6 +988,17 @@
         }
       }
 
+      // TrackMan standard pitch name map
+      const tmTypeMap = {
+        '4S': 'Fastball',
+        'SI': 'Sinker',
+        'CT': 'Cutter',
+        'SL': 'Slider',
+        'CB': 'Curveball',
+        'CH': 'ChangeUp',
+        'SPL': 'Splitter'
+      };
+
       const pitchRecord = {
         pitchNo: state.pitches.length + 1,
         inning: state.gameInfo.inning,
@@ -1028,6 +1013,7 @@
         batterName: batter.name,
         batterSide: batter.bats,
         pitchType: activePitchType,
+        taggedPitchType: tmTypeMap[activePitchType] || 'Fastball',
         pitchCall: call,
         zone: activeZone,
         zoneDesc: activeZoneDesc,
@@ -1101,7 +1087,7 @@
           advanceToNextBatter();
         }
 
-        showQuickToast(`3 OUTS! Half-Inning Over -> Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
+        showQuickToast(`3 OUTS! Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
       } else {
         state.gameInfo.outs = nextOuts;
         if (paEnded) {
@@ -1196,7 +1182,7 @@
       showQuickToast(`Added Extra Hitter: #${newBatter.order} ${newBatter.name}`);
     }
 
-    // ==================== 2D-COORDINATE PDF TABLE RECONSTRUCTION ====================
+    // OCR / PDF parsing handlers
     async function handleUnifiedFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1237,23 +1223,19 @@
         } catch (err) {
           console.error(err);
           loader.classList.add('hidden');
-          alert("Error parsing PDF. Try 'Quick-Paste Table' to copy and paste directly.");
+          alert("Error parsing PDF.");
         }
 
       } else if (file.type.startsWith('image/')) {
         progressText.innerText = "Analyzing screenshot...";
         try {
-          const { data: { text } } = await Tesseract.recognize(
-            file,
-            'eng',
-            {
-              logger: m => {
-                if (m.status === 'recognizing text') {
-                  progressText.innerText = `OCR: ${Math.round(m.progress * 100)}%`;
-                }
+          const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+            logger: m => {
+              if (m.status === 'recognizing text') {
+                progressText.innerText = `OCR: ${Math.round(m.progress * 100)}%`;
               }
             }
-          );
+          });
           loader.classList.add('hidden');
           parseReconstructedLines(text.split('\n'));
         } catch (err) {
@@ -1795,7 +1777,8 @@
 
       document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
 
-      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 9).length;
+      // Zones 1-4 are inside
+      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 4).length;
       document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
 
       const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
@@ -1925,6 +1908,7 @@
       showQuickToast(`Updated scouting tags for ${b.name}`);
     }
 
+    // DIRECT TRACKMAN / TRUMEDIA SPEC CSV EXPORT
     function exportToCSV() {
       if (state.pitches.length === 0) {
         alert("No pitches to export yet!");
@@ -1932,14 +1916,15 @@
       }
 
       const headers = [
-        "PitchNo", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
+        "PitchNo", "Time", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
         "Pitcher", "PitcherThrows", "Batter", "BatterSide",
-        "PitchType", "PitchCall", "TaggedHitType", "PlayResult",
-        "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win", "Timestamp"
+        "TaggedPitchType", "PitchCall", "TaggedHitType", "PlayResult",
+        "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win"
       ];
 
       const rows = state.pitches.map(p => [
         p.pitchNo,
+        `"${p.timestamp}"`,
         p.inning,
         p.isTop ? "Top" : "Bottom",
         p.outsBefore,
@@ -1949,15 +1934,14 @@
         p.pitcherThrows,
         `"${p.batterName}"`,
         p.batterSide,
-        p.pitchType,
-        p.pitchCall,
-        p.hitType,
-        p.playResult,
+        `"${p.taggedPitchType}"`,
+        `"${p.pitchCall}"`,
+        `"${p.hitType}"`,
+        `"${p.playResult}"`,
         p.zone,
         `"${p.zoneDesc}"`,
         p.is1_1Count ? 1 : 0,
-        p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : ""),
-        `"${p.timestamp}"`
+        p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : "")
       ]);
 
       const csvContent = "data:text/csv;charset=utf-8," 
@@ -1966,7 +1950,7 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Dugout_Pitch_Track_${state.gameInfo.date}_Inn${state.gameInfo.inning}.csv`);
+      link.setAttribute("download", `TrackMan_SLU_vs_Jones_${state.gameInfo.date}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
