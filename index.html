@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dugout Tracker</title>
+  <title>Dugout Data | Franilitics</title>
   
   <!-- iOS Web App Full-Screen Capabilities -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Dugout Tracker" />
-  <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/baseball.png" />
+  <meta name="apple-mobile-web-app-title" content="Dugout Data" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.PNG" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Added SortableJS for Drag and Drop Reordering -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -49,7 +48,6 @@
     .leverage-pulse {
       animation: pulse-subtle 1.8s infinite ease-in-out;
     }
-    /* Ghost class for drag and drop visuals */
     .sortable-ghost {
       opacity: 0.4;
       background-color: #064e3b !important;
@@ -60,29 +58,43 @@
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans antialiased overflow-x-hidden">
 
   <!-- TOP APP BAR -->
-  <header class="bg-gray-900 border-b border-gray-800 px-4 py-2.5 sticky top-0 z-40 flex flex-col sm:flex-row sm:items-center justify-between shadow-lg gap-2">
-    <div class="flex items-center space-x-3">
-      <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30">
-        <i data-lucide="activity" class="w-5 h-5"></i>
+  <header class="bg-gray-900 border-b border-gray-800 px-4 py-2.5 sticky top-0 z-40 flex flex-col sm:flex-row sm:items-center justify-between shadow-lg gap-3 sm:gap-2">
+    
+    <div class="flex items-center space-x-4">
+      <!-- CUSTOM BRANDING -->
+      <div class="flex items-center space-x-2">
+        <img src="apple-touch-icon.PNG" alt="Logo" class="w-9 h-9 rounded-lg shadow-sm" />
+        <div class="flex flex-col leading-none">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-black tracking-wider uppercase text-white font-sans">
+              DUGOUT<span class="text-amber-400">DATA</span>
+            </span>
+            <span id="storage-indicator" class="flex items-center text-[9px] bg-emerald-950/80 text-emerald-400 border border-emerald-800 px-1.5 py-0.5 rounded-full font-mono mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span> SAVED
+            </span>
+          </div>
+          <span class="text-[8px] font-bold tracking-widest text-gray-400 uppercase mt-1">FRANILITICS</span>
+        </div>
       </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <h1 class="text-sm font-black tracking-wider uppercase text-white">DUGOUT ANALYTICS</h1>
-          <span id="storage-indicator" class="flex items-center text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-mono">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span> SAVED
-          </span>
-        </div>
-        <!-- GLOBAL MATCHUP SELECTORS -->
-        <div class="flex items-center space-x-1.5 mt-0.5">
-          <span class="text-[10px] text-gray-400 font-bold uppercase">Mound:</span>
-          <select id="header-pitching-team" onchange="changeActivePitchingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
-          <span class="text-[10px] text-gray-500 font-bold uppercase ml-1">Plate:</span>
-          <select id="header-batting-team" onchange="changeActiveBattingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-amber-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
-        </div>
+
+      <!-- GLOBAL MATCHUP SELECTORS (Hidden on very small screens, scrolls if needed) -->
+      <div class="hidden md:flex items-center space-x-1.5 border-l border-gray-700 pl-4 mt-0.5">
+        <span class="text-[10px] text-gray-400 font-bold uppercase">Mound:</span>
+        <select id="header-pitching-team-desktop" onchange="changeActivePitchingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
+        <span class="text-[10px] text-gray-500 font-bold uppercase ml-1">Plate:</span>
+        <select id="header-batting-team-desktop" onchange="changeActiveBattingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-amber-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
       </div>
     </div>
 
-    <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+    <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0 w-full sm:w-auto justify-start sm:justify-end">
+      
+      <!-- Mobile Matchup Selectors (Visible only on small screens) -->
+      <div class="flex md:hidden items-center space-x-1 mr-2">
+        <select id="header-pitching-team-mobile" onchange="changeActivePitchingTeam(this.value)" class="text-[10px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-1 outline-none w-20 truncate"></select>
+        <span class="text-[9px] text-gray-500 font-bold">vs</span>
+        <select id="header-batting-team-mobile" onchange="changeActiveBattingTeam(this.value)" class="text-[10px] font-bold bg-gray-950 border border-gray-700 text-amber-400 rounded px-1 py-1 outline-none w-20 truncate"></select>
+      </div>
+
       <div class="flex items-center bg-gray-950 border border-gray-700 rounded-lg px-2.5 py-1 whitespace-nowrap">
         <span class="text-[10px] text-gray-400 font-bold uppercase mr-1.5">PITCHER:</span>
         <select id="pitcher-select" onchange="switchPitcher(this.value)" class="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer max-w-[120px] truncate">
@@ -91,7 +103,7 @@
 
       <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95 whitespace-nowrap">
         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-        <span>Roll Inning</span>
+        <span class="hidden sm:inline">Roll Inning</span>
       </button>
 
       <button onclick="exportToCSV()" class="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-lg transition active:scale-95 shadow whitespace-nowrap">
@@ -102,10 +114,6 @@
       <!-- FULL SCREEN TOGGLE BUTTON -->
       <button onclick="toggleFullScreen()" title="Toggle Full Screen" class="p-1.5 bg-gray-800 hover:bg-emerald-600/30 text-gray-300 hover:text-emerald-400 border border-gray-700 rounded-lg transition active:scale-95">
         <i data-lucide="maximize" id="fullscreen-icon" class="w-4 h-4"></i>
-      </button>
-
-      <button onclick="confirmResetGame()" title="New Game / Reset" class="p-1.5 bg-gray-800 hover:bg-red-600/30 text-gray-400 hover:text-red-400 border border-gray-700 rounded-lg transition">
-        <i data-lucide="trash-2" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
@@ -784,7 +792,6 @@
 
   <!-- JAVASCRIPT APPLICATION CODE -->
   <script>
-    // V12: Drag and Drop Lineup/Bench Reordering added using SortableJS
     const DEFAULT_APP_STATE = {
       gameInfo: {
         date: new Date().toISOString().split('T')[0],
@@ -865,7 +872,6 @@
     let sortableLineup = null;
     let sortableBench = null;
 
-    // Helper Accessors
     function getActivePitchers() { return state.teams[state.gameInfo.pitchingTeamId]?.pitchers || []; }
     function getActiveLineup() { return state.teams[state.gameInfo.battingTeamId]?.lineup || []; }
     function getActiveBench() { return state.teams[state.gameInfo.battingTeamId]?.bench || []; }
@@ -934,24 +940,25 @@
       lucide.createIcons();
     }
 
-    // ---------------- GLOBAL TEAM MATCHUP FUNCTIONS ---------------- //
     function populateGlobalTeamSelects() {
-      const pitchSel = document.getElementById('header-pitching-team');
-      const batSel = document.getElementById('header-batting-team');
+      const pDesktop = document.getElementById('header-pitching-team-desktop');
+      const bDesktop = document.getElementById('header-batting-team-desktop');
+      const pMobile = document.getElementById('header-pitching-team-mobile');
+      const bMobile = document.getElementById('header-batting-team-mobile');
       
       let optionsHtml = Object.values(state.teams).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
       
-      pitchSel.innerHTML = optionsHtml;
-      batSel.innerHTML = optionsHtml;
-      
-      pitchSel.value = state.gameInfo.pitchingTeamId;
-      batSel.value = state.gameInfo.battingTeamId;
+      if(pDesktop) { pDesktop.innerHTML = optionsHtml; pDesktop.value = state.gameInfo.pitchingTeamId; }
+      if(bDesktop) { bDesktop.innerHTML = optionsHtml; bDesktop.value = state.gameInfo.battingTeamId; }
+      if(pMobile) { pMobile.innerHTML = optionsHtml; pMobile.value = state.gameInfo.pitchingTeamId; }
+      if(bMobile) { bMobile.innerHTML = optionsHtml; bMobile.value = state.gameInfo.battingTeamId; }
     }
 
     function changeActivePitchingTeam(teamId) {
       state.gameInfo.pitchingTeamId = teamId;
       state.gameInfo.currentPitcherIndex = 0;
       saveState();
+      populateGlobalTeamSelects();
       populatePitcherSelect();
       populateScoutingSelect();
       renderAllViews();
@@ -962,12 +969,12 @@
       state.gameInfo.battingTeamId = teamId;
       state.gameInfo.currentBatterIndex = 0;
       saveState();
+      populateGlobalTeamSelects();
       populateScoutingSelect();
       renderAllViews();
       showQuickToast(`Lineup updated to ${state.teams[teamId].name}`);
     }
 
-    // ---------------- TEAM MANAGER FUNCTIONS (Roster Tab) ---------------- //
     function populateTeamManagerSelect() {
       const sel = document.getElementById('team-manager-select');
       sel.innerHTML = Object.values(state.teams).map(t => 
@@ -993,7 +1000,6 @@
       showQuickToast(`Created new team: ${tname}`);
     }
 
-    // ---------------- DRAG AND DROP REORDERING ---------------- //
     function initializeSortables() {
       const lineupEl = document.getElementById('roster-manage-lineup');
       const benchEl = document.getElementById('roster-manage-bench');
@@ -1006,7 +1012,7 @@
       };
 
       sortableLineup = new Sortable(lineupEl, {
-        group: 'shared-roster', // set both lists to same group
+        group: 'shared-roster', 
         animation: 150,
         handle: '.handle',
         ghostClass: 'sortable-ghost',
@@ -1026,7 +1032,7 @@
       const team = state.teams[managingTeamId];
       if (!team) return;
 
-      const allPlayers = [...team.lineup, ...team.bench]; // combine to find them easily
+      const allPlayers = [...team.lineup, ...team.bench]; 
       
       const lineupNodes = document.getElementById('roster-manage-lineup').children;
       const benchNodes = document.getElementById('roster-manage-bench').children;
@@ -1038,7 +1044,7 @@
         const id = parseInt(node.getAttribute('data-id'));
         const player = allPlayers.find(p => p.id === id);
         if (player) {
-          player.order = idx + 1; // Assign new 1-N order based on position
+          player.order = idx + 1; 
           newLineup.push(player);
         }
       });
@@ -1047,7 +1053,7 @@
         const id = parseInt(node.getAttribute('data-id'));
         const player = allPlayers.find(p => p.id === id);
         if (player) {
-          delete player.order; // remove order since they are benched
+          delete player.order; 
           newBench.push(player);
         }
       });
@@ -1057,7 +1063,6 @@
       
       saveState();
 
-      // If the team being edited is the active batting team, ensure batter index doesn't go out of bounds
       if (state.gameInfo.battingTeamId === managingTeamId) {
          if (state.gameInfo.currentBatterIndex >= team.lineup.length) {
             state.gameInfo.currentBatterIndex = Math.max(0, team.lineup.length - 1);
@@ -1065,13 +1070,10 @@
          populateScoutingSelect();
          renderCurrentBatter();
       }
-
-      // Re-render to update the visual # order numbers on the items
       renderLineupManager();
       showQuickToast("Roster updated");
     }
 
-    // ---------------- PLAYER MODAL FORM ---------------- //
     function openPlayerFormModal(role, playerId = null) {
       editingPlayerId = playerId;
       
@@ -1228,7 +1230,6 @@
       showQuickToast("Player deleted.");
     }
 
-    // ---------------- MAIN LOGIC INTEGRATION ---------------- //
     function populatePitcherSelect() {
       const sel = document.getElementById('pitcher-select');
       const pitchers = getActivePitchers();
@@ -1461,7 +1462,6 @@
       openPlayerFormModal('lineup'); 
     }
 
-    // FILE UPLOAD AND INGESTION
     async function handleUnifiedFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1682,7 +1682,6 @@
 
     let currentSubTargetId = null;
     
-    // In-game sub modal triggered from the charting view
     function openSubModal() {
       const lineup = getActiveLineup();
       if(lineup.length > 0) openSubModalFor(lineup[state.gameInfo.currentBatterIndex].id);
@@ -1769,250 +1768,6 @@
 
       if (toastTimeout) clearTimeout(toastTimeout);
       toastTimeout = setTimeout(() => { toast.classList.add('hidden'); }, 4500);
-    }
-
-    // ---------------- TAB 3 ROSTER RENDER ---------------- //
-    function renderLineupManager() {
-      const team = state.teams[managingTeamId];
-      if(!team) return;
-
-      const lContainer = document.getElementById('roster-manage-lineup');
-      lContainer.innerHTML = team.lineup.map((b, idx) => `
-        <div data-id="${b.id}" class="bg-gray-950 border border-gray-800 hover:border-emerald-500 rounded-lg flex items-stretch transition shadow-sm mb-1.5">
-          <div class="handle flex items-center justify-center bg-gray-900/50 rounded-l-lg px-2 border-r border-gray-800 cursor-grab active:cursor-grabbing text-gray-500 hover:text-emerald-400">
-            <i data-lucide="grip-vertical" class="w-4 h-4"></i>
-          </div>
-          <div onclick="openPlayerFormModal('lineup', ${b.id})" class="flex-1 p-2 cursor-pointer">
-            <div class="flex items-center space-x-2">
-              <span class="text-[10px] font-black font-mono text-gray-500">#${b.order}</span>
-              <span class="text-xs font-bold text-white">${b.name}</span>
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${b.throws[0]}/B:${b.bats[0]}</span>
-            </div>
-            <div class="flex items-center justify-between mt-1 pt-1 border-t border-gray-900 text-[9px]">
-              <span class="font-mono text-gray-400">${b.stats ? `${b.stats.avg} AVG • ${b.stats.hr} HR` : ''}</span>
-              <div class="flex space-x-1">${renderArchetypeBadges(b.archetypes)}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      const bContainer = document.getElementById('roster-manage-bench');
-      bContainer.innerHTML = team.bench.map((b) => `
-        <div data-id="${b.id}" class="bg-gray-950 border border-gray-800 hover:border-emerald-500 rounded-lg flex items-stretch transition shadow-sm mb-1.5">
-          <div class="handle flex items-center justify-center bg-gray-900/50 rounded-l-lg px-2 border-r border-gray-800 cursor-grab active:cursor-grabbing text-gray-500 hover:text-emerald-400">
-            <i data-lucide="grip-vertical" class="w-4 h-4"></i>
-          </div>
-          <div onclick="openPlayerFormModal('bench', ${b.id})" class="flex-1 p-2 cursor-pointer flex justify-between items-center text-[10px]">
-            <div>
-              <span class="text-white font-bold">${b.name} <span class="text-gray-500">(T:${b.throws[0]}/B:${b.bats[0]})</span></span>
-            </div>
-            <div class="flex space-x-1">${renderArchetypeBadges(b.archetypes)}</div>
-          </div>
-        </div>
-      `).join('');
-      
-      const pContainer = document.getElementById('roster-manage-pitchers');
-      pContainer.innerHTML = team.pitchers.map((p) => `
-        <div onclick="openPlayerFormModal('pitcher', ${p.id})" class="p-2 rounded bg-gray-950 border border-gray-800 hover:border-emerald-500 cursor-pointer transition flex justify-between items-center text-[10px]">
-          <span class="text-white font-bold">${p.name}</span>
-          <span class="font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${p.throws[0]}</span>
-        </div>
-      `).join('');
-      
-      initializeSortables();
-      lucide.createIcons();
-    }
-
-    function renderAllViews() {
-      renderHUD();
-      renderCurrentBatter();
-      renderCurrentSequence();
-      renderArsenalTally();
-      renderLineupManager(); 
-      renderGameLog();
-    }
-
-    function renderHUD() {
-      const g = state.gameInfo;
-      const pitchers = getActivePitchers();
-      const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
-
-      document.getElementById('inning-text').innerText = formatInningOrdinal(g.inning);
-      document.getElementById('inning-side-icon').innerText = g.isTop ? '▲ TOP' : '▼ BOT';
-      document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
-
-      document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
-      document.getElementById('out-dot-2').className = g.outs >= 2 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
-
-      if (!pitcher) return;
-
-      const pitcherPitches = state.pitches.filter(p => p.pitcherId === pitcher.id);
-      const innPitches = pitcherPitches.filter(p => p.inning === g.inning && p.isTop === g.isTop);
-
-      document.getElementById('hud-total-pitches').innerText = pitcherPitches.length;
-      document.getElementById('hud-inn-pitches').innerText = innPitches.length;
-
-      const strikes = pitcherPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
-      const balls = pitcherPitches.filter(p => ['BallCalled', 'HitByPitch'].includes(p.pitchCall)).length;
-      const strPct = pitcherPitches.length > 0 ? ((strikes / pitcherPitches.length) * 100).toFixed(1) : "0.0";
-      document.getElementById('hud-strike-pct').innerText = `${strPct}%`;
-      document.getElementById('hud-strikes').innerText = strikes;
-      document.getElementById('hud-balls').innerText = balls;
-
-      const oneOnePitches = pitcherPitches.filter(p => p.is1_1Count);
-      const oneOneWins = oneOnePitches.filter(p => p.is1_1Win === true).length;
-      const oneOneWinPct = oneOnePitches.length > 0 ? ((oneOneWins / oneOnePitches.length) * 100).toFixed(1) : "0.0";
-      document.getElementById('hud-1-1-win-pct').innerText = `${oneOneWinPct}%`;
-      document.getElementById('hud-1-1-wins').innerText = oneOneWins;
-      document.getElementById('hud-1-1-total').innerText = oneOnePitches.length;
-
-      const card1_1 = document.getElementById('stat-1-1-card');
-      card1_1.className = (g.balls === 1 && g.strikes === 1) ? "bg-amber-950/90 border border-amber-500 rounded-lg p-1.5 leverage-pulse" : "bg-gray-950/70 border border-gray-800 rounded-lg p-1.5";
-
-      const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
-      const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
-      document.getElementById('hud-fps-pct').innerText = firstPitches.length > 0 ? `${((fpsStrikes / firstPitches.length) * 100).toFixed(1)}%` : "0.0%";
-
-      const swings = pitcherPitches.filter(p => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
-      const whiffs = pitcherPitches.filter(p => p.pitchCall === 'StrikeSwinging').length;
-      document.getElementById('hud-whiff-pct').innerText = swings > 0 ? `${((whiffs / swings) * 100).toFixed(0)}%` : "0.0%";
-      document.getElementById('hud-whiff-count').innerText = whiffs;
-      document.getElementById('hud-swing-count').innerText = swings;
-      document.getElementById('tab-pitch-count').innerText = state.pitches.length;
-    }
-
-    function renderCurrentBatter() {
-      const lineup = getActiveLineup();
-      if (lineup.length === 0) return;
-      const b = lineup[state.gameInfo.currentBatterIndex];
-      
-      document.getElementById('batter-order-num').innerText = `#${b.order}`;
-      document.getElementById('batter-name').innerText = b.name;
-      document.getElementById('batter-side-badge').innerText = `${b.bats[0]}HH`;
-
-      const statContainer = document.getElementById('batter-statline');
-      statContainer.innerText = b.stats ? `${b.stats.avg} / ${b.stats.obp || '.---'} / ${b.stats.slg || '.---'} • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB` : "No stats registered";
-      document.getElementById('batter-archetype-badges').innerHTML = renderArchetypeBadges(b.archetypes);
-
-      const lastAb = b.history && b.history.length > 0 ? b.history[b.history.length - 1] : null;
-      document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
-
-      const tagsContainer = document.getElementById('batter-scouting-tags');
-      tagsContainer.innerHTML = (b.tags || []).map(t => `<span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">${t}</span>`).join('');
-      document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
-    }
-
-    function renderCurrentSequence() {
-      const lineup = getActiveLineup();
-      if (lineup.length === 0) return;
-      const b = lineup[state.gameInfo.currentBatterIndex];
-      const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
-
-      document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
-      const container = document.getElementById('sequence-list');
-      if (currentAbPitches.length === 0) {
-        container.innerHTML = `<div class="text-[11px] text-gray-500 italic text-center py-3">No pitches thrown this at-bat</div>`;
-        return;
-      }
-      container.innerHTML = currentAbPitches.map((pt, idx) => `
-        <div class="flex items-center justify-between p-1.5 rounded bg-gray-950 border border-gray-800/80">
-          <div class="flex items-center space-x-2">
-            <span class="text-[10px] font-mono text-gray-500">#${idx + 1}</span>
-            <span class="text-xs font-black text-emerald-400">${pt.pitchType}</span>
-            <span class="text-[11px] text-gray-300 font-medium">${formatCallName(pt.pitchCall)}</span>
-          </div>
-          <div class="flex items-center space-x-1.5 text-[10px] font-mono text-gray-400">
-            <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
-            <span class="text-gray-600">|</span>
-            <span class="text-gray-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderArsenalTally() {
-      const pitchers = getActivePitchers();
-      if (pitchers.length === 0) return;
-      const p = pitchers[state.gameInfo.currentPitcherIndex];
-      document.getElementById('tally-pitcher-label').innerText = `${p.name} (${p.throws[0]}HP)`;
-
-      const pitcherPitches = state.pitches.filter(pt => pt.pitcherId === p.id);
-      const types = ['4S', 'SI', 'CT', 'SL', 'CB', 'CH', 'SPL'];
-      const tbody = document.getElementById('arsenal-table-body');
-      let topWeapon = "None", maxWhiffs = -1;
-
-      tbody.innerHTML = types.map(t => {
-        const matching = pitcherPitches.filter(pt => pt.pitchType === t);
-        const count = matching.length;
-        if (count === 0) return `<tr class="text-gray-600 hover:bg-gray-800/20"><td class="py-1 font-bold">${t}</td><td class="py-1 text-center font-bold">0</td><td class="py-1 text-center">-</td><td class="py-1 text-center">-</td><td class="py-1 text-center">-</td></tr>`;
-        
-        const strikes = matching.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
-        const strPct = ((strikes / count) * 100).toFixed(0);
-        const swings = matching.filter(pt => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
-        const whiffs = matching.filter(pt => pt.pitchCall === 'StrikeSwinging').length;
-        const whiffPct = swings > 0 ? ((whiffs / swings) * 100).toFixed(0) : "0";
-        const calledStrikes = matching.filter(pt => pt.pitchCall === 'StrikeCalled').length;
-        const cswPct = (((whiffs + calledStrikes) / count) * 100).toFixed(0);
-
-        if (whiffs > maxWhiffs && whiffs > 0) { maxWhiffs = whiffs; topWeapon = `${t} (${whiffs} Whiff${whiffs > 1 ? 's' : ''} / ${whiffPct}%)`; }
-
-        return `
-          <tr class="text-gray-300 hover:bg-gray-800/40">
-            <td class="py-1.5 font-bold text-emerald-400">${t}</td>
-            <td class="py-1.5 text-center font-bold text-white">${count}</td>
-            <td class="py-1.5 text-center">${strPct}%</td>
-            <td class="py-1.5 text-center text-purple-400 font-bold">${whiffPct}% <span class="text-[9px] text-gray-500">(${whiffs})</span></td>
-            <td class="py-1.5 text-center text-amber-400 font-bold">${cswPct}%</td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
-
-      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 4).length;
-      document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
-
-      const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
-      const earlyStr = earlyPitches.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
-      document.getElementById('tally-early-str').innerText = earlyPitches.length > 0 ? `${((earlyStr / earlyPitches.length) * 100).toFixed(1)}%` : "0.0%";
-    }
-
-    function renderGameLog() {
-      const tbody = document.getElementById('gamelog-table-body');
-      if (state.pitches.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500 italic">No pitches recorded yet</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
-        <tr class="hover:bg-gray-800/40">
-          <td class="p-2 text-gray-500">${pt.pitchNo}</td>
-          <td class="p-2">${pt.isTop ? 'T' : 'B'}${pt.inning}</td>
-          <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
-          <td class="p-2">${pt.batterName.split(',')[0]}</td>
-          <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
-          <td class="p-2">${formatCallName(pt.pitchCall)}</td>
-          <td class="p-2 font-bold">${pt.ballsBefore}-${pt.strikesBefore}</td>
-          <td class="p-2 text-gray-400">${pt.zoneDesc.split(' ')[0]}</td>
-          <td class="p-2 ${pt.is1_1Win === true ? 'text-emerald-400 font-bold' : (pt.is1_1Win === false ? 'text-rose-400 font-bold' : 'text-gray-600')}">
-            ${pt.is1_1Win === true ? 'WIN' : (pt.is1_1Win === false ? 'LOSS' : '-')}
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function switchTab(tabId) {
-      ['charting', 'scouting', 'roster', 'gamelog'].forEach(t => {
-        const view = document.getElementById(`view-${t}`);
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (t === tabId) {
-          view.classList.remove('hidden');
-          btn.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap";
-        } else {
-          view.classList.add('hidden');
-          btn.className = "py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap";
-        }
-      });
-      lucide.createIcons();
     }
 
     function formatCallName(call) {
