@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <!-- GLOBAL MATCHUP SELECTORS (Hidden on very small screens, scrolls if needed) -->
+      <!-- GLOBAL MATCHUP SELECTORS (Desktop) -->
       <div class="hidden md:flex items-center space-x-1.5 border-l border-gray-700 pl-4 mt-0.5">
         <span class="text-[10px] text-gray-400 font-bold uppercase">Mound:</span>
         <select id="header-pitching-team-desktop" onchange="changeActivePitchingTeam(this.value)" class="text-[11px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-0.5 outline-none w-28 truncate"></select>
@@ -88,7 +88,7 @@
 
     <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0 w-full sm:w-auto justify-start sm:justify-end">
       
-      <!-- Mobile Matchup Selectors (Visible only on small screens) -->
+      <!-- Mobile Matchup Selectors -->
       <div class="flex md:hidden items-center space-x-1 mr-2">
         <select id="header-pitching-team-mobile" onchange="changeActivePitchingTeam(this.value)" class="text-[10px] font-bold bg-gray-950 border border-gray-700 text-emerald-400 rounded px-1 py-1 outline-none w-20 truncate"></select>
         <span class="text-[9px] text-gray-500 font-bold">vs</span>
@@ -119,7 +119,7 @@
   </header>
 
   <!-- LIVE GAME STATE HUD -->
-  <section class="bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
+  <section class="relative z-20 bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
       <div class="flex items-center justify-center space-x-1">
@@ -179,28 +179,28 @@
     </div>
   </section>
 
-  <!-- NAVIGATION TABS -->
-  <nav class="bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold overflow-x-auto custom-scrollbar">
-    <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 whitespace-nowrap">
+  <!-- NAVIGATION TABS (Added relative z-30 to ensure it is always clickable) -->
+  <nav class="relative z-30 bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold overflow-x-auto custom-scrollbar">
+    <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
       <i data-lucide="crosshair" class="w-4 h-4"></i>
       <span>LIVE CHARTING</span>
     </button>
-    <button onclick="switchTab('scouting')" id="tab-btn-scouting" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
+    <button onclick="switchTab('scouting')" id="tab-btn-scouting" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
       <i data-lucide="book-open" class="w-4 h-4"></i>
       <span>SCOUTING HUB</span>
     </button>
-    <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
+    <button onclick="switchTab('roster')" id="tab-btn-roster" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
       <i data-lucide="users" class="w-4 h-4"></i>
       <span>TEAMS & ROSTERS</span>
     </button>
-    <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap">
+    <button onclick="switchTab('gamelog')" id="tab-btn-gamelog" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
       <i data-lucide="list" class="w-4 h-4"></i>
       <span>PITCH LOG (<span id="tab-pitch-count">0</span>)</span>
     </button>
   </nav>
 
   <!-- MAIN VIEWPORT -->
-  <main class="flex-1 p-3 sm:p-4 max-w-7xl w-full mx-auto">
+  <main class="flex-1 p-3 sm:p-4 max-w-7xl w-full mx-auto relative z-10">
 
     <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
     <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -221,7 +221,6 @@
             </div>
           </div>
 
-          <!-- Highlighted Scout Profile & Archetypes -->
           <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
@@ -230,13 +229,11 @@
             <div id="batter-archetype-badges" class="flex flex-wrap gap-1"></div>
           </div>
 
-          <!-- Previous At-Bat Result -->
           <div class="bg-gray-950 rounded-lg p-2 border border-gray-800/80 mb-2.5">
             <span class="text-[9px] text-gray-400 font-bold uppercase block mb-0.5">PREVIOUS AT-BAT:</span>
             <p id="batter-last-ab" class="text-xs font-semibold text-amber-300">No prior plate appearances</p>
           </div>
 
-          <!-- Live Scouting Cues Overlay -->
           <div class="space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[10px] text-gray-400 font-bold uppercase flex items-center">
@@ -251,7 +248,6 @@
           </div>
         </div>
 
-        <!-- Previous Pitch Sequence for this Batter -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-1.5 mb-2">
             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">CURRENT AB SEQUENCE</span>
@@ -273,7 +269,6 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <!-- STRIKE ZONE INTERFACE -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-gray-950 border border-gray-800 rounded-2xl p-2.5 flex flex-col items-center justify-center space-y-2 shadow-inner">
             <button onclick="selectZone(5, 'Chase High')" id="zone-btn-5" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
               ▲ Chase High / Waste
@@ -311,7 +306,6 @@
             </button>
           </div>
 
-          <!-- Pitch Selection Strip -->
           <div class="w-full mt-3">
             <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1.5 px-1">SELECT PITCH TYPE:</span>
             <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
@@ -325,7 +319,6 @@
             </div>
           </div>
 
-          <!-- Direct Pitch Call Action Buttons -->
           <div class="w-full mt-3.5 space-y-2">
             <span class="text-[10px] text-gray-400 font-bold uppercase block px-1">LOG PITCH RESULT:</span>
             <div class="grid grid-cols-3 gap-2">
@@ -401,7 +394,6 @@
           </div>
         </div>
 
-        <!-- Quick Dugout Controls -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3 shadow-md space-y-2">
           <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">DUGOUT CONTROLS:</span>
           <div class="grid grid-cols-2 gap-2">
@@ -477,8 +469,6 @@
 
     <!-- ==================== TAB 3: TEAMS, ROSTERS & STATS ==================== -->
     <div id="view-roster" class="hidden space-y-4">
-      
-      <!-- Top Bar: Team Manager -->
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md mb-4">
         <div class="flex flex-col md:flex-row justify-between items-center gap-3">
           <div class="flex items-center space-x-3 w-full md:w-auto">
@@ -493,7 +483,6 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <!-- LEFT: Hitters (Lineup & Bench) -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md space-y-4">
           <div class="flex justify-between items-center border-b border-gray-800 pb-2">
             <h3 class="text-sm font-black text-white uppercase">TEAM HITTERS</h3>
@@ -510,20 +499,16 @@
 
           <div>
             <span class="text-[10px] font-bold text-gray-500 uppercase block mb-2">BATTING ORDER (LINEUP)</span>
-            <!-- Drag Container for Lineup -->
             <div id="roster-manage-lineup" class="space-y-1 min-h-[50px] max-h-64 overflow-y-auto custom-scrollbar pb-2"></div>
           </div>
           
           <div class="pt-2 border-t border-gray-800">
             <span class="text-[10px] font-bold text-gray-500 uppercase block mb-2">BENCH PLAYERS</span>
-            <!-- Drag Container for Bench -->
             <div id="roster-manage-bench" class="space-y-1 min-h-[50px] max-h-48 overflow-y-auto custom-scrollbar pb-2"></div>
           </div>
         </div>
 
-        <!-- RIGHT: Pitchers & Ingestion -->
         <div class="space-y-4">
-          <!-- Pitcher List -->
           <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md space-y-4">
             <div class="flex justify-between items-center border-b border-gray-800 pb-2">
               <h3 class="text-sm font-black text-white uppercase">TEAM PITCHERS</h3>
@@ -532,7 +517,6 @@
             <div id="roster-manage-pitchers" class="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar"></div>
           </div>
 
-          <!-- Multi-Format Uploader: PDF Stats, Photos, CSV -->
           <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-white uppercase flex items-center">
@@ -550,7 +534,6 @@
               <span class="text-xs font-bold text-white block">Tap to Select PDF or Image Stat Packet</span>
             </div>
 
-            <!-- Loading Spinner & Progress -->
             <div id="file-processing-loader" class="hidden text-center space-y-2 bg-gray-950 p-3 rounded-lg border border-emerald-600/30">
               <div class="inline-block w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
               <p id="file-progress-text" class="text-xs font-bold text-emerald-400">Reconstructing PDF layout...</p>
@@ -878,7 +861,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V12');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V13');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -888,7 +871,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V12', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V13', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -1001,77 +984,84 @@
     }
 
     function initializeSortables() {
-      const lineupEl = document.getElementById('roster-manage-lineup');
-      const benchEl = document.getElementById('roster-manage-bench');
-      
-      if (sortableLineup) sortableLineup.destroy();
-      if (sortableBench) sortableBench.destroy();
+      try {
+        const lineupEl = document.getElementById('roster-manage-lineup');
+        const benchEl = document.getElementById('roster-manage-bench');
+        
+        if (sortableLineup) sortableLineup.destroy();
+        if (sortableBench) sortableBench.destroy();
 
-      const onSortEnd = function () {
-        rebuildRostersFromDOM();
-      };
+        const onSortEnd = function () {
+          rebuildRostersFromDOM();
+        };
 
-      sortableLineup = new Sortable(lineupEl, {
-        group: 'shared-roster', 
-        animation: 150,
-        handle: '.handle',
-        ghostClass: 'sortable-ghost',
-        onEnd: onSortEnd
-      });
+        sortableLineup = new Sortable(lineupEl, {
+          group: 'shared-roster', 
+          animation: 150,
+          handle: '.handle',
+          ghostClass: 'sortable-ghost',
+          onEnd: onSortEnd
+        });
 
-      sortableBench = new Sortable(benchEl, {
-        group: 'shared-roster',
-        animation: 150,
-        handle: '.handle',
-        ghostClass: 'sortable-ghost',
-        onEnd: onSortEnd
-      });
+        sortableBench = new Sortable(benchEl, {
+          group: 'shared-roster',
+          animation: 150,
+          handle: '.handle',
+          ghostClass: 'sortable-ghost',
+          onEnd: onSortEnd
+        });
+      } catch (e) {
+        console.error("Sortable initialization failed", e);
+      }
     }
 
     function rebuildRostersFromDOM() {
-      const team = state.teams[managingTeamId];
-      if (!team) return;
+      try {
+        const team = state.teams[managingTeamId];
+        if (!team) return;
 
-      const allPlayers = [...team.lineup, ...team.bench]; 
-      
-      const lineupNodes = document.getElementById('roster-manage-lineup').children;
-      const benchNodes = document.getElementById('roster-manage-bench').children;
+        const allPlayers = [...team.lineup, ...team.bench]; 
+        const lineupNodes = document.getElementById('roster-manage-lineup').children;
+        const benchNodes = document.getElementById('roster-manage-bench').children;
 
-      const newLineup = [];
-      const newBench = [];
+        const newLineup = [];
+        const newBench = [];
 
-      Array.from(lineupNodes).forEach((node, idx) => {
-        const id = parseInt(node.getAttribute('data-id'));
-        const player = allPlayers.find(p => p.id === id);
-        if (player) {
-          player.order = idx + 1; 
-          newLineup.push(player);
+        Array.from(lineupNodes).forEach((node, idx) => {
+          const id = parseInt(node.getAttribute('data-id'));
+          const player = allPlayers.find(p => p.id === id);
+          if (player) {
+            player.order = idx + 1; 
+            newLineup.push(player);
+          }
+        });
+
+        Array.from(benchNodes).forEach(node => {
+          const id = parseInt(node.getAttribute('data-id'));
+          const player = allPlayers.find(p => p.id === id);
+          if (player) {
+            delete player.order; 
+            newBench.push(player);
+          }
+        });
+
+        team.lineup = newLineup;
+        team.bench = newBench;
+        
+        saveState();
+
+        if (state.gameInfo.battingTeamId === managingTeamId) {
+           if (state.gameInfo.currentBatterIndex >= team.lineup.length) {
+              state.gameInfo.currentBatterIndex = Math.max(0, team.lineup.length - 1);
+           }
+           populateScoutingSelect();
+           renderCurrentBatter();
         }
-      });
-
-      Array.from(benchNodes).forEach(node => {
-        const id = parseInt(node.getAttribute('data-id'));
-        const player = allPlayers.find(p => p.id === id);
-        if (player) {
-          delete player.order; 
-          newBench.push(player);
-        }
-      });
-
-      team.lineup = newLineup;
-      team.bench = newBench;
-      
-      saveState();
-
-      if (state.gameInfo.battingTeamId === managingTeamId) {
-         if (state.gameInfo.currentBatterIndex >= team.lineup.length) {
-            state.gameInfo.currentBatterIndex = Math.max(0, team.lineup.length - 1);
-         }
-         populateScoutingSelect();
-         renderCurrentBatter();
+        renderLineupManager();
+        showQuickToast("Roster updated");
+      } catch (e) {
+        console.error("Rebuild error", e);
       }
-      renderLineupManager();
-      showQuickToast("Roster updated");
     }
 
     function openPlayerFormModal(role, playerId = null) {
@@ -1238,7 +1228,7 @@
         return;
       }
       sel.innerHTML = pitchers.map((p, idx) => 
-        `<option value="${idx}" ${idx === state.gameInfo.currentPitcherIndex ? 'selected' : ''}>${p.name} (${p.throws[0]}HP)</option>`
+        `<option value="${idx}" ${idx === state.gameInfo.currentPitcherIndex ? 'selected' : ''}>${p.name} (${p.throws ? p.throws[0] : 'R'}HP)</option>`
       ).join('');
     }
 
@@ -1250,13 +1240,13 @@
       
       sel.innerHTML = `
         <optgroup label="Active Lineup">
-          ${lineup.map(b => `<option value="batter-${b.id}">#${b.order} ${b.name} (${b.bats})</option>`).join('')}
+          ${lineup.map(b => `<option value="batter-${b.id}">#${b.order} ${b.name} (T:${b.throws ? b.throws[0] : 'R'}/B:${b.bats ? b.bats[0] : 'R'})</option>`).join('')}
         </optgroup>
         <optgroup label="Active Bench">
-          ${bench.map(b => `<option value="batter-${b.id}">${b.name} (${b.bats})</option>`).join('')}
+          ${bench.map(b => `<option value="batter-${b.id}">${b.name} (T:${b.throws ? b.throws[0] : 'R'}/B:${b.bats ? b.bats[0] : 'R'})</option>`).join('')}
         </optgroup>
         <optgroup label="Active Pitching Staff">
-          ${pitchers.map(p => `<option value="pitcher-${p.id}">${p.name} (${p.throws})</option>`).join('')}
+          ${pitchers.map(p => `<option value="pitcher-${p.id}">${p.name} (${p.throws ? p.throws[0] : 'R'}HP)</option>`).join('')}
         </optgroup>
       `;
     }
@@ -1347,10 +1337,10 @@
         strikesBefore: currentStrikes,
         pitcherId: pitcher.id,
         pitcherName: pitcher.name,
-        pitcherThrows: pitcher.throws,
+        pitcherThrows: pitcher.throws || 'Right',
         batterId: batter.id,
         batterName: batter.name,
-        batterSide: batter.bats,
+        batterSide: batter.bats || 'Right',
         pitchType: activePitchType,
         taggedPitchType: tmTypeMap[activePitchType] || 'Fastball',
         pitchCall: call,
@@ -1527,7 +1517,7 @@
         const avgMatch = line.match(/(?:\s|^)(\.\d{3}|\d\.\d{3})(?:\s|$)/);
         if (avgMatch) {
           const tokens = line.split(/\s+/);
-          let nameTokens = [], avg = avgMatch[1], hr = 0, sb = 0, bats = "Right";
+          let nameTokens = [], avg = avgMatch[1], hr = 0, sb = 0;
 
           tokens.forEach((t, idx) => {
             if (/^[A-Za-z]+,?[A-Za-z]*$/.test(t) && !['AVG', 'GP', 'AB', 'R', 'H', 'HR', 'RBI', 'SLG', 'OBP', 'SO', 'BB'].includes(t.toUpperCase())) {
@@ -1544,7 +1534,7 @@
           let fullName = nameTokens.join(' ').replace(/[^a-zA-Z,\s#]/g, '').trim();
           if (fullName.length >= 3) {
             stagedParsedPlayers.push({
-              name: fullName, bats: bats, throws: "Right",
+              name: fullName, bats: "Right", throws: "Right",
               stats: { avg: avg, obp: ".350", slg: hr > 4 ? ".550" : ".380", hr: hr, sb: sb },
               archetypes: determineArchetypes(parseFloat(avg) || 0.250, 0.400, hr, sb),
               order: orderIndex <= 9 ? orderIndex : null,
@@ -1708,7 +1698,7 @@
             <div>
               <div class="flex items-center space-x-1.5">
                 <span class="font-bold text-white">${bp.name}</span>
-                <span class="text-[9px] text-gray-400 font-mono">(${bp.bats[0]}HH)</span>
+                <span class="text-[9px] text-gray-400 font-mono">(T:${bp.throws ? bp.throws[0] : 'R'}/B:${bp.bats ? bp.bats[0] : 'R'})</span>
               </div>
               <div class="flex space-x-1 mt-0.5">${renderArchetypeBadges(bp.archetypes)}</div>
             </div>
@@ -1768,6 +1758,254 @@
 
       if (toastTimeout) clearTimeout(toastTimeout);
       toastTimeout = setTimeout(() => { toast.classList.add('hidden'); }, 4500);
+    }
+
+    function renderAllViews() {
+      try { renderHUD(); } catch(e) { console.error("HUD Error:", e); }
+      try { renderCurrentBatter(); } catch(e) { console.error("Batter Error:", e); }
+      try { renderCurrentSequence(); } catch(e) { console.error("Sequence Error:", e); }
+      try { renderArsenalTally(); } catch(e) { console.error("Tally Error:", e); }
+      try { renderLineupManager(); } catch(e) { console.error("Roster Error:", e); }
+      try { renderGameLog(); } catch(e) { console.error("Log Error:", e); }
+    }
+
+    function renderHUD() {
+      const g = state.gameInfo;
+      const pitchers = getActivePitchers();
+      const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
+
+      document.getElementById('inning-text').innerText = formatInningOrdinal(g.inning);
+      document.getElementById('inning-side-icon').innerText = g.isTop ? '▲ TOP' : '▼ BOT';
+      document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
+
+      document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
+      document.getElementById('out-dot-2').className = g.outs >= 2 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
+
+      if (!pitcher) return;
+
+      const pitcherPitches = state.pitches.filter(p => p.pitcherId === pitcher.id);
+      const innPitches = pitcherPitches.filter(p => p.inning === g.inning && p.isTop === g.isTop);
+
+      document.getElementById('hud-total-pitches').innerText = pitcherPitches.length;
+      document.getElementById('hud-inn-pitches').innerText = innPitches.length;
+
+      const strikes = pitcherPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      const balls = pitcherPitches.filter(p => ['BallCalled', 'HitByPitch'].includes(p.pitchCall)).length;
+      const strPct = pitcherPitches.length > 0 ? ((strikes / pitcherPitches.length) * 100).toFixed(1) : "0.0";
+      document.getElementById('hud-strike-pct').innerText = `${strPct}%`;
+      document.getElementById('hud-strikes').innerText = strikes;
+      document.getElementById('hud-balls').innerText = balls;
+
+      const oneOnePitches = pitcherPitches.filter(p => p.is1_1Count);
+      const oneOneWins = oneOnePitches.filter(p => p.is1_1Win === true).length;
+      const oneOneWinPct = oneOnePitches.length > 0 ? ((oneOneWins / oneOnePitches.length) * 100).toFixed(1) : "0.0";
+      document.getElementById('hud-1-1-win-pct').innerText = `${oneOneWinPct}%`;
+      document.getElementById('hud-1-1-wins').innerText = oneOneWins;
+      document.getElementById('hud-1-1-total').innerText = oneOnePitches.length;
+
+      const card1_1 = document.getElementById('stat-1-1-card');
+      card1_1.className = (g.balls === 1 && g.strikes === 1) ? "bg-amber-950/90 border border-amber-500 rounded-lg p-1.5 leverage-pulse" : "bg-gray-950/70 border border-gray-800 rounded-lg p-1.5";
+
+      const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
+      const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      document.getElementById('hud-fps-pct').innerText = firstPitches.length > 0 ? `${((fpsStrikes / firstPitches.length) * 100).toFixed(1)}%` : "0.0%";
+
+      const swings = pitcherPitches.filter(p => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      const whiffs = pitcherPitches.filter(p => p.pitchCall === 'StrikeSwinging').length;
+      document.getElementById('hud-whiff-pct').innerText = swings > 0 ? `${((whiffs / swings) * 100).toFixed(0)}%` : "0.0%";
+      document.getElementById('hud-whiff-count').innerText = whiffs;
+      document.getElementById('hud-swing-count').innerText = swings;
+      document.getElementById('tab-pitch-count').innerText = state.pitches.length;
+    }
+
+    function renderCurrentBatter() {
+      const lineup = getActiveLineup();
+      if (lineup.length === 0) return;
+      const b = lineup[state.gameInfo.currentBatterIndex];
+      if (!b) return;
+      
+      document.getElementById('batter-order-num').innerText = `#${b.order}`;
+      document.getElementById('batter-name').innerText = b.name;
+      document.getElementById('batter-side-badge').innerText = `${b.bats ? b.bats[0] : 'R'}HH`;
+
+      const statContainer = document.getElementById('batter-statline');
+      statContainer.innerText = b.stats ? `${b.stats.avg} / ${b.stats.obp || '.---'} / ${b.stats.slg || '.---'} • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB` : "No stats registered";
+      document.getElementById('batter-archetype-badges').innerHTML = renderArchetypeBadges(b.archetypes);
+
+      const lastAb = b.history && b.history.length > 0 ? b.history[b.history.length - 1] : null;
+      document.getElementById('batter-last-ab').innerText = lastAb ? `Inn ${lastAb.inning}: ${lastAb.result}` : "No prior plate appearances today";
+
+      const tagsContainer = document.getElementById('batter-scouting-tags');
+      tagsContainer.innerHTML = (b.tags || []).map(t => `<span class="text-[10px] bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">${t}</span>`).join('');
+      document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
+    }
+
+    function renderCurrentSequence() {
+      const lineup = getActiveLineup();
+      if (lineup.length === 0) return;
+      const b = lineup[state.gameInfo.currentBatterIndex];
+      if (!b) return;
+
+      const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
+
+      document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
+      const container = document.getElementById('sequence-list');
+      if (currentAbPitches.length === 0) {
+        container.innerHTML = `<div class="text-[11px] text-gray-500 italic text-center py-3">No pitches thrown this at-bat</div>`;
+        return;
+      }
+      container.innerHTML = currentAbPitches.map((pt, idx) => `
+        <div class="flex items-center justify-between p-1.5 rounded bg-gray-950 border border-gray-800/80">
+          <div class="flex items-center space-x-2">
+            <span class="text-[10px] font-mono text-gray-500">#${idx + 1}</span>
+            <span class="text-xs font-black text-emerald-400">${pt.pitchType}</span>
+            <span class="text-[11px] text-gray-300 font-medium">${formatCallName(pt.pitchCall)}</span>
+          </div>
+          <div class="flex items-center space-x-1.5 text-[10px] font-mono text-gray-400">
+            <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
+            <span class="text-gray-600">|</span>
+            <span class="text-gray-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderArsenalTally() {
+      const pitchers = getActivePitchers();
+      if (pitchers.length === 0) return;
+      const p = pitchers[state.gameInfo.currentPitcherIndex];
+      if (!p) return;
+
+      document.getElementById('tally-pitcher-label').innerText = `${p.name} (${p.throws ? p.throws[0] : 'R'}HP)`;
+
+      const pitcherPitches = state.pitches.filter(pt => pt.pitcherId === p.id);
+      const types = ['4S', 'SI', 'CT', 'SL', 'CB', 'CH', 'SPL'];
+      const tbody = document.getElementById('arsenal-table-body');
+      let topWeapon = "None", maxWhiffs = -1;
+
+      tbody.innerHTML = types.map(t => {
+        const matching = pitcherPitches.filter(pt => pt.pitchType === t);
+        const count = matching.length;
+        if (count === 0) return `<tr class="text-gray-600 hover:bg-gray-800/20"><td class="py-1 font-bold">${t}</td><td class="py-1 text-center font-bold">0</td><td class="py-1 text-center">-</td><td class="py-1 text-center">-</td><td class="py-1 text-center">-</td></tr>`;
+        
+        const strikes = matching.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+        const strPct = ((strikes / count) * 100).toFixed(0);
+        const swings = matching.filter(pt => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+        const whiffs = matching.filter(pt => pt.pitchCall === 'StrikeSwinging').length;
+        const whiffPct = swings > 0 ? ((whiffs / swings) * 100).toFixed(0) : "0";
+        const calledStrikes = matching.filter(pt => pt.pitchCall === 'StrikeCalled').length;
+        const cswPct = (((whiffs + calledStrikes) / count) * 100).toFixed(0);
+
+        if (whiffs > maxWhiffs && whiffs > 0) { maxWhiffs = whiffs; topWeapon = `${t} (${whiffs} Whiff${whiffs > 1 ? 's' : ''} / ${whiffPct}%)`; }
+
+        return `
+          <tr class="text-gray-300 hover:bg-gray-800/40">
+            <td class="py-1.5 font-bold text-emerald-400">${t}</td>
+            <td class="py-1.5 text-center font-bold text-white">${count}</td>
+            <td class="py-1.5 text-center">${strPct}%</td>
+            <td class="py-1.5 text-center text-purple-400 font-bold">${whiffPct}% <span class="text-[9px] text-gray-500">(${whiffs})</span></td>
+            <td class="py-1.5 text-center text-amber-400 font-bold">${cswPct}%</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
+
+      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 4).length;
+      document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
+
+      const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
+      const earlyStr = earlyPitches.filter(pt => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(pt.pitchCall)).length;
+      document.getElementById('tally-early-str').innerText = earlyPitches.length > 0 ? `${((earlyStr / earlyPitches.length) * 100).toFixed(1)}%` : "0.0%";
+    }
+
+    function renderLineupManager() {
+      const team = state.teams[managingTeamId];
+      if(!team) return;
+
+      const lContainer = document.getElementById('roster-manage-lineup');
+      lContainer.innerHTML = team.lineup.map((b, idx) => `
+        <div data-id="${b.id}" class="bg-gray-950 border border-gray-800 hover:border-emerald-500 rounded-lg flex items-stretch transition shadow-sm mb-1.5">
+          <div class="handle flex items-center justify-center bg-gray-900/50 rounded-l-lg px-2 border-r border-gray-800 cursor-grab active:cursor-grabbing text-gray-500 hover:text-emerald-400">
+            <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+          </div>
+          <div onclick="openPlayerFormModal('lineup', ${b.id})" class="flex-1 p-2 cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-black font-mono text-gray-500">#${b.order}</span>
+              <span class="text-xs font-bold text-white">${b.name}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${b.throws ? b.throws[0] : 'R'}/B:${b.bats ? b.bats[0] : 'R'}</span>
+            </div>
+            <div class="flex items-center justify-between mt-1 pt-1 border-t border-gray-900 text-[9px]">
+              <span class="font-mono text-gray-400">${b.stats ? `${b.stats.avg} AVG • ${b.stats.hr} HR` : ''}</span>
+              <div class="flex space-x-1">${renderArchetypeBadges(b.archetypes)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const bContainer = document.getElementById('roster-manage-bench');
+      bContainer.innerHTML = team.bench.map((b) => `
+        <div data-id="${b.id}" class="bg-gray-950 border border-gray-800 hover:border-emerald-500 rounded-lg flex items-stretch transition shadow-sm mb-1.5">
+          <div class="handle flex items-center justify-center bg-gray-900/50 rounded-l-lg px-2 border-r border-gray-800 cursor-grab active:cursor-grabbing text-gray-500 hover:text-emerald-400">
+            <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+          </div>
+          <div onclick="openPlayerFormModal('bench', ${b.id})" class="flex-1 p-2 cursor-pointer flex justify-between items-center text-[10px]">
+            <div>
+              <span class="text-white font-bold">${b.name} <span class="text-gray-500">(T:${b.throws ? b.throws[0] : 'R'}/B:${b.bats ? b.bats[0] : 'R'})</span></span>
+            </div>
+            <div class="flex space-x-1">${renderArchetypeBadges(b.archetypes)}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      const pContainer = document.getElementById('roster-manage-pitchers');
+      pContainer.innerHTML = team.pitchers.map((p) => `
+        <div onclick="openPlayerFormModal('pitcher', ${p.id})" class="p-2 rounded bg-gray-950 border border-gray-800 hover:border-emerald-500 cursor-pointer transition flex justify-between items-center text-[10px]">
+          <span class="text-white font-bold">${p.name}</span>
+          <span class="font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">T:${p.throws ? p.throws[0] : 'R'}</span>
+        </div>
+      `).join('');
+      
+      initializeSortables();
+      lucide.createIcons();
+    }
+
+    function renderGameLog() {
+      const tbody = document.getElementById('gamelog-table-body');
+      if (state.pitches.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500 italic">No pitches recorded yet</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
+        <tr class="hover:bg-gray-800/40">
+          <td class="p-2 text-gray-500">${pt.pitchNo}</td>
+          <td class="p-2">${pt.isTop ? 'T' : 'B'}${pt.inning}</td>
+          <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
+          <td class="p-2">${pt.batterName.split(',')[0]}</td>
+          <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
+          <td class="p-2">${formatCallName(pt.pitchCall)}</td>
+          <td class="p-2 font-bold">${pt.ballsBefore}-${pt.strikesBefore}</td>
+          <td class="p-2 text-gray-400">${pt.zoneDesc.split(' ')[0]}</td>
+          <td class="p-2 ${pt.is1_1Win === true ? 'text-emerald-400 font-bold' : (pt.is1_1Win === false ? 'text-rose-400 font-bold' : 'text-gray-600')}">
+            ${pt.is1_1Win === true ? 'WIN' : (pt.is1_1Win === false ? 'LOSS' : '-')}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function switchTab(tabId) {
+      ['charting', 'scouting', 'roster', 'gamelog'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          btn.className = "py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap cursor-pointer";
+        } else {
+          view.classList.add('hidden');
+          btn.className = "py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 font-bold text-xs whitespace-nowrap cursor-pointer";
+        }
+      });
+      lucide.createIcons();
     }
 
     function formatCallName(call) {
