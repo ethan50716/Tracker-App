@@ -63,7 +63,7 @@
     <div class="flex items-center space-x-4">
       <!-- CUSTOM BRANDING -->
       <div class="flex items-center space-x-2">
-        <img src="apple-touch-icon.PNG" alt="Logo" class="w-9 h-9 rounded-lg shadow-sm" />
+        <img src="apple-touch-icon.PNG" alt="Logo" class="w-9 h-9 rounded-lg shadow-sm" onerror="this.style.display='none'" />
         <div class="flex flex-col leading-none">
           <div class="flex items-center space-x-2">
             <span class="text-sm font-black tracking-wider uppercase text-white font-sans">
@@ -101,7 +101,7 @@
         </select>
       </div>
 
-      <button onclick="rollInning()" title="Roll/Flip Half-Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95 whitespace-nowrap">
+      <button onclick="rollInning()" title="Roll/Flip Inning" class="flex items-center space-x-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-600/40 text-xs font-bold px-2.5 py-1 rounded-lg transition active:scale-95 whitespace-nowrap">
         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
         <span class="hidden sm:inline">Roll Inning</span>
       </button>
@@ -119,18 +119,16 @@
   </header>
 
   <!-- LIVE GAME STATE HUD -->
-  <section class="relative z-20 bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
-    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
-      <span class="text-[10px] text-gray-400 font-semibold block uppercase">INNING</span>
-      <div class="flex items-center justify-center space-x-1">
-        <span id="inning-side-icon" class="text-xs text-amber-400 font-black">▲ TOP</span>
-        <span id="inning-text" class="text-base font-black text-white">1st</span>
-      </div>
+  <section class="relative z-20 bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
+    
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 flex flex-col items-center justify-center">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase tracking-widest">INNING</span>
+      <span id="inning-text" class="text-xl font-black text-white leading-none mt-0.5">1</span>
     </div>
 
-    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 col-span-2 sm:col-span-1">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">COUNT & OUTS</span>
-      <div class="flex items-center justify-center space-x-2">
+      <div class="flex items-center justify-center space-x-2 mt-0.5">
         <span id="count-display" class="text-base font-black text-white tracking-wide">0 - 0</span>
         <span class="text-gray-600 font-black">|</span>
         <div class="flex space-x-1 items-center">
@@ -142,14 +140,14 @@
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">PITCHES (TOT / INN)</span>
-      <div class="text-base font-black text-emerald-400">
+      <div class="text-base font-black text-emerald-400 mt-0.5">
         <span id="hud-total-pitches">0</span> <span class="text-xs text-gray-500 font-normal">/</span> <span id="hud-inn-pitches" class="text-white text-sm">0</span>
       </div>
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">STRIKE % (S / B)</span>
-      <div class="text-sm font-black text-white">
+      <div class="text-sm font-black text-white mt-0.5">
         <span id="hud-strike-pct" class="text-emerald-400 text-base">0.0%</span>
         <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-strikes">0</span>/<span id="hud-balls">0</span>)</span>
       </div>
@@ -159,27 +157,22 @@
       <span class="text-[10px] text-amber-400 font-bold block uppercase flex items-center justify-center">
         <i data-lucide="target" class="w-3 h-3 mr-1 text-amber-400"></i> 1-1 WIN %
       </span>
-      <div class="text-sm font-black text-white">
+      <div class="text-sm font-black text-white mt-0.5">
         <span id="hud-1-1-win-pct" class="text-amber-400 text-base">0.0%</span>
         <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-1-1-wins">0</span>/<span id="hud-1-1-total">0</span>)</span>
       </div>
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
-      <span class="text-[10px] text-gray-400 font-semibold block uppercase">FPS %</span>
-      <div class="text-base font-black text-cyan-400" id="hud-fps-pct">0.0%</div>
-    </div>
-
-    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase">WHIFF % (SWINGS)</span>
-      <div class="text-sm font-black text-white">
+      <div class="text-sm font-black text-white mt-0.5">
         <span id="hud-whiff-pct" class="text-purple-400 text-base">0.0%</span>
         <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-whiff-count">0</span>/<span id="hud-swing-count">0</span>)</span>
       </div>
     </div>
   </section>
 
-  <!-- NAVIGATION TABS (Added relative z-30 to ensure it is always clickable) -->
+  <!-- NAVIGATION TABS -->
   <nav class="relative z-30 bg-gray-900 border-b border-gray-800 px-4 flex space-x-6 text-xs font-bold overflow-x-auto custom-scrollbar">
     <button onclick="switchTab('charting')" id="tab-btn-charting" class="py-2.5 border-b-2 border-emerald-500 text-emerald-400 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
       <i data-lucide="crosshair" class="w-4 h-4"></i>
@@ -204,7 +197,8 @@
 
     <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
     <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & HIGHLIGHTED STAT ARCHETYPES -->
+      
+      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & SEQUENCE -->
       <div class="lg:col-span-3 space-y-3">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-3.5 shadow-md">
           <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
@@ -221,6 +215,7 @@
             </div>
           </div>
 
+          <!-- Scout Profile -->
           <div class="bg-gray-950 rounded-lg p-2.5 border border-gray-800 mb-2.5 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[9px] text-gray-400 font-bold uppercase">SCOUT PROFILE:</span>
@@ -269,6 +264,7 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
+          <!-- STRIKE ZONE -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-gray-950 border border-gray-800 rounded-2xl p-2.5 flex flex-col items-center justify-center space-y-2 shadow-inner">
             <button onclick="selectZone(5, 'Chase High')" id="zone-btn-5" class="w-full py-2 bg-gray-900 hover:bg-emerald-950/40 text-gray-300 hover:text-emerald-300 border border-dashed border-gray-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
               ▲ Chase High / Waste
@@ -306,6 +302,7 @@
             </button>
           </div>
 
+          <!-- Pitch Selection Strip -->
           <div class="w-full mt-3">
             <span class="text-[10px] text-gray-400 font-bold uppercase block mb-1.5 px-1">SELECT PITCH TYPE:</span>
             <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
@@ -319,6 +316,7 @@
             </div>
           </div>
 
+          <!-- Direct Pitch Call Action Buttons -->
           <div class="w-full mt-3.5 space-y-2">
             <span class="text-[10px] text-gray-400 font-bold uppercase block px-1">LOG PITCH RESULT:</span>
             <div class="grid grid-cols-3 gap-2">
@@ -400,12 +398,15 @@
             <button onclick="clearBases()" class="py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-lg transition border border-gray-700">
               Clear Count
             </button>
+            <button onclick="addBaseOut()" class="py-2 bg-gray-800 hover:bg-gray-700 text-rose-400 font-bold text-xs rounded-lg transition border border-gray-700">
+              + Base Out
+            </button>
             <button onclick="addExtraHitterPrompt()" class="py-2 bg-gray-800 hover:bg-gray-700 text-emerald-400 font-bold text-xs rounded-lg transition border border-gray-700">
               + Extra Hitter
             </button>
-            <button onclick="undoLastPitch()" class="col-span-2 py-2 bg-gray-800 hover:bg-amber-600/20 text-amber-300 border border-gray-700 hover:border-amber-500/40 font-black text-xs rounded-lg transition flex items-center justify-center space-x-1">
+            <button onclick="undoLastPitch()" class="py-2 bg-gray-800 hover:bg-amber-600/20 text-amber-300 border border-gray-700 hover:border-amber-500/40 font-black text-xs rounded-lg transition flex items-center justify-center space-x-1">
               <i data-lucide="undo" class="w-3.5 h-3.5"></i>
-              <span>Undo Last Pitch</span>
+              <span>Undo Last</span>
             </button>
           </div>
         </div>
@@ -493,7 +494,7 @@
           </div>
           
           <div class="bg-emerald-950/30 border border-emerald-900 rounded p-2 mb-3 text-[10px] text-emerald-400 font-bold flex items-center space-x-2">
-            <i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i>
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 shrink-0"></i>
             <span>Tip: Drag the ☰ handle to reorder the lineup, or drag players between Lineup and Bench to substitute them.</span>
           </div>
 
@@ -781,7 +782,7 @@
         pitchingTeamId: 'slu',
         battingTeamId: 'jones',
         inning: 1,
-        isTop: true,
+        isTop: true, // Only kept for legacy compat, functionally ignored for full-inning advance
         outs: 0,
         balls: 0,
         strikes: 0,
@@ -861,7 +862,7 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V13');
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V14');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn("Storage fallback", e);
@@ -871,7 +872,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V13', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V14', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -1209,9 +1210,26 @@
     function deleteManagedPlayer() {
       if (!confirm("Are you sure you want to delete this player?")) return;
       const team = state.teams[managingTeamId];
+      
+      const delLineupIdx = team.lineup.findIndex(x => x.id === editingPlayerId);
+      
       team.pitchers = team.pitchers.filter(x => x.id !== editingPlayerId);
       team.lineup = team.lineup.filter(x => x.id !== editingPlayerId);
       team.bench = team.bench.filter(x => x.id !== editingPlayerId);
+      
+      // Re-assign proper numeric orders
+      team.lineup.forEach((p, idx) => p.order = idx + 1);
+
+      // Handle the case where we deleted a player currently at the plate
+      if (managingTeamId === state.gameInfo.battingTeamId && delLineupIdx !== -1) {
+        if (delLineupIdx < state.gameInfo.currentBatterIndex) {
+          state.gameInfo.currentBatterIndex--;
+        }
+        if (state.gameInfo.currentBatterIndex >= team.lineup.length) {
+          state.gameInfo.currentBatterIndex = Math.max(0, team.lineup.length - 1);
+        }
+      }
+
       saveState();
       closePlayerFormModal();
       populatePitcherSelect();
@@ -1381,15 +1399,16 @@
 
       if (nextOuts >= 3) {
         state.gameInfo.outs = 0; state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
-        state.gameInfo.isTop = !state.gameInfo.isTop;
-        if (state.gameInfo.isTop) state.gameInfo.inning++;
+        
+        // Full inning progression - no half innings
+        state.gameInfo.inning++;
         
         if (paEnded) {
           if (!batter.history) batter.history = [];
           batter.history.push({ inning: pitchRecord.inning, result: paSummary });
           advanceToNextBatter();
         }
-        showQuickToast(`3 OUTS! Advanced to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`, true);
+        showQuickToast(`3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
       } else {
         state.gameInfo.outs = nextOuts;
         if (paEnded) {
@@ -1430,14 +1449,30 @@
       recordPitch('InPlay', { trajectory: selectedTrajectory, outcome: outcome, isOut: isOut });
     }
 
-    function rollInning() {
-      state.gameInfo.outs = 0; state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
-      state.gameInfo.isTop = !state.gameInfo.isTop;
-      if (state.gameInfo.isTop) state.gameInfo.inning++;
-      advanceToNextBatter();
+    // BASE RUNNER OUT LOGIC (Caught Stealing / Pickoff)
+    function addBaseOut() {
+      if (state.gameInfo.outs >= 2) {
+        state.gameInfo.outs = 0;
+        state.gameInfo.balls = 0;
+        state.gameInfo.strikes = 0;
+        state.gameInfo.inning++;
+        showQuickToast(`Base Out! 3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
+      } else {
+        state.gameInfo.outs++;
+        showQuickToast(`Base Out! Now ${state.gameInfo.outs} Out(s).`);
+      }
       saveState();
       renderAllViews();
-      showQuickToast(`Rolled Inning -> Now in ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${formatInningOrdinal(state.gameInfo.inning)}`);
+    }
+
+    function rollInning() {
+      state.gameInfo.outs = 0; 
+      state.gameInfo.balls = 0; 
+      state.gameInfo.strikes = 0;
+      state.gameInfo.inning++; // Full inning progression
+      saveState();
+      renderAllViews();
+      showQuickToast(`Rolled to Inning ${state.gameInfo.inning}`);
     }
 
     function clearBases() {
@@ -1774,8 +1809,7 @@
       const pitchers = getActivePitchers();
       const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
 
-      document.getElementById('inning-text').innerText = formatInningOrdinal(g.inning);
-      document.getElementById('inning-side-icon').innerText = g.isTop ? '▲ TOP' : '▼ BOT';
+      document.getElementById('inning-text').innerText = g.inning; // Simplified full inning layout
       document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
 
       document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
@@ -1784,7 +1818,7 @@
       if (!pitcher) return;
 
       const pitcherPitches = state.pitches.filter(p => p.pitcherId === pitcher.id);
-      const innPitches = pitcherPitches.filter(p => p.inning === g.inning && p.isTop === g.isTop);
+      const innPitches = pitcherPitches.filter(p => p.inning === g.inning);
 
       document.getElementById('hud-total-pitches').innerText = pitcherPitches.length;
       document.getElementById('hud-inn-pitches').innerText = innPitches.length;
@@ -1846,7 +1880,7 @@
       const b = lineup[state.gameInfo.currentBatterIndex];
       if (!b) return;
 
-      const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
+      const currentAbPitches = state.pitches.filter(pt => pt.batterId === b.id && pt.inning === state.gameInfo.inning);
 
       document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
       const container = document.getElementById('sequence-list');
@@ -1979,7 +2013,7 @@
       tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
         <tr class="hover:bg-gray-800/40">
           <td class="p-2 text-gray-500">${pt.pitchNo}</td>
-          <td class="p-2">${pt.isTop ? 'T' : 'B'}${pt.inning}</td>
+          <td class="p-2">Inn ${pt.inning}</td>
           <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
           <td class="p-2">${pt.batterName.split(',')[0]}</td>
           <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
@@ -2014,8 +2048,7 @@
     }
 
     function formatInningOrdinal(n) {
-      const s = ["th", "st", "nd", "rd"], v = n % 100;
-      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      return n; // Hard returns the number for full-inning setup without suffix
     }
     
     function exportToCSV() {
@@ -2029,7 +2062,7 @@
       ];
 
       const rows = state.pitches.map(p => [
-        p.pitchNo, `"${p.timestamp}"`, p.inning, p.isTop ? "Top" : "Bottom",
+        p.pitchNo, `"${p.timestamp}"`, p.inning, "Top",
         p.outsBefore, p.ballsBefore, p.strikesBefore, `"${p.pitcherName}"`, p.pitcherThrows,
         `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, `"${p.pitchCall}"`,
         `"${p.hitType}"`, `"${p.playResult}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
