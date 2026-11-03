@@ -119,11 +119,11 @@
   </header>
 
   <!-- LIVE GAME STATE HUD -->
-  <section class="relative z-20 bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2 items-center text-center">
+  <section class="relative z-20 bg-gray-900/90 border-b border-gray-800 px-4 py-2 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2 items-center text-center">
     
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 flex flex-col items-center justify-center">
       <span class="text-[10px] text-gray-400 font-semibold block uppercase tracking-widest">INNING</span>
-      <span id="inning-text" class="text-xl font-black text-white leading-none mt-0.5">1</span>
+      <span id="inning-text" class="text-xl font-black text-white leading-none mt-0.5">TOP 1</span>
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5 col-span-2 sm:col-span-1">
@@ -139,17 +139,25 @@
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
-      <span class="text-[10px] text-gray-400 font-semibold block uppercase">PITCHES (TOT / INN)</span>
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">PITCHES (TOT/INN)</span>
       <div class="text-base font-black text-emerald-400 mt-0.5">
         <span id="hud-total-pitches">0</span> <span class="text-xs text-gray-500 font-normal">/</span> <span id="hud-inn-pitches" class="text-white text-sm">0</span>
       </div>
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
-      <span class="text-[10px] text-gray-400 font-semibold block uppercase">STRIKE % (S / B)</span>
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">STRIKE % (S/B)</span>
       <div class="text-sm font-black text-white mt-0.5">
         <span id="hud-strike-pct" class="text-emerald-400 text-base">0.0%</span>
         <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-strikes">0</span>/<span id="hud-balls">0</span>)</span>
+      </div>
+    </div>
+
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">FPS %</span>
+      <div class="text-sm font-black text-white mt-0.5">
+        <span id="hud-fps-pct" class="text-emerald-400 text-base">0.0%</span>
+        <span class="text-[11px] text-gray-400 font-normal text-transparent">(-)</span>
       </div>
     </div>
 
@@ -164,12 +172,21 @@
     </div>
 
     <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
-      <span class="text-[10px] text-gray-400 font-semibold block uppercase">WHIFF % (SWINGS)</span>
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">WHIFF %</span>
       <div class="text-sm font-black text-white mt-0.5">
         <span id="hud-whiff-pct" class="text-purple-400 text-base">0.0%</span>
         <span class="text-[11px] text-gray-400 font-normal">(<span id="hud-whiff-count">0</span>/<span id="hud-swing-count">0</span>)</span>
       </div>
     </div>
+
+    <div class="bg-gray-950/70 border border-gray-800 rounded-lg p-1.5">
+      <span class="text-[10px] text-gray-400 font-semibold block uppercase">K:BB RATIO</span>
+      <div class="text-sm font-black text-white mt-0.5">
+        <span id="hud-kbb-ratio" class="text-cyan-400 text-base">0.0</span>
+        <span id="hud-kbb-counts" class="text-[11px] text-gray-400 font-normal">(0K / 0BB)</span>
+      </div>
+    </div>
+
   </section>
 
   <!-- NAVIGATION TABS -->
@@ -190,6 +207,10 @@
       <i data-lucide="list" class="w-4 h-4"></i>
       <span>PITCH LOG (<span id="tab-pitch-count">0</span>)</span>
     </button>
+    <button onclick="switchTab('settings')" id="tab-btn-settings" class="py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center space-x-1.5 whitespace-nowrap cursor-pointer">
+      <i data-lucide="settings" class="w-4 h-4"></i>
+      <span>SETTINGS</span>
+    </button>
   </nav>
 
   <!-- MAIN VIEWPORT -->
@@ -206,11 +227,11 @@
               <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">AT THE PLATE</span>
               <div class="flex items-center space-x-1.5">
                 <span id="batter-order-num" class="bg-gray-800 text-gray-300 text-xs px-1.5 py-0.5 rounded font-black font-mono">#1</span>
-                <h3 id="batter-name" class="text-sm font-black text-white">Champagne</h3>
+                <h3 id="batter-name" class="text-sm font-black text-white">Batter</h3>
               </div>
             </div>
             <div class="text-right">
-              <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">LHH</span>
+              <span id="batter-side-badge" class="bg-blue-950 text-blue-400 border border-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase">RHH</span>
               <button onclick="openSubModal()" class="block text-[10px] text-emerald-400 hover:underline mt-1 font-bold">Sub / PH</button>
             </div>
           </div>
@@ -579,6 +600,25 @@
         </div>
       </div>
     </div>
+    
+    <!-- ==================== TAB 5: SETTINGS ==================== -->
+    <div id="view-settings" class="hidden space-y-4">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-md max-w-xl">
+        <h2 class="text-sm font-black text-white uppercase tracking-wider mb-4">Application Settings</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-gray-950 rounded-lg border border-gray-800">
+            <div>
+              <span class="block text-white font-bold text-xs uppercase">Tracking Mode</span>
+              <span class="block text-gray-400 text-[10px]">Track both teams (Top/Bottom half) or one team continuously</span>
+            </div>
+            <select id="settings-tracking-mode" onchange="updateSettings('trackingMode', this.value)" class="bg-gray-900 border border-gray-700 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded outline-none">
+              <option value="both">Both Teams (Halves)</option>
+              <option value="single">One Team (Continuous)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
 
@@ -777,17 +817,21 @@
   <!-- JAVASCRIPT APPLICATION CODE -->
   <script>
     const DEFAULT_APP_STATE = {
+      settings: {
+        trackingMode: 'both' // 'both' = Track Top/Bottom | 'single' = Continuous One Team
+      },
       gameInfo: {
         date: new Date().toISOString().split('T')[0],
         pitchingTeamId: 'slu',
-        battingTeamId: 'jones',
+        battingTeamId: 'opp',
         inning: 1,
-        isTop: true, // Only kept for legacy compat, functionally ignored for full-inning advance
+        isTop: true,
         outs: 0,
         balls: 0,
         strikes: 0,
         currentPitcherIndex: 0,
-        currentBatterIndex: 0
+        currentBatterIndex: 0,
+        teamBatterIndices: { 'slu': 0, 'opp': 0 } // Tracks position in lineup
       },
       teams: {
         'slu': {
@@ -815,28 +859,33 @@
             { id: 19, name: "Mills", throws: "Right", bats: "Right", notes: "Power arm out of bullpen." },
             { id: 20, name: "Bullock", throws: "Right", bats: "Right", notes: "Aggressive strike-thrower." }
           ],
-          lineup: [],
-          bench: []
-        },
-        'jones': {
-          id: 'jones',
-          name: 'Jones College Bobcats',
-          pitchers: [],
           lineup: [
-            { id: 501, order: 1, name: "#5 Champagne", throws: "Right", bats: "Left", stats: { avg: ".384", obp: ".470", slg: ".520", hr: 4, sb: 11 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Ambush 1st Pitch FB", "Plus Runner"], notes: "Plus runner (11-13 SB).", history: [] },
-            { id: 502, order: 2, name: "#14 Theriot", throws: "Right", bats: "Right", stats: { avg: ".317", obp: ".420", slg: ".390", hr: 1, sb: 10 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Plus Runner"], notes: "Hahnville HS.", history: [] },
-            { id: 503, order: 3, name: "#28 Russell", throws: "Right", bats: "Left", stats: { avg: ".371", obp: ".480", slg: ".680", hr: 15, sb: 4 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Middle of Order Power"], notes: "Southern Miss transfer.", history: [] },
-            { id: 504, order: 4, name: "#26 Ainsworth", throws: "Right", bats: "Right", stats: { avg: ".360", obp: ".450", slg: ".650", hr: 15, sb: 3 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Run Producer"], notes: "Madison Central HS.", history: [] },
-            { id: 505, order: 5, name: "#16 Hutchinson", throws: "Left", bats: "Left", stats: { avg: ".307", obp: ".455", slg: ".410", hr: 2, sb: 8 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Elite Eye (48 BB)"], notes: "Madison Central HS.", history: [] },
-            { id: 506, order: 6, name: "#17 Quick", throws: "Right", bats: "Right", stats: { avg: ".333", obp: ".400", slg: ".440", hr: 3, sb: 3 }, archetypes: ["CONTACT"], tags: ["Solid Contact"], notes: "Germantown HS catcher.", history: [] },
-            { id: 507, order: 7, name: "#11 Reeves, G.", throws: "Right", bats: "Right", stats: { avg: ".314", obp: ".370", slg: ".480", hr: 4, sb: 5 }, archetypes: ["CONTACT", "POWER THREAT"], tags: ["Extra Base Threat"], notes: "George County HS.", history: [] },
-            { id: 508, order: 8, name: "#4 Guidry", throws: "Right", bats: "Right", stats: { avg: ".288", obp: ".390", slg: ".410", hr: 4, sb: 13 }, archetypes: ["RUNNER"], tags: ["Lead Base Stealer"], notes: "Parkview Baptist HS.", history: [] },
-            { id: 509, order: 9, name: "#24 Graham", throws: "Left", bats: "Left", stats: { avg: ".342", obp: ".410", slg: ".540", hr: 3, sb: 5 }, archetypes: ["CONTACT"], tags: ["Two-Way Option"], notes: "Wayne County HS.", history: [] }
+            { id: 201, order: 1, name: "TJ Salvaggio", throws: "Right", bats: "Right", stats: { avg: ".300", obp: ".390", slg: ".450", hr: 6, sb: 12 }, archetypes: ["RUNNER", "CONTACT"], tags: ["Aggressive Early"], notes: "SS", history: [] },
+            { id: 202, order: 2, name: "Rhett Rosevear", throws: "Right", bats: "Left", stats: { avg: ".285", obp: ".480", slg: ".410", hr: 5, sb: 15 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Elite Eye"], notes: "2B", history: [] },
+            { id: 203, order: 3, name: "Shea Thomas", throws: "Right", bats: "Right", stats: { avg: ".310", obp: ".410", slg: ".520", hr: 12, sb: 2 }, archetypes: ["POWER THREAT"], tags: ["Run Producer"], notes: "3B", history: [] },
+            { id: 204, order: 4, name: "Jude Hall", throws: "Left", bats: "Left", stats: { avg: ".320", obp: ".420", slg: ".610", hr: 14, sb: 8 }, archetypes: ["POWER THREAT", "CONTACT"], tags: ["Middle of Order Power"], notes: "OF", history: [] },
+            { id: 205, order: 5, name: "Bailyn Sorensen", throws: "Right", bats: "Right", stats: { avg: ".275", obp: ".360", slg: ".480", hr: 9, sb: 1 }, archetypes: ["POWER THREAT"], tags: ["Solid Contact"], notes: "C", history: [] },
+            { id: 206, order: 6, name: "Ryan Brome", throws: "Right", bats: "Left", stats: { avg: ".290", obp: ".370", slg: ".430", hr: 4, sb: 5 }, archetypes: ["CONTACT"], tags: ["Gap-to-Gap"], notes: "OF", history: [] },
+            { id: 207, order: 7, name: "Christian Garcia", throws: "Right", bats: "Right", stats: { avg: ".260", obp: ".350", slg: ".460", hr: 8, sb: 3 }, archetypes: ["POWER THREAT"], tags: ["Fastball Hitter"], notes: "OF", history: [] },
+            { id: 208, order: 8, name: "Conner O'Neal", throws: "Right", bats: "Left", stats: { avg: ".280", obp: ".380", slg: ".410", hr: 3, sb: 2 }, archetypes: ["CONTACT"], tags: [], notes: "DH", history: [] },
+            { id: 209, order: 9, name: "Peyton Woods", throws: "Right", bats: "Right", stats: { avg: ".270", obp: ".360", slg: ".390", hr: 2, sb: 4 }, archetypes: ["CONTACT"], tags: ["Turn the Lineup"], notes: "1B", history: [] }
           ],
           bench: [
-            { id: 601, name: "#8 Smith, D.", throws: "Right", bats: "Right", stats: { avg: ".278", obp: ".310", slg: ".340", hr: 0, sb: 0 }, archetypes: [], tags: ["Rolls over Sinker Down"], notes: "West Jones HS." },
-            { id: 602, name: "#2 Wheat", throws: "Right", bats: "Right", stats: { avg: ".304", obp: ".420", slg: ".410", hr: 1, sb: 4 }, archetypes: ["CONTACT", "RUNNER"], tags: ["Solid Eye (12 BB)"], notes: "Oak Grove HS." }
+            { id: 301, name: "Cole Stromboe", throws: "Right", bats: "Left", stats: { avg: ".250", obp: ".340", slg: ".350", hr: 1, sb: 5 }, archetypes: ["RUNNER"], tags: ["Pinch Runner"], notes: "OF" },
+            { id: 302, name: "Dom Regira", throws: "Right", bats: "Right", stats: { avg: ".260", obp: ".330", slg: ".400", hr: 3, sb: 0 }, archetypes: [], tags: [], notes: "INF" },
+            { id: 303, name: "Jake Haze", throws: "Right", bats: "Right", stats: { avg: ".240", obp: ".310", slg: ".300", hr: 0, sb: 1 }, archetypes: [], tags: [], notes: "INF" }
           ]
+        },
+        'opp': {
+          id: 'opp',
+          name: 'Opposing Team',
+          pitchers: [
+            { id: 901, name: "Opp Pitcher 1", throws: "Right", bats: "Right", notes: "" }
+          ],
+          lineup: [
+            { id: 911, order: 1, name: "Opp Batter 1", throws: "Right", bats: "Right", stats: { avg: ".250", obp: ".350", slg: ".350", hr: 0, sb: 0 }, archetypes: [], tags: [], notes: "", history: [] }
+          ],
+          bench: []
         }
       },
       pitches: []
@@ -862,8 +911,13 @@
 
     function loadPersistedState() {
       try {
-        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V14');
-        if (saved) return JSON.parse(saved);
+        const saved = localStorage.getItem('SLU_DUGOUT_PITCH_APP_STATE_V15');
+        if (saved) {
+          let parsed = JSON.parse(saved);
+          if (!parsed.settings) parsed.settings = { trackingMode: 'both' };
+          if (!parsed.gameInfo.teamBatterIndices) parsed.gameInfo.teamBatterIndices = { 'slu': 0, 'opp': 0 };
+          return parsed;
+        }
       } catch (e) {
         console.warn("Storage fallback", e);
       }
@@ -872,7 +926,7 @@
 
     function saveState() {
       try {
-        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V14', JSON.stringify(state));
+        localStorage.setItem('SLU_DUGOUT_PITCH_APP_STATE_V15', JSON.stringify(state));
         flashSavedIndicator();
       } catch (e) {
         console.error("Save error", e);
@@ -898,6 +952,7 @@
       populatePitcherSelect();
       populateScoutingSelect();
       selectZone(1, 'Up-In (Zone 1)');
+      document.getElementById('settings-tracking-mode').value = state.settings.trackingMode;
       renderAllViews();
     });
 
@@ -922,6 +977,13 @@
       const isFull = document.fullscreenElement || document.webkitFullscreenElement;
       icon.setAttribute('data-lucide', isFull ? 'minimize' : 'maximize');
       lucide.createIcons();
+    }
+    
+    function updateSettings(key, value) {
+      state.settings[key] = value;
+      saveState();
+      renderHUD();
+      showQuickToast(`Settings updated`);
     }
 
     function populateGlobalTeamSelects() {
@@ -951,7 +1013,7 @@
 
     function changeActiveBattingTeam(teamId) {
       state.gameInfo.battingTeamId = teamId;
-      state.gameInfo.currentBatterIndex = 0;
+      state.gameInfo.currentBatterIndex = state.gameInfo.teamBatterIndices[teamId] || 0;
       saveState();
       populateGlobalTeamSelects();
       populateScoutingSelect();
@@ -1217,10 +1279,8 @@
       team.lineup = team.lineup.filter(x => x.id !== editingPlayerId);
       team.bench = team.bench.filter(x => x.id !== editingPlayerId);
       
-      // Re-assign proper numeric orders
       team.lineup.forEach((p, idx) => p.order = idx + 1);
 
-      // Handle the case where we deleted a player currently at the plate
       if (managingTeamId === state.gameInfo.battingTeamId && delLineupIdx !== -1) {
         if (delLineupIdx < state.gameInfo.currentBatterIndex) {
           state.gameInfo.currentBatterIndex--;
@@ -1400,15 +1460,39 @@
       if (nextOuts >= 3) {
         state.gameInfo.outs = 0; state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
         
-        // Full inning progression - no half innings
-        state.gameInfo.inning++;
-        
-        if (paEnded) {
-          if (!batter.history) batter.history = [];
-          batter.history.push({ inning: pitchRecord.inning, result: paSummary });
-          advanceToNextBatter();
+        if (state.settings.trackingMode === 'both') {
+          if (!state.gameInfo.isTop) state.gameInfo.inning++;
+          state.gameInfo.isTop = !state.gameInfo.isTop;
+          
+          if (paEnded) {
+            if (!batter.history) batter.history = [];
+            batter.history.push({ inning: pitchRecord.inning, result: paSummary });
+            advanceToNextBatter(); // Advance batter for team leaving the plate
+          }
+          
+          // Save leaving team's lineup spot, prep for incoming team
+          state.gameInfo.teamBatterIndices = state.gameInfo.teamBatterIndices || {};
+          state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] = state.gameInfo.currentBatterIndex;
+          
+          // Swap teams
+          const temp = state.gameInfo.pitchingTeamId;
+          state.gameInfo.pitchingTeamId = state.gameInfo.battingTeamId;
+          state.gameInfo.battingTeamId = temp;
+          state.gameInfo.currentPitcherIndex = 0;
+          
+          // Restore lineup spot for incoming team
+          state.gameInfo.currentBatterIndex = state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] || 0;
+          
+          showQuickToast(`3 OUTS! Switched sides. Now ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${state.gameInfo.inning}`, true);
+        } else {
+          state.gameInfo.inning++;
+          if (paEnded) {
+            if (!batter.history) batter.history = [];
+            batter.history.push({ inning: pitchRecord.inning, result: paSummary });
+            advanceToNextBatter();
+          }
+          showQuickToast(`3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
         }
-        showQuickToast(`3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
       } else {
         state.gameInfo.outs = nextOuts;
         if (paEnded) {
@@ -1449,14 +1533,30 @@
       recordPitch('InPlay', { trajectory: selectedTrajectory, outcome: outcome, isOut: isOut });
     }
 
-    // BASE RUNNER OUT LOGIC (Caught Stealing / Pickoff)
     function addBaseOut() {
       if (state.gameInfo.outs >= 2) {
         state.gameInfo.outs = 0;
         state.gameInfo.balls = 0;
         state.gameInfo.strikes = 0;
-        state.gameInfo.inning++;
-        showQuickToast(`Base Out! 3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
+        
+        if (state.settings.trackingMode === 'both') {
+          if (!state.gameInfo.isTop) state.gameInfo.inning++;
+          state.gameInfo.isTop = !state.gameInfo.isTop;
+          
+          state.gameInfo.teamBatterIndices = state.gameInfo.teamBatterIndices || {};
+          state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] = state.gameInfo.currentBatterIndex;
+          
+          const temp = state.gameInfo.pitchingTeamId;
+          state.gameInfo.pitchingTeamId = state.gameInfo.battingTeamId;
+          state.gameInfo.battingTeamId = temp;
+          state.gameInfo.currentPitcherIndex = 0;
+          state.gameInfo.currentBatterIndex = state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] || 0;
+          
+          showQuickToast(`Base Out! 3 OUTS! Now ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${state.gameInfo.inning}`, true);
+        } else {
+          state.gameInfo.inning++;
+          showQuickToast(`Base Out! 3 OUTS! Advanced to Inning ${state.gameInfo.inning}`, true);
+        }
       } else {
         state.gameInfo.outs++;
         showQuickToast(`Base Out! Now ${state.gameInfo.outs} Out(s).`);
@@ -1469,10 +1569,28 @@
       state.gameInfo.outs = 0; 
       state.gameInfo.balls = 0; 
       state.gameInfo.strikes = 0;
-      state.gameInfo.inning++; // Full inning progression
+      
+      if (state.settings.trackingMode === 'both') {
+        if (!state.gameInfo.isTop) state.gameInfo.inning++;
+        state.gameInfo.isTop = !state.gameInfo.isTop;
+        
+        state.gameInfo.teamBatterIndices = state.gameInfo.teamBatterIndices || {};
+        state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] = state.gameInfo.currentBatterIndex;
+        
+        const temp = state.gameInfo.pitchingTeamId;
+        state.gameInfo.pitchingTeamId = state.gameInfo.battingTeamId;
+        state.gameInfo.battingTeamId = temp;
+        state.gameInfo.currentPitcherIndex = 0;
+        state.gameInfo.currentBatterIndex = state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] || 0;
+        
+        showQuickToast(`Rolled to ${state.gameInfo.isTop ? 'Top' : 'Bot'} ${state.gameInfo.inning}`);
+      } else {
+        state.gameInfo.inning++;
+        showQuickToast(`Rolled to Inning ${state.gameInfo.inning}`);
+      }
+      
       saveState();
       renderAllViews();
-      showQuickToast(`Rolled to Inning ${state.gameInfo.inning}`);
     }
 
     function clearBases() {
@@ -1775,7 +1893,10 @@
 
       const lineup = getActiveLineup();
       const bIdx = lineup.findIndex(b => b.id === last.batterId);
-      if (bIdx !== -1) state.gameInfo.currentBatterIndex = bIdx;
+      if (bIdx !== -1) {
+        state.gameInfo.currentBatterIndex = bIdx;
+        state.gameInfo.teamBatterIndices[state.gameInfo.battingTeamId] = bIdx;
+      }
 
       saveState(); renderAllViews();
       showQuickToast(`Reverted pitch #${last.pitchNo}`);
@@ -1809,7 +1930,10 @@
       const pitchers = getActivePitchers();
       const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
 
-      document.getElementById('inning-text').innerText = g.inning; // Simplified full inning layout
+      document.getElementById('inning-text').innerText = state.settings.trackingMode === 'both' 
+        ? `${g.isTop ? 'TOP' : 'BOT'} ${g.inning}` 
+        : g.inning;
+        
       document.getElementById('count-display').innerText = `${g.balls} - ${g.strikes}`;
 
       document.getElementById('out-dot-1').className = g.outs >= 1 ? "w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" : "w-2.5 h-2.5 rounded-full bg-gray-700 border border-gray-600";
@@ -1829,6 +1953,11 @@
       document.getElementById('hud-strike-pct').innerText = `${strPct}%`;
       document.getElementById('hud-strikes').innerText = strikes;
       document.getElementById('hud-balls').innerText = balls;
+      
+      // Calculate First Pitch Strike (FPS%)
+      const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
+      const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
+      document.getElementById('hud-fps-pct').innerText = firstPitches.length > 0 ? `${((fpsStrikes / firstPitches.length) * 100).toFixed(1)}%` : "0.0%";
 
       const oneOnePitches = pitcherPitches.filter(p => p.is1_1Count);
       const oneOneWins = oneOnePitches.filter(p => p.is1_1Win === true).length;
@@ -1840,15 +1969,19 @@
       const card1_1 = document.getElementById('stat-1-1-card');
       card1_1.className = (g.balls === 1 && g.strikes === 1) ? "bg-amber-950/90 border border-amber-500 rounded-lg p-1.5 leverage-pulse" : "bg-gray-950/70 border border-gray-800 rounded-lg p-1.5";
 
-      const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
-      const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
-      document.getElementById('hud-fps-pct').innerText = firstPitches.length > 0 ? `${((fpsStrikes / firstPitches.length) * 100).toFixed(1)}%` : "0.0%";
-
       const swings = pitcherPitches.filter(p => ['StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
       const whiffs = pitcherPitches.filter(p => p.pitchCall === 'StrikeSwinging').length;
       document.getElementById('hud-whiff-pct').innerText = swings > 0 ? `${((whiffs / swings) * 100).toFixed(0)}%` : "0.0%";
       document.getElementById('hud-whiff-count').innerText = whiffs;
       document.getElementById('hud-swing-count').innerText = swings;
+      
+      // Calculate K:BB Ratio
+      const ks = pitcherPitches.filter(p => (p.pitchCall === 'StrikeCalled' || p.pitchCall === 'StrikeSwinging') && p.strikesBefore === 2).length;
+      const bbs = pitcherPitches.filter(p => p.pitchCall === 'BallCalled' && p.ballsBefore === 3).length;
+      const kbbRatio = bbs === 0 ? (ks > 0 ? "INF" : "0.0") : (ks / bbs).toFixed(1);
+      document.getElementById('hud-kbb-ratio').innerText = kbbRatio;
+      document.getElementById('hud-kbb-counts').innerText = `(${ks}K / ${bbs}BB)`;
+
       document.getElementById('tab-pitch-count').innerText = state.pitches.length;
     }
 
@@ -2013,7 +2146,7 @@
       tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
         <tr class="hover:bg-gray-800/40">
           <td class="p-2 text-gray-500">${pt.pitchNo}</td>
-          <td class="p-2">Inn ${pt.inning}</td>
+          <td class="p-2">${pt.isTop ? 'T' : 'B'}${pt.inning}</td>
           <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
           <td class="p-2">${pt.batterName.split(',')[0]}</td>
           <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
@@ -2028,7 +2161,7 @@
     }
 
     function switchTab(tabId) {
-      ['charting', 'scouting', 'roster', 'gamelog'].forEach(t => {
+      ['charting', 'scouting', 'roster', 'gamelog', 'settings'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const btn = document.getElementById(`tab-btn-${t}`);
         if (t === tabId) {
@@ -2047,10 +2180,6 @@
       return map[call] || call;
     }
 
-    function formatInningOrdinal(n) {
-      return n; // Hard returns the number for full-inning setup without suffix
-    }
-    
     function exportToCSV() {
       if (state.pitches.length === 0) { alert("No pitches to export yet!"); return; }
 
@@ -2062,7 +2191,7 @@
       ];
 
       const rows = state.pitches.map(p => [
-        p.pitchNo, `"${p.timestamp}"`, p.inning, "Top",
+        p.pitchNo, `"${p.timestamp}"`, p.inning, p.isTop ? "Top" : "Bottom",
         p.outsBefore, p.ballsBefore, p.strikesBefore, `"${p.pitcherName}"`, p.pitcherThrows,
         `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, `"${p.pitchCall}"`,
         `"${p.hitType}"`, `"${p.playResult}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
