@@ -93,7 +93,7 @@
 </head>
 <body class="bg-gradient-to-br from-slate-950 via-gray-950 to-slate-900 text-gray-100 min-h-screen flex flex-col font-sans antialiased overflow-x-hidden selection:bg-emerald-500/30">
 
-<!-- TOP APP BAR -->
+  <!-- TOP APP BAR -->
   <header class="glass-panel sticky top-0 z-40 px-3 py-1.5 flex items-center justify-between gap-1.5 border-b border-white/10">
     
     <!-- LEFT: BRANDING -->
@@ -169,6 +169,7 @@
       </button>
     </div>
   </header>
+
   <!-- LIVE GAME STATE HUD (WITH FPS% AND K:BB) -->
   <section class="relative z-20 px-3 py-2 grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 items-stretch text-center">
     
@@ -347,55 +348,82 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <!-- STRIKE ZONE WITH GLASS DESIGN -->
-          <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-slate-950/80 border border-white/10 rounded-2xl p-2.5 flex flex-col items-center justify-center space-y-2 shadow-2xl backdrop-blur-xl">
-            <button onclick="selectZone(5, 'Chase High')" id="zone-btn-5" class="w-full py-2 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
+          <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID (CORNERS + MIDDLE) -->
+          <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-slate-950/80 border border-white/10 rounded-2xl p-2 flex flex-col items-center justify-center space-y-1.5 shadow-2xl backdrop-blur-xl">
+            <!-- CHASE HIGH (ZONE 6) -->
+            <button onclick="selectZone(6, 'Chase High')" id="zone-btn-6" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98">
               ▲ Chase High / Waste
             </button>
-            <div class="w-full flex items-stretch space-x-2">
-              <button onclick="selectZone(6, 'Chase In (Arm)')" id="zone-btn-6" class="w-16 sm:w-20 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
+            
+            <div class="w-full flex items-stretch space-x-1.5">
+              <!-- CHASE IN (ZONE 7) -->
+              <button onclick="selectZone(7, 'Chase In (Arm)')" id="zone-btn-7" class="w-14 sm:w-16 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[9px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
                 <span>◀ In</span>
-                <span class="text-[9px] text-slate-400 font-medium">(Arm)</span>
+                <span class="text-[8px] text-slate-400 font-medium">(Arm)</span>
               </button>
-              <div class="relative flex-1 grid grid-cols-2 grid-rows-2 gap-1.5 h-44 bg-slate-900/90 border-2 border-emerald-500/80 rounded-2xl p-1.5 shadow-inner">
-                <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="glass-card-interactive rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5">
-                  <span id="zone-label-1" class="text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight">Up-In</span>
-                  <span id="zone-sub-1" class="text-[10px] font-mono text-slate-400 mt-0.5">Zone 1</span>
+
+              <!-- IN-ZONE 5-PANEL GRID -->
+              <div class="relative flex-1 h-44 bg-slate-900/90 border-2 border-emerald-500/80 rounded-2xl p-1 shadow-inner grid grid-cols-2 grid-rows-2 gap-1">
+                <!-- ZONE 1: UP-IN -->
+                <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                  <span id="zone-label-1" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Up-In</span>
+                  <span id="zone-sub-1" class="text-[9px] font-mono text-slate-400">Z1</span>
                 </button>
-                <button onclick="selectZone(2, 'In-Zone Up-Away')" id="zone-btn-2" class="glass-card-interactive rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5">
-                  <span id="zone-label-2" class="text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight">Up-Away</span>
-                  <span id="zone-sub-2" class="text-[10px] font-mono text-slate-400 mt-0.5">Zone 2</span>
+                <!-- ZONE 2: UP-AWAY -->
+                <button onclick="selectZone(2, 'In-Zone Up-Away')" id="zone-btn-2" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                  <span id="zone-label-2" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Up-Away</span>
+                  <span id="zone-sub-2" class="text-[9px] font-mono text-slate-400">Z2</span>
                 </button>
-                <button onclick="selectZone(3, 'In-Zone Down-In')" id="zone-btn-3" class="glass-card-interactive rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5">
-                  <span id="zone-label-3" class="text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight">Down-In</span>
-                  <span id="zone-sub-3" class="text-[10px] font-mono text-slate-400 mt-0.5">Zone 3</span>
+                <!-- ZONE 3: DOWN-IN -->
+                <button onclick="selectZone(3, 'In-Zone Down-In')" id="zone-btn-3" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                  <span id="zone-label-3" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Down-In</span>
+                  <span id="zone-sub-3" class="text-[9px] font-mono text-slate-400">Z3</span>
                 </button>
-                <button onclick="selectZone(4, 'In-Zone Down-Away')" id="zone-btn-4" class="glass-card-interactive rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5">
-                  <span id="zone-label-4" class="text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight">Down-Away</span>
-                  <span id="zone-sub-4" class="text-[10px] font-mono text-slate-400 mt-0.5">Zone 4</span>
+                <!-- ZONE 4: DOWN-AWAY -->
+                <button onclick="selectZone(4, 'In-Zone Down-Away')" id="zone-btn-4" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                  <span id="zone-label-4" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Down-Away</span>
+                  <span id="zone-sub-4" class="text-[9px] font-mono text-slate-400">Z4</span>
+                </button>
+
+                <!-- ZONE 5: MIDDLE / HEART -->
+                <button onclick="selectZone(5, 'In-Zone Middle (Heart)')" id="zone-btn-5" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl glass-card border border-emerald-400/60 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10">
+                  <span id="zone-label-5" class="text-xs font-black tracking-tight text-emerald-300 leading-tight">MIDDLE</span>
+                  <span id="zone-sub-5" class="text-[8px] font-mono text-emerald-400/80">Heart (Z5)</span>
                 </button>
               </div>
-              <button onclick="selectZone(7, 'Chase Away (Glove)')" id="zone-btn-7" class="w-16 sm:w-20 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
+
+              <!-- CHASE AWAY (ZONE 8) -->
+              <button onclick="selectZone(8, 'Chase Away (Glove)')" id="zone-btn-8" class="w-14 sm:w-16 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[9px] font-bold uppercase tracking-tight flex flex-col items-center justify-center p-1 transition active:scale-98 text-center leading-tight">
                 <span>Away ▶</span>
-                <span class="text-[9px] text-slate-400 font-medium">(Glove)</span>
+                <span class="text-[8px] text-slate-400 font-medium">(Glove)</span>
               </button>
             </div>
-            <button onclick="selectZone(8, 'Chase Dirt / Below')" id="zone-btn-8" class="w-full py-2 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[11px] font-bold uppercase tracking-wider transition active:scale-98">
+
+            <!-- CHASE DIRT (ZONE 9) -->
+            <button onclick="selectZone(9, 'Chase Dirt / Below')" id="zone-btn-9" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98">
               ▼ Chase Dirt / Below
             </button>
           </div>
 
-          <!-- Pitch Selection Strip -->
-          <div class="w-full mt-3">
-            <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1.5 px-1">SELECT PITCH TYPE:</span>
-            <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
-              <button onclick="selectPitchType('4S')" id="pt-4S" class="py-2.5 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black text-xs border border-emerald-300/40 shadow-md active:scale-95 transition">4S</button>
-              <button onclick="selectPitchType('SI')" id="pt-SI" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SI</button>
-              <button onclick="selectPitchType('CT')" id="pt-CT" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CT</button>
-              <button onclick="selectPitchType('SL')" id="pt-SL" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SL</button>
-              <button onclick="selectPitchType('CB')" id="pt-CB" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CB</button>
-              <button onclick="selectPitchType('CH')" id="pt-CH" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CH</button>
-              <button onclick="selectPitchType('SPL')" id="pt-SPL" class="py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SPL</button>
+          <!-- VELOCITY (RADAR GUN) & PITCH TYPE SELECTION -->
+          <div class="w-full mt-2.5">
+            <div class="flex items-center justify-between mb-1.5 px-1">
+              <span class="text-[10px] text-slate-400 font-bold uppercase">SELECT PITCH & VELO:</span>
+              <!-- OPTIONAL VELOCITY INPUT -->
+              <div class="flex items-center space-x-1 bg-slate-900/90 border border-emerald-500/30 rounded-lg px-2 py-0.5">
+                <i data-lucide="gauge" class="w-3 h-3 text-emerald-400"></i>
+                <input type="number" id="pitch-velo-input" step="0.1" placeholder="MPH" class="bg-transparent w-12 text-center text-xs font-mono font-black text-emerald-300 placeholder-slate-600 outline-none" />
+              </div>
+            </div>
+            
+            <div id="pitch-type-buttons" class="grid grid-cols-4 sm:grid-cols-7 gap-1">
+              <button onclick="selectPitchType('4S')" id="pt-4S" class="py-2 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black text-xs border border-emerald-300/40 shadow-md active:scale-95 transition">4S</button>
+              <button onclick="selectPitchType('SI')" id="pt-SI" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SI</button>
+              <button onclick="selectPitchType('CT')" id="pt-CT" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CT</button>
+              <button onclick="selectPitchType('SL')" id="pt-SL" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SL</button>
+              <button onclick="selectPitchType('CB')" id="pt-CB" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CB</button>
+              <button onclick="selectPitchType('CH')" id="pt-CH" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">CH</button>
+              <button onclick="selectPitchType('SPL')" id="pt-SPL" class="py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition">SPL</button>
             </div>
           </div>
 
@@ -917,7 +945,7 @@
         pitchingTeamId: 'slu',
         battingTeamId: 'opponent',
         inning: 1,
-        isTop: true, // In 'single' mode, this represents the active pitching half
+        isTop: true,
         outs: 0,
         balls: 0,
         strikes: 0,
@@ -925,7 +953,7 @@
         currentBatterIndex: 0
       },
       settings: {
-        trackingMode: 'single' // Defaulted to single team staff tracker as requested
+        trackingMode: 'single'
       },
       teams: {
         'slu': {
@@ -1009,7 +1037,7 @@
     let state = loadPersistedState();
     let activePitchType = '4S';
     let activeZone = 1;
-    let activeZoneDesc = 'Up-In (Zone 1)';
+    let activeZoneDesc = 'In-Zone Up-In';
     let selectedTrajectory = 'GroundBall';
     let toastTimeout = null;
     let stagedParsedPlayers = [];
@@ -1065,7 +1093,7 @@
       populateTeamManagerSelect();
       populatePitcherSelect();
       populateScoutingSelect();
-      selectZone(1, 'Up-In (Zone 1)');
+      selectZone(1, 'In-Zone Up-In');
       updateSettingsUI();
       renderAllViews();
     });
@@ -1096,15 +1124,11 @@
     function populateGlobalTeamSelects() {
       const pDesktop = document.getElementById('header-pitching-team-desktop');
       const bDesktop = document.getElementById('header-batting-team-desktop');
-      const pMobile = document.getElementById('header-pitching-team-mobile');
-      const bMobile = document.getElementById('header-batting-team-mobile');
       
       let optionsHtml = Object.values(state.teams).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
       
       if(pDesktop) { pDesktop.innerHTML = optionsHtml; pDesktop.value = state.gameInfo.pitchingTeamId; }
       if(bDesktop) { bDesktop.innerHTML = optionsHtml; bDesktop.value = state.gameInfo.battingTeamId; }
-      if(pMobile) { pMobile.innerHTML = optionsHtml; pMobile.value = state.gameInfo.pitchingTeamId; }
-      if(bMobile) { bMobile.innerHTML = optionsHtml; bMobile.value = state.gameInfo.battingTeamId; }
     }
 
     function changeActivePitchingTeam(teamId) {
@@ -1180,12 +1204,10 @@
       const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
 
       if (isSingleMode) {
-        // Single Team staff mode: Advance whole inning directly without Top/Bottom flips
         state.gameInfo.inning++;
         state.gameInfo.isTop = true;
         showQuickToast(`Now Inning ${state.gameInfo.inning} (Staff Ongoing)`, true);
       } else {
-        // Both Teams mode: Cycle Top -> Bottom -> Next Inning Top with team flips
         if (state.gameInfo.isTop) {
           state.gameInfo.isTop = false;
           const oldPitching = state.gameInfo.pitchingTeamId;
@@ -1544,8 +1566,8 @@
         const btn = document.getElementById(`pt-${t}`);
         if (!btn) return;
         btn.className = (t === pt) 
-          ? "py-2.5 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black text-xs border border-emerald-300/40 shadow-md active:scale-95 transition"
-          : "py-2.5 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition";
+          ? "py-2 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-black text-xs border border-emerald-300/40 shadow-md active:scale-95 transition"
+          : "py-2 rounded-xl glass-button text-slate-200 font-black text-xs active:scale-95 transition";
       });
     }
 
@@ -1554,23 +1576,29 @@
       activeZoneDesc = customDesc || `Zone ${zoneNum}`;
       document.getElementById('selected-loc-label').innerText = `Location: ${activeZoneDesc}`;
 
-      for (let z = 1; z <= 8; z++) {
+      for (let z = 1; z <= 9; z++) {
         const btn = document.getElementById(`zone-btn-${z}`);
         if (!btn) continue;
 
-        if (z <= 4) {
+        // Zones 1-5: In-Zone targets
+        if (z <= 5) {
           const title = document.getElementById(`zone-label-${z}`);
           const sub = document.getElementById(`zone-sub-${z}`);
           if (z === zoneNum) {
-            btn.className = "bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 rounded-xl flex flex-col items-center justify-center active:scale-95 transition shadow-lg p-1.5";
-            if (title) title.className = "text-xs sm:text-sm font-bold tracking-tight text-white leading-tight";
-            if (sub) sub.className = "text-[10px] font-mono text-emerald-100 mt-0.5";
+            btn.className = (z === 5)
+              ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10"
+              : "bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 rounded-lg flex flex-col items-center justify-center active:scale-95 transition shadow-lg p-1";
+            if (title) title.className = "text-xs font-bold tracking-tight text-white leading-tight";
+            if (sub) sub.className = "text-[9px] font-mono text-emerald-100";
           } else {
-            btn.className = "glass-card-interactive rounded-xl flex flex-col items-center justify-center active:scale-95 transition p-1.5";
-            if (title) title.className = "text-xs sm:text-sm font-bold tracking-tight text-emerald-400 leading-tight";
-            if (sub) sub.className = "text-[10px] font-mono text-slate-400 mt-0.5";
+            btn.className = (z === 5)
+              ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl glass-card border border-emerald-400/60 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10"
+              : "glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1";
+            if (title) title.className = (z === 5) ? "text-xs font-black tracking-tight text-emerald-300 leading-tight" : "text-xs font-bold tracking-tight text-emerald-400 leading-tight";
+            if (sub) sub.className = (z === 5) ? "text-[8px] font-mono text-emerald-400/80" : "text-[9px] font-mono text-slate-400";
           }
         } else {
+          // Zones 6-9: Chases/Waste
           if (z === zoneNum) {
             btn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-slate-700/80', 'border-dashed');
             btn.classList.add('bg-amber-500/30', 'text-amber-200', 'border-amber-400', 'border-solid');
@@ -1609,6 +1637,10 @@
 
       const tmTypeMap = { '4S': 'Fastball', 'SI': 'Sinker', 'CT': 'Cutter', 'SL': 'Slider', 'CB': 'Curveball', 'CH': 'ChangeUp', 'SPL': 'Splitter' };
 
+      // Optional Radar Gun velocity
+      const veloInput = document.getElementById('pitch-velo-input');
+      const veloVal = veloInput && veloInput.value ? parseFloat(veloInput.value) : null;
+
       const pitchRecord = {
         pitchNo: state.pitches.length + 1,
         inning: state.gameInfo.inning,
@@ -1625,6 +1657,7 @@
         pitchType: activePitchType,
         taggedPitchType: tmTypeMap[activePitchType] || 'Fastball',
         pitchCall: call,
+        velo: veloVal,
         zone: activeZone,
         zoneDesc: activeZoneDesc,
         is1_1Count: is1_1Count,
@@ -1635,6 +1668,9 @@
       };
 
       state.pitches.push(pitchRecord);
+
+      // Reset velocity field for the next pitch
+      if (veloInput) veloInput.value = '';
 
       let nextBalls = currentBalls, nextStrikes = currentStrikes, nextOuts = currentOuts;
       let paEnded = false, paSummary = "";
@@ -1658,7 +1694,8 @@
         else { paSummary = `${inPlayData.trajectory} (${inPlayData.outcome})`; }
       }
 
-      showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
+      const veloTag = veloVal ? ` @ ${veloVal} mph` : '';
+      showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType}${veloTag} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
 
       if (nextOuts >= 3) {
         if (paEnded) {
@@ -2053,7 +2090,6 @@
       const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
       const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
 
-      // Inning display: Full Inning for single mode vs Half for both-teams mode
       document.getElementById('inning-text').innerText = g.inning;
       const halfIcon = document.getElementById('inning-half-icon');
       const halfLabel = document.getElementById('inning-half-label');
@@ -2092,7 +2128,7 @@
       document.getElementById('hud-strikes').innerText = strikes;
       document.getElementById('hud-balls').innerText = balls;
 
-      // FPS% (First Pitch Strike %)
+      // FPS%
       const firstPitches = pitcherPitches.filter(p => p.ballsBefore === 0 && p.strikesBefore === 0);
       const fpsStrikes = firstPitches.filter(p => ['StrikeCalled', 'StrikeSwinging', 'FoulBall', 'InPlay'].includes(p.pitchCall)).length;
       const fpsPct = firstPitches.length > 0 ? ((fpsStrikes / firstPitches.length) * 100).toFixed(1) : "0.0";
@@ -2188,6 +2224,7 @@
             <span class="text-[11px] text-slate-300 font-medium">${formatCallName(pt.pitchCall)}</span>
           </div>
           <div class="flex items-center space-x-1.5 text-[10px] font-mono text-slate-400">
+            ${pt.velo ? `<span class="text-emerald-300 font-bold">${pt.velo}mph</span><span class="text-slate-600">|</span>` : ''}
             <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
             <span class="text-slate-600">|</span>
             <span class="text-slate-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
@@ -2237,7 +2274,8 @@
 
       document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
 
-      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 4).length;
+      // Zones 1 through 5 represent the expanded in-zone matrix
+      const zonePitches = pitcherPitches.filter(pt => pt.zone <= 5).length;
       document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
 
       const earlyPitches = pitcherPitches.filter(pt => (pt.ballsBefore === 0 && pt.strikesBefore === 0) || (pt.ballsBefore === 1 && pt.strikesBefore === 0));
@@ -2310,7 +2348,7 @@
           <td class="p-2 text-amber-400 font-bold">${isSingleMode ? `Inn ${pt.inning}` : (pt.isTop ? 'Top ' : 'Bot ') + pt.inning}</td>
           <td class="p-2 text-white font-bold">${pt.pitcherName.split(',')[0]}</td>
           <td class="p-2">${pt.batterName.split(',')[0]}</td>
-          <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}</td>
+          <td class="p-2 text-emerald-400 font-bold">${pt.pitchType}${pt.velo ? ` <span class="text-[10px] text-slate-300">(${pt.velo})</span>` : ''}</td>
           <td class="p-2">${formatCallName(pt.pitchCall)}</td>
           <td class="p-2 font-bold">${pt.ballsBefore}-${pt.strikesBefore}</td>
           <td class="p-2 text-slate-400">${pt.zoneDesc.split(' ')[0]}</td>
@@ -2408,14 +2446,14 @@
       const headers = [
         "PitchNo", "Time", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
         "Pitcher", "PitcherThrows", "Batter", "BatterSide",
-        "TaggedPitchType", "PitchCall", "TaggedHitType", "PlayResult",
+        "TaggedPitchType", "RelSpeed", "PitchCall", "TaggedHitType", "PlayResult",
         "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win"
       ];
 
       const rows = state.pitches.map(p => [
         p.pitchNo, `"${p.timestamp}"`, p.inning, isSingleMode ? "Inning" : (p.isTop ? "Top" : "Bottom"),
         p.outsBefore, p.ballsBefore, p.strikesBefore, `"${p.pitcherName}"`, p.pitcherThrows,
-        `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, `"${p.pitchCall}"`,
+        `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, p.velo || "", `"${p.pitchCall}"`,
         `"${p.hitType}"`, `"${p.playResult}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
         p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : "")
       ]);
@@ -2432,3 +2470,4 @@
   </script>
 </body>
 </html>
+```
