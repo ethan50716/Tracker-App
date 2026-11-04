@@ -158,6 +158,12 @@
         <span>CSV</span>
       </button>
 
+      <!-- NEW GAME BUTTON -->
+      <button onclick="startNewGamePrompt()" title="Start New Game" class="flex items-center space-x-1 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold px-2 py-1 rounded-xl transition active:scale-95 whitespace-nowrap shadow-sm backdrop-blur-md">
+        <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+        <span>New Game</span>
+      </button>
+
       <!-- SETTINGS -->
       <button onclick="openSettingsModal()" title="Tracking Settings & Preferences" class="p-1.5 glass-button text-slate-300 hover:text-emerald-400 rounded-xl transition active:scale-95">
         <i data-lucide="settings" class="w-3.5 h-3.5"></i>
@@ -1761,6 +1767,34 @@
       showQuickToast(`Count reset to 0-0`);
     }
 
+function startNewGamePrompt() {
+      const confirmReset = confirm("Are you sure you want to start a new game?");
+      if (!confirmReset) return;
+
+      // Reset Game State to Inning 1, 0-0 Count, 0 Outs
+      state.gameInfo.date = new Date().toISOString().split('T')[0];
+      state.gameInfo.inning = 1;
+      state.gameInfo.isTop = true;
+      state.gameInfo.outs = 0;
+      state.gameInfo.balls = 0;
+      state.gameInfo.strikes = 0;
+      state.gameInfo.currentPitcherIndex = 0;
+      state.gameInfo.currentBatterIndex = 0;
+
+      // Clear all pitch records
+      state.pitches = [];
+
+      // Clear previous at-bat logs for all hitters (preserves rosters & scouting notes)
+      Object.values(state.teams).forEach(team => {
+        (team.lineup || []).forEach(hitter => hitter.history = []);
+        (team.bench || []).forEach(hitter => hitter.history = []);
+      });
+
+      saveState();
+      renderAllViews();
+      showQuickToast("New game started!");
+    }
+    
     function addExtraHitterPrompt() { 
       switchTab('roster');
       changeManagedTeam(state.gameInfo.battingTeamId);
