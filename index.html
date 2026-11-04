@@ -274,7 +274,9 @@
       
       <!-- LEFT COLUMN: BATTER DOSSIER & SEQUENCES -->
       <div class="lg:col-span-3 space-y-3">
-        <div class="glass-panel rounded-2xl p-3.5 shadow-xl">
+
+        <!-- 1A: STANDARD AT THE PLATE CARD -->
+        <div id="standard-plate-panel" class="glass-panel rounded-2xl p-3.5 shadow-xl">
           <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
             <div>
               <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">AT THE PLATE</span>
@@ -317,6 +319,52 @@
           </div>
         </div>
 
+        <!-- 1B: SCOUTING MODE PLATE CARD -->
+        <div id="scouting-plate-panel" class="glass-panel rounded-2xl p-3.5 shadow-xl hidden space-y-3 border-emerald-500/30">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div class="flex items-center space-x-1.5">
+              <i data-lucide="binoculars" class="w-4 h-4 text-emerald-400"></i>
+              <span class="text-[10px] text-emerald-300 font-black uppercase tracking-wider">SCOUTING MODE</span>
+            </div>
+            <span class="text-[9px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-white/5">FAST CUES</span>
+          </div>
+
+          <!-- OPPOSING TEAM QUICK SELECT -->
+          <div class="glass-card rounded-xl p-2 border border-white/5">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-slate-400 font-bold uppercase">OPPOSING TEAM:</span>
+              <select id="scouting-mode-opp-select" onchange="changeActiveBattingTeam(this.value)" class="bg-transparent text-xs font-bold text-amber-300 outline-none cursor-pointer max-w-[150px] truncate">
+              </select>
+            </div>
+          </div>
+
+          <!-- HANDEDNESS TOGGLE (LHH / RHH) -->
+          <div class="space-y-1">
+            <span class="text-[9px] text-slate-400 font-bold uppercase block">HITTER HANDEDNESS:</span>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="setScoutHandedness('Left')" id="scout-btn-lhh" class="py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95">
+                <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                <span>LHH</span>
+              </button>
+              <button type="button" onclick="setScoutHandedness('Right')" id="scout-btn-rhh" class="py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95">
+                <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                <span>RHH</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- IN-GAME SCOUTING NOTES -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] text-slate-400 font-bold uppercase flex items-center">
+                <i data-lucide="edit-3" class="w-3 h-3 text-amber-400 mr-1"></i> LIVE GAME NOTES
+              </span>
+              <span id="scouting-mode-save-tag" class="text-[9px] font-mono text-emerald-400 font-bold">Auto-saved</span>
+            </div>
+            <textarea id="scouting-mode-notes" oninput="saveScoutModeNotes(this.value)" rows="5" placeholder="Log real-time cues, pitch recognition tells, swing weaknesses..." class="w-full bg-slate-950/70 border border-white/10 rounded-xl p-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500 custom-scrollbar backdrop-blur-md"></textarea>
+          </div>
+        </div>
+
         <!-- INTEGRATED SEQUENCE PANEL (CURRENT & PREVIOUS AT-BATS) -->
         <div class="glass-panel rounded-2xl p-3 shadow-xl space-y-3">
           <div>
@@ -329,7 +377,8 @@
             </div>
           </div>
 
-          <div class="pt-2 border-t border-white/10">
+          <!-- PREVIOUS AB SEQUENCES CONTAINER (HIDDEN IN SCOUTING MODE) -->
+          <div id="prev-sequences-section" class="pt-2 border-t border-white/10">
             <div class="flex items-center justify-between pb-1.5 mb-1.5">
               <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PREVIOUS AB SEQUENCES</span>
               <span id="prev-seq-count" class="text-[10px] text-slate-400 font-mono">0 PAs</span>
@@ -735,6 +784,16 @@
                 <span class="text-slate-400 text-[11px] leading-tight block mt-0.5">Tracks Top and Bottom half-innings. When 3 outs are recorded (or Inning is rolled), Mound and Plate automatically flip sides.</span>
               </div>
             </label>
+            <!-- NEW SCOUTING MODE SETTING -->
+            <label class="glass-card-interactive p-3 rounded-2xl cursor-pointer flex items-start space-x-3 border-emerald-500/20">
+              <input type="radio" name="trackingMode" value="scouting" id="mode-scouting" class="mt-1 text-emerald-500 focus:ring-emerald-400" onchange="setTrackingMode('scouting')" />
+              <div>
+                <span class="font-bold text-emerald-300 block flex items-center">
+                  <i data-lucide="binoculars" class="w-3.5 h-3.5 mr-1.5 text-emerald-400"></i> Scouting Mode (Opponent LHH / RHH Quick Track)
+                </span>
+                <span class="text-slate-400 text-[11px] leading-tight block mt-0.5">Disregards individual hitter identity. Toggles directly between LHH/RHH with live dugout notes, active opponent selection, and previous AB sequences disabled.</span>
+              </div>
+            </label>
           </div>
         </div>
 
@@ -975,6 +1034,10 @@
       settings: {
         trackingMode: 'single'
       },
+      scoutingModeState: {
+        hitterSide: 'Right',
+        liveNotes: ''
+      },
       teams: {
         'slu': {
           id: 'slu',
@@ -1079,6 +1142,9 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           if (!parsed.settings) parsed.settings = { trackingMode: 'single' };
+          // Ensure it starts in single team mode per prompt requirement
+          parsed.settings.trackingMode = 'single';
+          if (!parsed.scoutingModeState) parsed.scoutingModeState = { hitterSide: 'Right', liveNotes: '' };
           return parsed;
         }
       } catch (e) {
@@ -1145,11 +1211,13 @@
     function populateGlobalTeamSelects() {
       const pDesktop = document.getElementById('header-pitching-team-desktop');
       const bDesktop = document.getElementById('header-batting-team-desktop');
+      const scoutOppSelect = document.getElementById('scouting-mode-opp-select');
       
       let optionsHtml = Object.values(state.teams).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
       
       if(pDesktop) { pDesktop.innerHTML = optionsHtml; pDesktop.value = state.gameInfo.pitchingTeamId; }
       if(bDesktop) { bDesktop.innerHTML = optionsHtml; bDesktop.value = state.gameInfo.battingTeamId; }
+      if(scoutOppSelect) { scoutOppSelect.innerHTML = optionsHtml; scoutOppSelect.value = state.gameInfo.battingTeamId; }
     }
 
     function changeActivePitchingTeam(teamId) {
@@ -1170,7 +1238,7 @@
       populateGlobalTeamSelects();
       populateScoutingSelect();
       renderAllViews();
-      showQuickToast(`Lineup switched to ${state.teams[teamId].name}`);
+      showQuickToast(`Opponent / Lineup switched to ${state.teams[teamId].name}`);
     }
 
     function populateTeamManagerSelect() {
@@ -1198,7 +1266,7 @@
       showQuickToast(`Created new team: ${tname}`);
     }
 
-    /* INNING PROGRESSION AND DUAL TRACKING MODES */
+    /* INNING PROGRESSION AND MODES */
     function rollInning() {
       handleHalfInningTransition();
     }
@@ -1222,9 +1290,9 @@
       state.gameInfo.balls = 0;
       state.gameInfo.strikes = 0;
 
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+      const mode = state.settings?.trackingMode || 'single';
 
-      if (isSingleMode) {
+      if (mode === 'single' || mode === 'scouting') {
         state.gameInfo.inning++;
         state.gameInfo.isTop = true;
         showQuickToast(`Now Inning ${state.gameInfo.inning} (Staff Ongoing)`, true);
@@ -1269,8 +1337,13 @@
       state.settings.trackingMode = mode;
       saveState();
       updateSettingsUI();
-      renderHUD();
-      showQuickToast(`Mode: ${mode === 'single' ? 'Single Team (Staff Only)' : 'Both Teams (Auto-Switch)'}`);
+      renderAllViews();
+      const labels = {
+        'single': 'Single Team (Staff Only)',
+        'both': 'Both Teams (Auto-Switch)',
+        'scouting': 'Scouting Mode (LHH/RHH Quick Track)'
+      };
+      showQuickToast(`Mode: ${labels[mode] || mode}`);
     }
     function toggleActiveHalfInning() {
       state.gameInfo.isTop = !state.gameInfo.isTop;
@@ -1282,16 +1355,55 @@
       const mode = state.settings?.trackingMode || 'single';
       const bRadio = document.getElementById('mode-both');
       const sRadio = document.getElementById('mode-single');
+      const scRadio = document.getElementById('mode-scouting');
+      
       if (bRadio) bRadio.checked = (mode === 'both');
       if (sRadio) sRadio.checked = (mode === 'single');
+      if (scRadio) scRadio.checked = (mode === 'scouting');
       
       const halfSection = document.getElementById('manual-half-adjust-section');
       if (halfSection) {
-        halfSection.classList.toggle('hidden', mode === 'single');
+        halfSection.classList.toggle('hidden', mode !== 'both');
       }
 
       const lbl = document.getElementById('settings-half-indicator');
       if (lbl) lbl.innerText = state.gameInfo.isTop ? "▲ Top" : "▼ Bottom";
+    }
+
+    /* SCOUTING MODE CONTROLS */
+    function setScoutHandedness(side) {
+      if (!state.scoutingModeState) state.scoutingModeState = { hitterSide: 'Right', liveNotes: '' };
+      state.scoutingModeState.hitterSide = side;
+      saveState();
+      updateScoutHandednessUI();
+      showQuickToast(`Hitter switched to ${side === 'Left' ? 'LHH' : 'RHH'}`);
+    }
+
+    function updateScoutHandednessUI() {
+      const side = state.scoutingModeState?.hitterSide || 'Right';
+      const btnL = document.getElementById('scout-btn-lhh');
+      const btnR = document.getElementById('scout-btn-rhh');
+
+      if (!btnL || !btnR) return;
+
+      if (side === 'Left') {
+        btnL.className = "py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95 bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 shadow-md";
+        btnR.className = "py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95 glass-button text-slate-300 border-white/10";
+      } else {
+        btnR.className = "py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95 bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-blue-400 shadow-md";
+        btnL.className = "py-2.5 rounded-xl font-black text-xs transition border flex items-center justify-center space-x-1 active:scale-95 glass-button text-slate-300 border-white/10";
+      }
+    }
+
+    function saveScoutModeNotes(text) {
+      if (!state.scoutingModeState) state.scoutingModeState = { hitterSide: 'Right', liveNotes: '' };
+      state.scoutingModeState.liveNotes = text;
+      saveState();
+      const tag = document.getElementById('scouting-mode-save-tag');
+      if (tag) {
+        tag.innerText = "Saved";
+        tag.classList.remove('opacity-50');
+      }
     }
 
     function initializeSortables() {
@@ -1593,6 +1705,9 @@
     }
 
     function getZoneHitterOverlay(zoneNum) {
+      const mode = state.settings?.trackingMode || 'single';
+      if (mode === 'scouting') return ''; // simplified view in scouting mode
+
       const lineup = getActiveLineup();
       if (lineup.length === 0) return '';
       const b = lineup[state.gameInfo.currentBatterIndex];
@@ -1681,15 +1796,33 @@
 
     function recordPitch(call, inPlayData = null) {
       const pitchers = getActivePitchers();
+      const isScoutingMode = (state.settings?.trackingMode || 'single') === 'scouting';
       const lineup = getActiveLineup();
       
-      if (pitchers.length === 0 || lineup.length === 0) {
-        showQuickToast("Please ensure both Mound and Plate have active players loaded", true);
+      if (pitchers.length === 0) {
+        showQuickToast("Please ensure Mound has active pitchers loaded", true);
+        return;
+      }
+      if (!isScoutingMode && lineup.length === 0) {
+        showQuickToast("Please ensure Plate has active players loaded", true);
         return;
       }
 
       const pitcher = pitchers[state.gameInfo.currentPitcherIndex];
-      const batter = lineup[state.gameInfo.currentBatterIndex];
+      let batterId = null;
+      let batterName = "Opponent Batter";
+      let batterSide = "Right";
+
+      if (isScoutingMode) {
+        batterSide = state.scoutingModeState?.hitterSide || "Right";
+        batterId = 999000 + (batterSide === 'Left' ? 1 : 2);
+        batterName = `Scout ${batterSide === 'Left' ? 'LHH' : 'RHH'}`;
+      } else {
+        const batter = lineup[state.gameInfo.currentBatterIndex];
+        batterId = batter.id;
+        batterName = batter.name;
+        batterSide = batter.bats || 'Right';
+      }
 
       const currentBalls = state.gameInfo.balls;
       const currentStrikes = state.gameInfo.strikes;
@@ -1719,9 +1852,10 @@
         pitcherId: pitcher.id,
         pitcherName: pitcher.name,
         pitcherThrows: pitcher.throws || 'Right',
-        batterId: batter.id,
-        batterName: batter.name,
-        batterSide: batter.bats || 'Right',
+        batterId: batterId,
+        batterName: batterName,
+        batterSide: batterSide,
+        scoutingNotes: isScoutingMode ? (state.scoutingModeState?.liveNotes || '') : '',
         pitchType: activePitchType,
         taggedPitchType: tmTypeMap[activePitchType] || 'Fastball',
         pitchCall: call,
@@ -1767,19 +1901,22 @@
       showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType}${veloTag} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
 
       if (nextOuts >= 3) {
-        if (paEnded) {
-          if (!batter.history) batter.history = [];
-          const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
-          const abPitches = state.pitches.filter(pt => {
-            if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
-            return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
-          });
-          batter.history.push({ 
-            inning: pitchRecord.inning, 
-            isTop: pitchRecord.isTop, 
-            result: paSummary,
-            pitches: [...abPitches]
-          });
+        if (paEnded && !isScoutingMode) {
+          const batter = lineup[state.gameInfo.currentBatterIndex];
+          if (batter) {
+            if (!batter.history) batter.history = [];
+            const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+            const abPitches = state.pitches.filter(pt => {
+              if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
+              return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
+            });
+            batter.history.push({ 
+              inning: pitchRecord.inning, 
+              isTop: pitchRecord.isTop, 
+              result: paSummary,
+              pitches: [...abPitches]
+            });
+          }
           advanceToNextBatter();
         }
         handleHalfInningTransition();
@@ -1787,19 +1924,24 @@
         state.gameInfo.outs = nextOuts;
         if (paEnded) {
           state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
-          if (!batter.history) batter.history = [];
-          const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
-          const abPitches = state.pitches.filter(pt => {
-            if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
-            return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
-          });
-          batter.history.push({ 
-            inning: pitchRecord.inning, 
-            isTop: pitchRecord.isTop, 
-            result: paSummary,
-            pitches: [...abPitches]
-          });
-          advanceToNextBatter();
+          if (!isScoutingMode) {
+            const batter = lineup[state.gameInfo.currentBatterIndex];
+            if (batter) {
+              if (!batter.history) batter.history = [];
+              const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+              const abPitches = state.pitches.filter(pt => {
+                if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
+                return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
+              });
+              batter.history.push({ 
+                inning: pitchRecord.inning, 
+                isTop: pitchRecord.isTop, 
+                result: paSummary,
+                pitches: [...abPitches]
+              });
+            }
+            advanceToNextBatter();
+          }
         } else {
           state.gameInfo.balls = nextBalls; state.gameInfo.strikes = nextStrikes;
         }
@@ -1863,20 +2005,22 @@
     }
 
     function clearBases() {
+      const mode = state.settings?.trackingMode || 'single';
       const lineup = getActiveLineup();
       const currentBatter = lineup.length > 0 ? lineup[state.gameInfo.currentBatterIndex] : null;
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
 
-      if (currentBatter) {
+      if (mode === 'scouting') {
+        state.pitches = state.pitches.filter(pt => pt.inning !== state.gameInfo.inning);
+      } else if (currentBatter) {
         state.pitches = state.pitches.filter(pt => {
-          if (isSingleMode) {
+          if (mode === 'single') {
             return !(pt.batterId === currentBatter.id && pt.inning === state.gameInfo.inning);
           }
           return !(pt.batterId === currentBatter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
         });
-
-        state.pitches.forEach((pt, idx) => { pt.pitchNo = idx + 1; });
       }
+
+      state.pitches.forEach((pt, idx) => { pt.pitchNo = idx + 1; });
 
       state.gameInfo.balls = 0; 
       state.gameInfo.strikes = 0;
@@ -1897,6 +2041,7 @@
       state.gameInfo.strikes = 0;
       state.gameInfo.currentPitcherIndex = 0;
       state.gameInfo.currentBatterIndex = 0;
+      state.settings.trackingMode = 'single'; // start in single team only
 
       state.pitches = [];
 
@@ -1906,8 +2051,9 @@
       });
 
       saveState();
+      updateSettingsUI();
       renderAllViews();
-      showQuickToast("New game started!");
+      showQuickToast("New game started (Single Team Mode)!");
     }
 
     function addExtraHitterPrompt() { 
@@ -2202,9 +2348,14 @@
       state.gameInfo.balls = last.ballsBefore;
       state.gameInfo.strikes = last.strikesBefore;
 
-      const lineup = getActiveLineup();
-      const bIdx = lineup.findIndex(b => b.id === last.batterId);
-      if (bIdx !== -1) state.gameInfo.currentBatterIndex = bIdx;
+      const isScoutingMode = (state.settings?.trackingMode || 'single') === 'scouting';
+      if (!isScoutingMode) {
+        const lineup = getActiveLineup();
+        const bIdx = lineup.findIndex(b => b.id === last.batterId);
+        if (bIdx !== -1) state.gameInfo.currentBatterIndex = bIdx;
+      } else if (last.batterSide) {
+        state.scoutingModeState.hitterSide = last.batterSide;
+      }
 
       saveState(); renderAllViews();
       showQuickToast(`Reverted pitch #${last.pitchNo}`);
@@ -2237,7 +2388,8 @@
       const g = state.gameInfo;
       const pitchers = getActivePitchers();
       const pitcher = pitchers.length > 0 ? pitchers[g.currentPitcherIndex] : null;
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+      const mode = state.settings?.trackingMode || 'single';
+      const isSingleMode = (mode === 'single' || mode === 'scouting');
 
       document.getElementById('inning-text').innerText = g.inning;
       const halfIcon = document.getElementById('inning-half-icon');
@@ -2319,6 +2471,35 @@
     }
 
     function renderCurrentBatter() {
+      const mode = state.settings?.trackingMode || 'single';
+      const isScoutingMode = (mode === 'scouting');
+
+      const stdPanel = document.getElementById('standard-plate-panel');
+      const scPanel = document.getElementById('scouting-plate-panel');
+      const prevSection = document.getElementById('prev-sequences-section');
+
+      if (isScoutingMode) {
+        if (stdPanel) stdPanel.classList.add('hidden');
+        if (scPanel) scPanel.classList.remove('hidden');
+        if (prevSection) prevSection.classList.add('hidden');
+
+        updateScoutHandednessUI();
+        const oppSelect = document.getElementById('scouting-mode-opp-select');
+        if (oppSelect) oppSelect.value = state.gameInfo.battingTeamId;
+
+        const notesBox = document.getElementById('scouting-mode-notes');
+        if (notesBox) notesBox.value = state.scoutingModeState?.liveNotes || '';
+
+        selectZone(activeZone, activeZoneDesc);
+        lucide.createIcons();
+        return;
+      }
+
+      // Standard / Both Team Modes
+      if (stdPanel) stdPanel.classList.remove('hidden');
+      if (scPanel) scPanel.classList.add('hidden');
+      if (prevSection) prevSection.classList.remove('hidden');
+
       const lineup = getActiveLineup();
       if (lineup.length === 0) return;
       const b = lineup[state.gameInfo.currentBatterIndex];
@@ -2332,7 +2513,7 @@
       statContainer.innerText = b.stats ? `${b.stats.avg} / ${b.stats.obp || '.---'} / ${b.stats.slg || '.---'} • ${b.stats.hr || 0} HR • ${b.stats.sb || 0} SB` : "No stats registered";
       document.getElementById('batter-archetype-badges').innerHTML = renderArchetypeBadges(b.archetypes);
 
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+      const isSingleMode = (mode === 'single');
       const lastAb = b.history && b.history.length > 0 ? b.history[b.history.length - 1] : null;
       if (lastAb) {
         document.getElementById('batter-last-ab').innerText = isSingleMode 
@@ -2347,25 +2528,36 @@
       document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
 
       selectZone(activeZone, activeZoneDesc);
+      lucide.createIcons();
     }
 
     function renderCurrentSequence() {
-      const lineup = getActiveLineup();
-      if (lineup.length === 0) return;
-      const b = lineup[state.gameInfo.currentBatterIndex];
-      if (!b) return;
+      const mode = state.settings?.trackingMode || 'single';
+      const isScoutingMode = (mode === 'scouting');
 
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
-      const currentAbPitches = state.pitches.filter(pt => {
-        if (isSingleMode) return pt.batterId === b.id && pt.inning === state.gameInfo.inning;
-        return pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
-      });
+      let currentAbPitches = [];
+
+      if (isScoutingMode) {
+        // Sequence in current frame
+        currentAbPitches = state.pitches.filter(pt => pt.inning === state.gameInfo.inning);
+      } else {
+        const lineup = getActiveLineup();
+        if (lineup.length === 0) return;
+        const b = lineup[state.gameInfo.currentBatterIndex];
+        if (!b) return;
+
+        const isSingleMode = (mode === 'single');
+        currentAbPitches = state.pitches.filter(pt => {
+          if (isSingleMode) return pt.batterId === b.id && pt.inning === state.gameInfo.inning;
+          return pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
+        });
+      }
 
       // Render Current AB
       document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
       const container = document.getElementById('sequence-list');
       if (currentAbPitches.length === 0) {
-        container.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-2.5">No pitches thrown this at-bat</div>`;
+        container.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-2.5">No pitches thrown this frame</div>`;
       } else {
         container.innerHTML = currentAbPitches.map((pt, idx) => `
           <div class="flex items-center justify-between p-2 rounded-xl glass-card">
@@ -2384,7 +2576,15 @@
         `).join('');
       }
 
-      // Render Previous AB Sequences
+      // If in scouting mode, previous at-bat sequences list is disabled
+      if (isScoutingMode) return;
+
+      // Render Previous AB Sequences in standard modes
+      const lineup = getActiveLineup();
+      if (lineup.length === 0) return;
+      const b = lineup[state.gameInfo.currentBatterIndex];
+      if (!b) return;
+
       const prevContainer = document.getElementById('previous-sequences-list');
       const prevCounter = document.getElementById('prev-seq-count');
       const historyList = b.history || [];
@@ -2398,6 +2598,7 @@
         return;
       }
 
+      const isSingleMode = (mode === 'single');
       prevContainer.innerHTML = historyList.slice().reverse().map((pa, idx) => {
         const paNum = historyList.length - idx;
         const inningLabel = isSingleMode ? `Inn ${pa.inning}` : `${pa.isTop ? 'Top' : 'Bot'} ${pa.inning}`;
@@ -2536,7 +2737,8 @@
         tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">No pitches recorded yet</td></tr>`;
         return;
       }
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+      const mode = state.settings?.trackingMode || 'single';
+      const isSingleMode = (mode === 'single' || mode === 'scouting');
 
       tbody.innerHTML = state.pitches.slice().reverse().map(pt => `
         <tr class="hover:bg-white/5 transition">
@@ -2638,12 +2840,13 @@
     function exportToCSV() {
       if (state.pitches.length === 0) { showQuickToast("No pitches to export yet!", true); return; }
 
-      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+      const mode = state.settings?.trackingMode || 'single';
+      const isSingleMode = (mode === 'single' || mode === 'scouting');
       const headers = [
         "PitchNo", "Time", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
         "Pitcher", "PitcherThrows", "Batter", "BatterSide",
         "TaggedPitchType", "RelSpeed", "PitchCall", "TaggedHitType", "PlayResult",
-        "ExitVeloBand", "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win"
+        "ExitVeloBand", "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win", "Notes"
       ];
 
       const rows = state.pitches.map(p => [
@@ -2651,7 +2854,8 @@
         p.outsBefore, p.ballsBefore, p.strikesBefore, `"${p.pitcherName}"`, p.pitcherThrows,
         `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, p.velo || "", `"${p.pitchCall}"`,
         `"${p.hitType}"`, `"${p.playResult}"`, `"${p.exitVelo || 'Undefined'}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
-        p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : "")
+        p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : ""),
+        `"${p.scoutingNotes || ''}"`
       ]);
 
       const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
