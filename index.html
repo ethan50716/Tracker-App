@@ -112,9 +112,8 @@
       </div>
     </div>
 
-    <!-- CENTER / MATCHUP CONTROLS: MOUND & PLATE -->
+    <!-- CENTER: MOUND & PLATE PILLS -->
     <div class="flex items-center space-x-1 shrink min-w-0">
-      <!-- MOUND PILL -->
       <div class="flex items-center glass-button rounded-xl px-2 py-1 border border-emerald-500/30 shadow-sm min-w-0">
         <i data-lucide="circle-dot" class="w-3 h-3 text-emerald-400 mr-1 shrink-0"></i>
         <span class="text-[9px] text-emerald-400 font-black uppercase tracking-wider mr-1 shrink-0">MOUND:</span>
@@ -122,12 +121,10 @@
         </select>
       </div>
 
-      <!-- SWAP BUTTON -->
       <button onclick="manuallySwapHalfInning()" title="Swap Teams" class="p-1 rounded-lg glass-button text-slate-400 hover:text-white transition shrink-0 active:scale-95">
         <i data-lucide="arrow-left-right" class="w-3 h-3"></i>
       </button>
 
-      <!-- PLATE PILL -->
       <div class="flex items-center glass-button rounded-xl px-2 py-1 border border-amber-500/30 shadow-sm min-w-0">
         <i data-lucide="home" class="w-3 h-3 text-amber-400 mr-1 shrink-0"></i>
         <span class="text-[9px] text-amber-400 font-black uppercase tracking-wider mr-1 shrink-0">PLATE:</span>
@@ -136,9 +133,8 @@
       </div>
     </div>
 
-    <!-- RIGHT: PITCHER & ACTION BUTTONS -->
+    <!-- RIGHT: CONTROLS & NEW GAME -->
     <div class="flex items-center space-x-1.5 shrink-0">
-      <!-- PITCHER SELECTOR PILL -->
       <div class="flex items-center glass-button rounded-xl px-2 py-1 border border-emerald-500/30 shadow-sm">
         <i data-lucide="target" class="w-3 h-3 text-emerald-400 mr-1 shrink-0"></i>
         <span class="text-[9px] text-slate-400 font-black uppercase tracking-wider mr-1 shrink-0">PITCHER:</span>
@@ -146,15 +142,9 @@
         </select>
       </div>
 
-      <!-- NEXT FRAME BUTTON -->
       <button onclick="rollInning()" title="Advance Inning / Next Frame" class="flex items-center space-x-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold px-2 py-1 rounded-xl transition active:scale-95 whitespace-nowrap shadow-sm backdrop-blur-md">
         <i data-lucide="rotate-cw" class="w-3 h-3"></i>
         <span>Next</span>
-      </button>
-
-     <!-- CSV EXPORT (ICON ONLY) -->
-      <button onclick="exportToCSV()" title="Export TrackMan CSV" class="p-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl transition active:scale-95 shadow border border-emerald-400/30">
-        <i data-lucide="download" class="w-3.5 h-3.5"></i>
       </button>
 
       <!-- NEW GAME BUTTON -->
@@ -163,22 +153,24 @@
         <span>New Game</span>
       </button>
 
-      <!-- SETTINGS -->
+      <!-- CSV EXPORT (ICON ONLY) -->
+      <button onclick="exportToCSV()" title="Export TrackMan CSV" class="p-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl transition active:scale-95 shadow border border-emerald-400/30">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+      </button>
+
       <button onclick="openSettingsModal()" title="Tracking Settings & Preferences" class="p-1.5 glass-button text-slate-300 hover:text-emerald-400 rounded-xl transition active:scale-95">
         <i data-lucide="settings" class="w-3.5 h-3.5"></i>
       </button>
 
-      <!-- FULL SCREEN -->
       <button onclick="toggleFullScreen()" title="Toggle Full Screen" class="p-1.5 glass-button text-slate-300 hover:text-emerald-400 rounded-xl transition active:scale-95">
         <i data-lucide="maximize" id="fullscreen-icon" class="w-3.5 h-3.5"></i>
       </button>
     </div>
   </header>
 
-  <!-- LIVE GAME STATE HUD (WITH FPS% AND K:BB) -->
+  <!-- LIVE GAME STATE HUD -->
   <section class="relative z-20 px-3 py-2 grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 items-stretch text-center">
     
-    <!-- INNING DISPLAY -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-slate-400 font-semibold block uppercase tracking-wider">INNING</span>
       <div class="flex items-center space-x-1 mt-0.5">
@@ -188,7 +180,6 @@
       </div>
     </div>
 
-    <!-- COUNT & OUTS -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-slate-400 font-semibold block uppercase">COUNT & OUTS</span>
       <div class="flex items-center justify-center space-x-2 mt-0.5">
@@ -201,7 +192,6 @@
       </div>
     </div>
 
-    <!-- TOTAL / INNING PITCHES -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-slate-400 font-semibold block uppercase">PITCHES (TOT/INN)</span>
       <div class="text-base font-black text-emerald-400 mt-0.5">
@@ -209,7 +199,6 @@
       </div>
     </div>
 
-    <!-- STRIKE % (S / B) -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-slate-400 font-semibold block uppercase">STRIKE % (S / B)</span>
       <div class="text-sm font-black text-white mt-0.5">
@@ -218,7 +207,6 @@
       </div>
     </div>
 
-    <!-- FPS% (FIRST PITCH STRIKE %) -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-cyan-400 font-bold block uppercase flex items-center justify-center">
         <i data-lucide="zap" class="w-2.5 h-2.5 mr-0.5 text-cyan-400"></i> FPS %
@@ -229,7 +217,6 @@
       </div>
     </div>
 
-    <!-- 1-1 WIN % -->
     <div id="stat-1-1-card" class="glass-card rounded-xl p-2 flex flex-col items-center justify-center relative transition-all duration-300">
       <span class="text-[9px] text-amber-400 font-bold block uppercase flex items-center justify-center">
         <i data-lucide="target" class="w-2.5 h-2.5 mr-0.5 text-amber-400"></i> 1-1 WIN %
@@ -240,7 +227,6 @@
       </div>
     </div>
 
-    <!-- WHIFF % -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-slate-400 font-semibold block uppercase">WHIFF % (SWINGS)</span>
       <div class="text-sm font-black text-white mt-0.5">
@@ -249,7 +235,6 @@
       </div>
     </div>
 
-    <!-- K:BB RATIO -->
     <div class="glass-card rounded-xl p-2 flex flex-col items-center justify-center">
       <span class="text-[9px] text-emerald-400 font-bold block uppercase flex items-center justify-center">
         <i data-lucide="award" class="w-2.5 h-2.5 mr-0.5 text-emerald-400"></i> K : BB
@@ -287,7 +272,7 @@
     <!-- ==================== TAB 1: LIVE CHARTING ==================== -->
     <div id="view-charting" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
       
-      <!-- LEFT COLUMN: BATTER AT-A-GLANCE & SEQUENCE -->
+      <!-- LEFT COLUMN: BATTER DOSSIER & SEQUENCES -->
       <div class="lg:col-span-3 space-y-3">
         <div class="glass-panel rounded-2xl p-3.5 shadow-xl">
           <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
@@ -332,26 +317,29 @@
           </div>
         </div>
 
-       <div class="glass-panel rounded-2xl p-3 shadow-xl">
-          <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">CURRENT AB SEQUENCE</span>
-            <span id="seq-pitch-count" class="text-[10px] text-slate-400 font-mono">0 Pitches</span>
+        <!-- INTEGRATED SEQUENCE PANEL (CURRENT & PREVIOUS AT-BATS) -->
+        <div class="glass-panel rounded-2xl p-3 shadow-xl space-y-3">
+          <div>
+            <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">CURRENT AB SEQUENCE</span>
+              <span id="seq-pitch-count" class="text-[10px] text-slate-400 font-mono">0 Pitches</span>
+            </div>
+            <div id="sequence-list" class="space-y-1.5 max-h-44 overflow-y-auto custom-scrollbar text-xs">
+              <div class="text-[11px] text-slate-500 italic text-center py-2.5">No pitches thrown this at-bat</div>
+            </div>
           </div>
-          <div id="sequence-list" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar text-xs">
-            <div class="text-[11px] text-slate-500 italic text-center py-3">No pitches thrown this at-bat</div>
-          </div>
-        </div>
 
-        <!-- PREVIOUS AB SEQUENCES -->
-        <div class="glass-panel rounded-2xl p-3 shadow-xl">
-          <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PREVIOUS AB SEQUENCES</span>
-            <span id="prev-seq-count" class="text-[10px] text-slate-400 font-mono">0 PAs</span>
-          </div>
-          <div id="previous-sequences-list" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar text-xs">
-            <div class="text-[11px] text-slate-500 italic text-center py-3">No completed plate appearances yet</div>
+          <div class="pt-2 border-t border-white/10">
+            <div class="flex items-center justify-between pb-1.5 mb-1.5">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PREVIOUS AB SEQUENCES</span>
+              <span id="prev-seq-count" class="text-[10px] text-slate-400 font-mono">0 PAs</span>
+            </div>
+            <div id="previous-sequences-list" class="space-y-1.5 max-h-44 overflow-y-auto custom-scrollbar text-xs">
+              <div class="text-[11px] text-slate-500 italic text-center py-2.5">No prior plate appearances</div>
+            </div>
           </div>
         </div>
+      </div>
 
       <!-- CENTER COLUMN: RAPID LOGGING INTERFACE -->
       <div class="lg:col-span-5 space-y-3">
@@ -363,7 +351,7 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID (CORNERS + MIDDLE) -->
+          <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID (CORNERS + MIDDLE HEART) -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-slate-950/80 border border-white/10 rounded-2xl p-2 flex flex-col items-center justify-center space-y-1.5 shadow-2xl backdrop-blur-xl">
             <!-- CHASE HIGH (ZONE 6) -->
             <button onclick="selectZone(6, 'Chase High')" id="zone-btn-6" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98">
@@ -424,7 +412,6 @@
           <div class="w-full mt-2.5">
             <div class="flex items-center justify-between mb-1.5 px-1">
               <span class="text-[10px] text-slate-400 font-bold uppercase">SELECT PITCH & VELO:</span>
-              <!-- OPTIONAL VELOCITY INPUT -->
               <div class="flex items-center space-x-1 bg-slate-900/90 border border-emerald-500/30 rounded-lg px-2 py-0.5">
                 <i data-lucide="gauge" class="w-3 h-3 text-emerald-400"></i>
                 <input type="number" id="pitch-velo-input" step="0.1" placeholder="MPH" class="bg-transparent w-12 text-center text-xs font-mono font-black text-emerald-300 placeholder-slate-600 outline-none" />
@@ -801,7 +788,7 @@
     </div>
   </div>
 
-  <!-- MODAL: PINCH HITTER / LINEUP SUBSTITUTION -->
+  <!-- MODAL: PINCH HITTER / BENCH SUB -->
   <div id="modal-sub" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="glass-panel rounded-3xl max-w-sm w-full p-4 space-y-3 shadow-2xl border border-white/10">
       <div class="flex justify-between items-center border-b border-white/10 pb-2">
@@ -1595,7 +1582,6 @@
         const btn = document.getElementById(`zone-btn-${z}`);
         if (!btn) continue;
 
-        // Zones 1-5: In-Zone targets
         if (z <= 5) {
           const title = document.getElementById(`zone-label-${z}`);
           const sub = document.getElementById(`zone-sub-${z}`);
@@ -1613,7 +1599,6 @@
             if (sub) sub.className = (z === 5) ? "text-[8px] font-mono text-emerald-400/80" : "text-[9px] font-mono text-slate-400";
           }
         } else {
-          // Zones 6-9: Chases/Waste
           if (z === zoneNum) {
             btn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-slate-700/80', 'border-dashed');
             btn.classList.add('bg-amber-500/30', 'text-amber-200', 'border-amber-400', 'border-solid');
@@ -1652,7 +1637,6 @@
 
       const tmTypeMap = { '4S': 'Fastball', 'SI': 'Sinker', 'CT': 'Cutter', 'SL': 'Slider', 'CB': 'Curveball', 'CH': 'ChangeUp', 'SPL': 'Splitter' };
 
-      // Optional Radar Gun velocity
       const veloInput = document.getElementById('pitch-velo-input');
       const veloVal = veloInput && veloInput.value ? parseFloat(veloInput.value) : null;
 
@@ -1684,7 +1668,6 @@
 
       state.pitches.push(pitchRecord);
 
-      // Reset velocity field for the next pitch
       if (veloInput) veloInput.value = '';
 
       let nextBalls = currentBalls, nextStrikes = currentStrikes, nextOuts = currentOuts;
@@ -1712,7 +1695,7 @@
       const veloTag = veloVal ? ` @ ${veloVal} mph` : '';
       showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType}${veloTag} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
 
-    if (nextOuts >= 3) {
+      if (nextOuts >= 3) {
         if (paEnded) {
           if (!batter.history) batter.history = [];
           const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
@@ -1790,12 +1773,11 @@
       }
     }
 
-   function clearBases() {
+    function clearBases() {
       const lineup = getActiveLineup();
       const currentBatter = lineup.length > 0 ? lineup[state.gameInfo.currentBatterIndex] : null;
       const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
 
-      // Remove pitches logged during this batter's active at-bat
       if (currentBatter) {
         state.pitches = state.pitches.filter(pt => {
           if (isSingleMode) {
@@ -1804,7 +1786,6 @@
           return !(pt.batterId === currentBatter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
         });
 
-        // Re-index remaining pitches sequentially
         state.pitches.forEach((pt, idx) => { pt.pitchNo = idx + 1; });
       }
 
@@ -1815,11 +1796,10 @@
       showQuickToast(`Count and current sequence cleared`);
     }
 
-function startNewGamePrompt() {
+    function startNewGamePrompt() {
       const confirmReset = confirm("Are you sure you want to start a new game?");
       if (!confirmReset) return;
 
-      // Reset Game State to Inning 1, 0-0 Count, 0 Outs
       state.gameInfo.date = new Date().toISOString().split('T')[0];
       state.gameInfo.inning = 1;
       state.gameInfo.isTop = true;
@@ -1829,10 +1809,8 @@ function startNewGamePrompt() {
       state.gameInfo.currentPitcherIndex = 0;
       state.gameInfo.currentBatterIndex = 0;
 
-      // Clear all pitch records
       state.pitches = [];
 
-      // Clear previous at-bat logs for all hitters (preserves rosters & scouting notes)
       Object.values(state.teams).forEach(team => {
         (team.lineup || []).forEach(hitter => hitter.history = []);
         (team.bench || []).forEach(hitter => hitter.history = []);
@@ -1842,7 +1820,7 @@ function startNewGamePrompt() {
       renderAllViews();
       showQuickToast("New game started!");
     }
-    
+
     function addExtraHitterPrompt() { 
       switchTab('roster');
       changeManagedTeam(state.gameInfo.battingTeamId);
@@ -2280,7 +2258,7 @@ function startNewGamePrompt() {
       document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
     }
 
-   function renderCurrentSequence() {
+    function renderCurrentSequence() {
       const lineup = getActiveLineup();
       if (lineup.length === 0) return;
       const b = lineup[state.gameInfo.currentBatterIndex];
@@ -2296,7 +2274,7 @@ function startNewGamePrompt() {
       document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
       const container = document.getElementById('sequence-list');
       if (currentAbPitches.length === 0) {
-        container.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-3">No pitches thrown this at-bat</div>`;
+        container.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-2.5">No pitches thrown this at-bat</div>`;
       } else {
         container.innerHTML = currentAbPitches.map((pt, idx) => `
           <div class="flex items-center justify-between p-2 rounded-xl glass-card">
@@ -2315,7 +2293,7 @@ function startNewGamePrompt() {
         `).join('');
       }
 
-      // Render Previous AB Sequences for this batter
+      // Render Previous AB Sequences
       const prevContainer = document.getElementById('previous-sequences-list');
       const prevCounter = document.getElementById('prev-seq-count');
       const historyList = b.history || [];
@@ -2325,7 +2303,7 @@ function startNewGamePrompt() {
       if (!prevContainer) return;
 
       if (historyList.length === 0) {
-        prevContainer.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-3">No completed plate appearances yet</div>`;
+        prevContainer.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-2.5">No prior plate appearances</div>`;
         return;
       }
 
@@ -2337,14 +2315,12 @@ function startNewGamePrompt() {
         return `
           <div class="p-2 rounded-xl glass-card border border-white/5 space-y-1.5">
             <div class="flex items-center justify-between pb-1 border-b border-white/5">
-              <div class="flex items-center space-x-1.5">
-                <span class="text-[9px] font-mono font-black text-amber-400 uppercase">PA #${paNum} (${inningLabel})</span>
-              </div>
+              <span class="text-[9px] font-mono font-black text-amber-400 uppercase">PA #${paNum} (${inningLabel})</span>
               <span class="text-[10px] font-black text-emerald-300 font-mono">${pa.result}</span>
             </div>
             <div class="space-y-1 pt-0.5">
               ${pitches.length > 0 ? pitches.map((pt, pIdx) => `
-                <div class="flex items-center justify-between text-[10px] text-slate-300 px-1 py-0.5 rounded bg-slate-950/40">
+                <div class="flex items-center justify-between text-[10px] text-slate-300 px-1.5 py-0.5 rounded bg-slate-950/40">
                   <div class="flex items-center space-x-1.5">
                     <span class="text-[9px] font-mono text-slate-500">#${pIdx + 1}</span>
                     <span class="font-bold text-emerald-400">${pt.pitchType}</span>
@@ -2362,6 +2338,7 @@ function startNewGamePrompt() {
         `;
       }).join('');
     }
+
     function renderArsenalTally() {
       const pitchers = getActivePitchers();
       if (pitchers.length === 0) return;
@@ -2403,7 +2380,6 @@ function startNewGamePrompt() {
 
       document.getElementById('tally-top-weapon').innerText = topWeapon === "None" ? "Fastball" : topWeapon;
 
-      // Zones 1 through 5 represent the expanded in-zone matrix
       const zonePitches = pitcherPitches.filter(pt => pt.zone <= 5).length;
       document.getElementById('tally-zone-rate').innerText = pitcherPitches.length > 0 ? `${((zonePitches / pitcherPitches.length) * 100).toFixed(1)}%` : "0.0%";
 
@@ -2599,4 +2575,3 @@ function startNewGamePrompt() {
   </script>
 </body>
 </html>
-```
