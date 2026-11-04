@@ -332,7 +332,7 @@
           </div>
         </div>
 
-        <div class="glass-panel rounded-2xl p-3 shadow-xl">
+       <div class="glass-panel rounded-2xl p-3 shadow-xl">
           <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">CURRENT AB SEQUENCE</span>
             <span id="seq-pitch-count" class="text-[10px] text-slate-400 font-mono">0 Pitches</span>
@@ -341,7 +341,17 @@
             <div class="text-[11px] text-slate-500 italic text-center py-3">No pitches thrown this at-bat</div>
           </div>
         </div>
-      </div>
+
+        <!-- PREVIOUS AB SEQUENCES -->
+        <div class="glass-panel rounded-2xl p-3 shadow-xl">
+          <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PREVIOUS AB SEQUENCES</span>
+            <span id="prev-seq-count" class="text-[10px] text-slate-400 font-mono">0 PAs</span>
+          </div>
+          <div id="previous-sequences-list" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar text-xs">
+            <div class="text-[11px] text-slate-500 italic text-center py-3">No completed plate appearances yet</div>
+          </div>
+        </div>
 
       <!-- CENTER COLUMN: RAPID LOGGING INTERFACE -->
       <div class="lg:col-span-5 space-y-3">
@@ -1702,10 +1712,20 @@
       const veloTag = veloVal ? ` @ ${veloVal} mph` : '';
       showQuickToast(`Pitch ${pitchRecord.pitchNo}: ${activePitchType}${veloTag} - ${formatCallName(call)} (${nextBalls}-${nextStrikes})`);
 
-      if (nextOuts >= 3) {
+    if (nextOuts >= 3) {
         if (paEnded) {
           if (!batter.history) batter.history = [];
-          batter.history.push({ inning: pitchRecord.inning, isTop: pitchRecord.isTop, result: paSummary });
+          const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+          const abPitches = state.pitches.filter(pt => {
+            if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
+            return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
+          });
+          batter.history.push({ 
+            inning: pitchRecord.inning, 
+            isTop: pitchRecord.isTop, 
+            result: paSummary,
+            pitches: [...abPitches]
+          });
           advanceToNextBatter();
         }
         handleHalfInningTransition();
@@ -1714,7 +1734,17 @@
         if (paEnded) {
           state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
           if (!batter.history) batter.history = [];
-          batter.history.push({ inning: pitchRecord.inning, isTop: pitchRecord.isTop, result: paSummary });
+          const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+          const abPitches = state.pitches.filter(pt => {
+            if (isSingleMode) return pt.batterId === batter.id && pt.inning === state.gameInfo.inning;
+            return pt.batterId === batter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
+          });
+          batter.history.push({ 
+            inning: pitchRecord.inning, 
+            isTop: pitchRecord.isTop, 
+            result: paSummary,
+            pitches: [...abPitches]
+          });
           advanceToNextBatter();
         } else {
           state.gameInfo.balls = nextBalls; state.gameInfo.strikes = nextStrikes;
@@ -1760,10 +1790,29 @@
       }
     }
 
-    function clearBases() {
-      state.gameInfo.balls = 0; state.gameInfo.strikes = 0;
-      saveState(); renderAllViews();
-      showQuickToast(`Count reset to 0-0`);
+   function clearBases() {
+      const lineup = getActiveLineup();
+      const currentBatter = lineup.length > 0 ? lineup[state.gameInfo.currentBatterIndex] : null;
+      const isSingleMode = (state.settings?.trackingMode || 'single') === 'single';
+
+      // Remove pitches logged during this batter's active at-bat
+      if (currentBatter) {
+        state.pitches = state.pitches.filter(pt => {
+          if (isSingleMode) {
+            return !(pt.batterId === currentBatter.id && pt.inning === state.gameInfo.inning);
+          }
+          return !(pt.batterId === currentBatter.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop);
+        });
+
+        // Re-index remaining pitches sequentially
+        state.pitches.forEach((pt, idx) => { pt.pitchNo = idx + 1; });
+      }
+
+      state.gameInfo.balls = 0; 
+      state.gameInfo.strikes = 0;
+      saveState(); 
+      renderAllViews();
+      showQuickToast(`Count and current sequence cleared`);
     }
 
 function startNewGamePrompt() {
@@ -2231,7 +2280,7 @@ function startNewGamePrompt() {
       document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
     }
 
-    function renderCurrentSequence() {
+   function renderCurrentSequence() {
       const lineup = getActiveLineup();
       if (lineup.length === 0) return;
       const b = lineup[state.gameInfo.currentBatterIndex];
@@ -2243,29 +2292,76 @@ function startNewGamePrompt() {
         return pt.batterId === b.id && pt.inning === state.gameInfo.inning && pt.isTop === state.gameInfo.isTop;
       });
 
+      // Render Current AB
       document.getElementById('seq-pitch-count').innerText = `${currentAbPitches.length} Pitches`;
       const container = document.getElementById('sequence-list');
       if (currentAbPitches.length === 0) {
         container.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-3">No pitches thrown this at-bat</div>`;
+      } else {
+        container.innerHTML = currentAbPitches.map((pt, idx) => `
+          <div class="flex items-center justify-between p-2 rounded-xl glass-card">
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-mono text-slate-500">#${idx + 1}</span>
+              <span class="text-xs font-black text-emerald-400">${pt.pitchType}</span>
+              <span class="text-[11px] text-slate-300 font-medium">${formatCallName(pt.pitchCall)}</span>
+            </div>
+            <div class="flex items-center space-x-1.5 text-[10px] font-mono text-slate-400">
+              ${pt.velo ? `<span class="text-emerald-300 font-bold">${pt.velo}mph</span><span class="text-slate-600">|</span>` : ''}
+              <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
+              <span class="text-slate-600">|</span>
+              <span class="text-slate-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Render Previous AB Sequences for this batter
+      const prevContainer = document.getElementById('previous-sequences-list');
+      const prevCounter = document.getElementById('prev-seq-count');
+      const historyList = b.history || [];
+
+      if (prevCounter) prevCounter.innerText = `${historyList.length} PA${historyList.length === 1 ? '' : 's'}`;
+
+      if (!prevContainer) return;
+
+      if (historyList.length === 0) {
+        prevContainer.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-3">No completed plate appearances yet</div>`;
         return;
       }
-      container.innerHTML = currentAbPitches.map((pt, idx) => `
-        <div class="flex items-center justify-between p-2 rounded-xl glass-card">
-          <div class="flex items-center space-x-2">
-            <span class="text-[10px] font-mono text-slate-500">#${idx + 1}</span>
-            <span class="text-xs font-black text-emerald-400">${pt.pitchType}</span>
-            <span class="text-[11px] text-slate-300 font-medium">${formatCallName(pt.pitchCall)}</span>
-          </div>
-          <div class="flex items-center space-x-1.5 text-[10px] font-mono text-slate-400">
-            ${pt.velo ? `<span class="text-emerald-300 font-bold">${pt.velo}mph</span><span class="text-slate-600">|</span>` : ''}
-            <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
-            <span class="text-slate-600">|</span>
-            <span class="text-slate-400 font-bold">${pt.zoneDesc.split(' ')[0]}</span>
-          </div>
-        </div>
-      `).join('');
-    }
 
+      prevContainer.innerHTML = historyList.slice().reverse().map((pa, idx) => {
+        const paNum = historyList.length - idx;
+        const inningLabel = isSingleMode ? `Inn ${pa.inning}` : `${pa.isTop ? 'Top' : 'Bot'} ${pa.inning}`;
+        const pitches = pa.pitches || [];
+
+        return `
+          <div class="p-2 rounded-xl glass-card border border-white/5 space-y-1.5">
+            <div class="flex items-center justify-between pb-1 border-b border-white/5">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-[9px] font-mono font-black text-amber-400 uppercase">PA #${paNum} (${inningLabel})</span>
+              </div>
+              <span class="text-[10px] font-black text-emerald-300 font-mono">${pa.result}</span>
+            </div>
+            <div class="space-y-1 pt-0.5">
+              ${pitches.length > 0 ? pitches.map((pt, pIdx) => `
+                <div class="flex items-center justify-between text-[10px] text-slate-300 px-1 py-0.5 rounded bg-slate-950/40">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="text-[9px] font-mono text-slate-500">#${pIdx + 1}</span>
+                    <span class="font-bold text-emerald-400">${pt.pitchType}</span>
+                    <span>${formatCallName(pt.pitchCall)}</span>
+                  </div>
+                  <div class="flex items-center space-x-1 font-mono text-[9px] text-slate-400">
+                    ${pt.velo ? `<span class="text-emerald-300 font-semibold">${pt.velo}m</span>` : ''}
+                    <span>${pt.ballsBefore}-${pt.strikesBefore}</span>
+                    <span class="text-slate-500">(${pt.zoneDesc.split(' ')[0]})</span>
+                  </div>
+                </div>
+              `).join('') : '<span class="text-[9px] text-slate-500 italic">No sequence detail</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
     function renderArsenalTally() {
       const pitchers = getActivePitchers();
       if (pitchers.length === 0) return;
