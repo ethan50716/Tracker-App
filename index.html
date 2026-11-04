@@ -26,7 +26,7 @@
       user-select: none;
     }
     
-    /* Standard Liquid Glassmorphic Styles */
+    /* Standard Liquid Glassmorphic Styles (Dark Baseline) */
     .glass-panel {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.72);
       backdrop-filter: blur(18px);
@@ -58,6 +58,7 @@
     .glass-button {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(30, 41, 59, 0.8);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
       transition: all 0.15s ease;
@@ -91,57 +92,116 @@
     }
 
     /* ========================================================
-       HIGH-CONTRAST / DAY GAME / OUTDOOR SUN OVERRIDES
+       APPLE LIQUID GLASS: SLEEK LIGHT MODE OVERRIDES
        ======================================================== */
-    body.high-contrast {
-      background: #000000 !important;
-      color: #ffffff !important;
+    body.light-mode {
+      background: radial-gradient(circle at 15% 10%, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%) !important;
+      color: #0f172a !important;
     }
-    body.high-contrast .glass-panel {
-      background: #0a0a0a !important;
-      border: 2px solid #ffffff !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      box-shadow: none !important;
+
+    /* Apple Frosted Glass Panels */
+    body.light-mode .glass-panel {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(248, 250, 252, 0.58) 100%) !important;
+      backdrop-filter: blur(28px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.85) !important;
+      box-shadow: 0 18px 38px -12px rgba(148, 163, 184, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95) !important;
     }
-    body.high-contrast .glass-card {
-      background: #111111 !important;
-      border: 1.5px solid #71717a !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      box-shadow: none !important;
+
+    /* Sleek Translucent Cards */
+    body.light-mode .glass-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.65) 100%) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.9) !important;
+      box-shadow: 0 6px 20px -4px rgba(100, 116, 139, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     }
-    body.high-contrast .glass-card-interactive {
-      background: #18181b !important;
-      border: 1.5px solid #a1a1aa !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
+
+    body.light-mode .glass-card-interactive {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.68) 100%) !important;
+      backdrop-filter: blur(18px) !important;
+      -webkit-backdrop-filter: blur(18px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 4px 14px -2px rgba(100, 116, 139, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
     }
-    body.high-contrast .glass-button {
-      background: #27272a !important;
-      border: 1.5px solid #ffffff !important;
-      color: #ffffff !important;
-      backdrop-filter: none !important;
+
+    body.light-mode .glass-card-interactive:hover {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 253, 245, 0.8) 100%) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
+      box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.18) !important;
     }
-    body.high-contrast .text-slate-400,
-    body.high-contrast .text-slate-500 {
-      color: #e4e4e7 !important;
+
+    /* Tactile Glass Pills & Buttons */
+    body.light-mode .glass-button {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.9) !important;
+      color: #0f172a !important;
+      box-shadow: 0 2px 8px -2px rgba(100, 116, 139, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
     }
-    body.high-contrast .text-emerald-400 {
-      color: #4ade80 !important;
-      font-weight: 900 !important;
+
+    /* Strike Zone Sub-Panels */
+    body.light-mode .bg-slate-950\/80,
+    body.light-mode .bg-slate-900\/90,
+    body.light-mode .bg-slate-950\/70,
+    body.light-mode .bg-slate-950\/40,
+    body.light-mode .bg-slate-900\/80 {
+      background: rgba(241, 245, 249, 0.72) !important;
+      border-color: rgba(203, 213, 225, 0.7) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
     }
-    body.high-contrast .text-amber-400 {
-      color: #facc15 !important;
-      font-weight: 900 !important;
+
+    /* Light Mode Typography Adjustments */
+    body.light-mode .text-white {
+      color: #09090b !important;
     }
-    body.high-contrast .text-cyan-400 {
-      color: #38bdf8 !important;
-      font-weight: 900 !important;
+    body.light-mode .text-slate-400,
+    body.light-mode .text-slate-500 {
+      color: #64748b !important;
     }
-    body.high-contrast .border-white\/10,
-    body.high-contrast .border-white\/5 {
-      border-color: #52525b !important;
+    body.light-mode .text-slate-300,
+    body.light-mode .text-slate-200 {
+      color: #334155 !important;
+    }
+
+    body.light-mode .text-emerald-400,
+    body.light-mode .text-emerald-300 {
+      color: #059669 !important;
+    }
+    body.light-mode .text-amber-400,
+    body.light-mode .text-amber-300 {
+      color: #d97706 !important;
+    }
+    body.light-mode .text-cyan-400,
+    body.light-mode .text-cyan-300 {
+      color: #0284c7 !important;
+    }
+    body.light-mode .text-purple-400,
+    body.light-mode .text-purple-300 {
+      color: #7c3aed !important;
+    }
+
+    body.light-mode .border-white\/10,
+    body.light-mode .border-white\/5 {
+      border-color: rgba(203, 213, 225, 0.6) !important;
+    }
+
+    /* Scrollbars */
+    body.light-mode .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(226, 232, 240, 0.5);
+    }
+    body.light-mode .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.6);
+    }
+
+    /* Modals & Backdrop Blur */
+    body.light-mode .bg-black\/80,
+    body.light-mode .bg-black\/85 {
+      background: rgba(15, 23, 42, 0.35) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
     }
   </style>
 </head>
@@ -207,9 +267,9 @@
         <span>New Game</span>
       </button>
 
-      <!-- HIGH CONTRAST / DAY GAME HEADER TOGGLE -->
-      <button onclick="toggleHighContrastTheme()" id="header-sun-btn" title="Toggle Day Game / High-Contrast Mode" class="p-1.5 glass-button text-slate-300 hover:text-amber-400 rounded-xl transition active:scale-95">
-        <i data-lucide="sun" id="header-sun-icon" class="w-3.5 h-3.5"></i>
+      <!-- LIGHT / DARK MODE HEADER TOGGLE -->
+      <button onclick="toggleLightModeTheme()" id="header-theme-btn" title="Toggle Light / Dark Mode" class="p-1.5 glass-button text-slate-300 hover:text-amber-400 rounded-xl transition active:scale-95">
+        <i data-lucide="sun" id="header-theme-icon" class="w-3.5 h-3.5"></i>
       </button>
 
       <!-- CSV EXPORT (ICON ONLY) -->
@@ -436,7 +496,7 @@
             </div>
           </div>
 
-          <!-- PREVIOUS AB SEQUENCES CONTAINER (HIDDEN IN SCOUTING MODE) -->
+          <!-- PREVIOUS AB SEQUENCES CONTAINER -->
           <div id="prev-sequences-section" class="pt-2 border-t border-white/10">
             <div class="flex items-center justify-between pb-1.5 mb-1.5">
               <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PREVIOUS AB SEQUENCES</span>
@@ -459,7 +519,7 @@
             <span id="selected-loc-label" class="text-[10px] font-mono text-emerald-400 font-bold">Location: Up-In (Zone 1)</span>
           </div>
 
-          <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID (CORNERS + MIDDLE HEART) -->
+          <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-slate-950/80 border border-white/10 rounded-2xl p-2 flex flex-col items-center justify-center space-y-1.5 shadow-2xl backdrop-blur-xl">
             <!-- CHASE HIGH (ZONE 6) -->
             <button onclick="selectZone(6, 'Chase High')" id="zone-btn-6" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98 flex flex-col items-center justify-center">
@@ -827,22 +887,22 @@
 
       <div class="space-y-4 text-xs">
         
-        <!-- HIGH-CONTRAST / DAY GAME OPTION -->
+        <!-- LIGHT MODE OPTION -->
         <div>
-          <label class="text-slate-300 font-bold block mb-1">DUGOUT DISPLAY & CONTRAST:</label>
-          <div class="glass-card-interactive p-3 rounded-2xl flex items-center justify-between border border-amber-500/20">
+          <label class="text-slate-300 font-bold block mb-1">DUGOUT DISPLAY & APPEARANCE:</label>
+          <div class="glass-card-interactive p-3 rounded-2xl flex items-center justify-between border border-emerald-500/20">
             <div class="flex items-center space-x-3">
-              <div class="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+              <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
                 <i data-lucide="sun" class="w-4 h-4"></i>
               </div>
               <div>
-                <span class="font-bold text-white block">Day Game Mode (High Contrast)</span>
-                <span class="text-slate-400 text-[11px] leading-tight block">Stark black background, crisp white borders, and glare-resistant high-visibility text for direct sunlight.</span>
+                <span class="font-bold text-white block">Light Mode (Liquid Glass)</span>
+                <span class="text-slate-400 text-[11px] leading-tight block">Clean, minimal light frosted glass styling with specular highlights and clear day-game contrast.</span>
               </div>
             </div>
             <label class="relative inline-flex items-center cursor-pointer ml-2">
-              <input type="checkbox" id="setting-high-contrast-toggle" onchange="toggleHighContrastTheme(this.checked)" class="sr-only peer">
-              <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+              <input type="checkbox" id="setting-light-mode-toggle" onchange="toggleLightModeTheme(this.checked)" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
             </label>
           </div>
         </div>
@@ -1112,7 +1172,7 @@
       },
       settings: {
         trackingMode: 'single',
-        highContrast: false
+        lightMode: false
       },
       scoutingModeState: {
         hitterSide: 'Right',
@@ -1221,8 +1281,12 @@
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (!parsed.settings) parsed.settings = { trackingMode: 'single', highContrast: false };
-          if (parsed.settings.highContrast === undefined) parsed.settings.highContrast = false;
+          if (!parsed.settings) parsed.settings = { trackingMode: 'single', lightMode: false };
+          if (parsed.settings.lightMode === undefined) {
+            // Migrate legacy setting if present
+            parsed.settings.lightMode = parsed.settings.highContrast || false;
+            delete parsed.settings.highContrast;
+          }
           if (!parsed.scoutingModeState) parsed.scoutingModeState = { hitterSide: 'Right', liveNotes: '' };
           return parsed;
         }
@@ -1255,7 +1319,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      applyContrastTheme(state.settings?.highContrast || false);
+      applyLightModeTheme(state.settings?.lightMode || false);
       populateGlobalTeamSelects();
       populateTeamManagerSelect();
       populatePitcherSelect();
@@ -1288,24 +1352,24 @@
       lucide.createIcons();
     }
 
-    /* THEME / HIGH CONTRAST HANDLERS */
-    function toggleHighContrastTheme(explicitVal = null) {
+    /* THEME / LIGHT MODE HANDLERS */
+    function toggleLightModeTheme(explicitVal = null) {
       if (!state.settings) state.settings = {};
-      state.settings.highContrast = (explicitVal !== null) ? explicitVal : !state.settings.highContrast;
+      state.settings.lightMode = (explicitVal !== null) ? explicitVal : !state.settings.lightMode;
       saveState();
-      applyContrastTheme(state.settings.highContrast);
+      applyLightModeTheme(state.settings.lightMode);
       updateSettingsUI();
-      showQuickToast(state.settings.highContrast ? "High Contrast / Day Game Mode Active" : "Standard Theme Restored");
+      showQuickToast(state.settings.lightMode ? "Liquid Glass Light Mode Active" : "Dark Glass Mode Active");
     }
 
-    function applyContrastTheme(isHighContrast) {
+    function applyLightModeTheme(isLightMode) {
       const body = document.getElementById('app-body');
-      const headerIcon = document.getElementById('header-sun-icon');
-      if (isHighContrast) {
-        body.classList.add('high-contrast');
+      const headerIcon = document.getElementById('header-theme-icon');
+      if (isLightMode) {
+        body.classList.add('light-mode');
         if (headerIcon) headerIcon.setAttribute('data-lucide', 'moon');
       } else {
-        body.classList.remove('high-contrast');
+        body.classList.remove('light-mode');
         if (headerIcon) headerIcon.setAttribute('data-lucide', 'sun');
       }
       lucide.createIcons();
@@ -1464,9 +1528,9 @@
       if (sRadio) sRadio.checked = (mode === 'single');
       if (scRadio) scRadio.checked = (mode === 'scouting');
       
-      const contrastToggle = document.getElementById('setting-high-contrast-toggle');
-      if (contrastToggle) {
-        contrastToggle.checked = Boolean(state.settings?.highContrast);
+      const lightToggle = document.getElementById('setting-light-mode-toggle');
+      if (lightToggle) {
+        lightToggle.checked = Boolean(state.settings?.lightMode);
       }
 
       const halfSection = document.getElementById('manual-half-adjust-section');
@@ -2685,7 +2749,7 @@
 
       if (isScoutingMode) return;
 
-      // Render Previous AB Sequences in standard modes
+      // Render Previous AB Sequences
       const lineup = getActiveLineup();
       if (lineup.length === 0) return;
       const b = lineup[state.gameInfo.currentBatterIndex];
