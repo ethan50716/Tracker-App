@@ -354,8 +354,8 @@
           <!-- STRIKE ZONE WITH 5-PANEL IN-ZONE GRID (CORNERS + MIDDLE HEART) -->
           <div class="relative w-full max-w-[340px] sm:max-w-[360px] bg-slate-950/80 border border-white/10 rounded-2xl p-2 flex flex-col items-center justify-center space-y-1.5 shadow-2xl backdrop-blur-xl">
             <!-- CHASE HIGH (ZONE 6) -->
-            <button onclick="selectZone(6, 'Chase High')" id="zone-btn-6" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98">
-              ▲ Chase High / Waste
+            <button onclick="selectZone(6, 'Chase High')" id="zone-btn-6" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98 flex flex-col items-center justify-center">
+              <span>▲ Chase High / Waste</span>
             </button>
             
             <div class="w-full flex items-stretch space-x-1.5">
@@ -366,30 +366,30 @@
               </button>
 
               <!-- IN-ZONE 5-PANEL GRID -->
-              <div class="relative flex-1 h-44 bg-slate-900/90 border-2 border-emerald-500/80 rounded-2xl p-1 shadow-inner grid grid-cols-2 grid-rows-2 gap-1">
+              <div class="relative flex-1 h-48 bg-slate-900/90 border-2 border-emerald-500/80 rounded-2xl p-1 shadow-inner grid grid-cols-2 grid-rows-2 gap-1">
                 <!-- ZONE 1: UP-IN -->
-                <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                <button onclick="selectZone(1, 'In-Zone Up-In')" id="zone-btn-1" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1 overflow-hidden">
                   <span id="zone-label-1" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Up-In</span>
-                  <span id="zone-sub-1" class="text-[9px] font-mono text-slate-400">Z1</span>
+                  <span id="zone-sub-1" class="text-[8px] font-mono text-slate-400">Z1</span>
                 </button>
                 <!-- ZONE 2: UP-AWAY -->
-                <button onclick="selectZone(2, 'In-Zone Up-Away')" id="zone-btn-2" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                <button onclick="selectZone(2, 'In-Zone Up-Away')" id="zone-btn-2" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1 overflow-hidden">
                   <span id="zone-label-2" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Up-Away</span>
-                  <span id="zone-sub-2" class="text-[9px] font-mono text-slate-400">Z2</span>
+                  <span id="zone-sub-2" class="text-[8px] font-mono text-slate-400">Z2</span>
                 </button>
                 <!-- ZONE 3: DOWN-IN -->
-                <button onclick="selectZone(3, 'In-Zone Down-In')" id="zone-btn-3" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                <button onclick="selectZone(3, 'In-Zone Down-In')" id="zone-btn-3" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1 overflow-hidden">
                   <span id="zone-label-3" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Down-In</span>
-                  <span id="zone-sub-3" class="text-[9px] font-mono text-slate-400">Z3</span>
+                  <span id="zone-sub-3" class="text-[8px] font-mono text-slate-400">Z3</span>
                 </button>
                 <!-- ZONE 4: DOWN-AWAY -->
-                <button onclick="selectZone(4, 'In-Zone Down-Away')" id="zone-btn-4" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1">
+                <button onclick="selectZone(4, 'In-Zone Down-Away')" id="zone-btn-4" class="glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1 overflow-hidden">
                   <span id="zone-label-4" class="text-xs font-bold tracking-tight text-emerald-400 leading-tight">Down-Away</span>
-                  <span id="zone-sub-4" class="text-[9px] font-mono text-slate-400">Z4</span>
+                  <span id="zone-sub-4" class="text-[8px] font-mono text-slate-400">Z4</span>
                 </button>
 
                 <!-- ZONE 5: MIDDLE / HEART -->
-                <button onclick="selectZone(5, 'In-Zone Middle (Heart)')" id="zone-btn-5" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl glass-card border border-emerald-400/60 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10">
+                <button onclick="selectZone(5, 'In-Zone Middle (Heart)')" id="zone-btn-5" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-20 rounded-xl glass-card border border-emerald-400/60 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10 p-0.5">
                   <span id="zone-label-5" class="text-xs font-black tracking-tight text-emerald-300 leading-tight">MIDDLE</span>
                   <span id="zone-sub-5" class="text-[8px] font-mono text-emerald-400/80">Heart (Z5)</span>
                 </button>
@@ -403,8 +403,8 @@
             </div>
 
             <!-- CHASE DIRT (ZONE 9) -->
-            <button onclick="selectZone(9, 'Chase Dirt / Below')" id="zone-btn-9" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98">
-              ▼ Chase Dirt / Below
+            <button onclick="selectZone(9, 'Chase Dirt / Below')" id="zone-btn-9" class="w-full py-1.5 bg-slate-900/80 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border border-dashed border-slate-700/80 rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-98 flex flex-col items-center justify-center">
+              <span>▼ Chase Dirt / Below</span>
             </button>
           </div>
 
@@ -788,6 +788,24 @@
     </div>
   </div>
 
+  <!-- MODAL: EXIT VELOCITY SELECTION -->
+  <div id="modal-exit-velo" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel rounded-3xl max-w-xs w-full p-4 space-y-4 shadow-2xl border border-white/10">
+      <div class="flex justify-between items-center border-b border-white/10 pb-2">
+        <h3 class="text-sm font-black text-white uppercase tracking-wider">EXIT VELOCITY</h3>
+        <button onclick="closeExitVeloModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+        <button onclick="selectExitVelo('<85')" class="py-3 bg-gradient-to-b from-blue-900/80 to-blue-950/90 hover:from-blue-800 text-blue-200 rounded-xl border border-blue-500/40 font-mono active:scale-95">&lt;85</button>
+        <button onclick="selectExitVelo('85-94')" class="py-3 bg-gradient-to-b from-emerald-900/80 to-emerald-950/90 hover:from-emerald-800 text-emerald-200 rounded-xl border border-emerald-500/40 font-mono active:scale-95">85-94</button>
+        <button onclick="selectExitVelo('95-103')" class="py-3 bg-gradient-to-b from-amber-900/80 to-amber-950/90 hover:from-amber-800 text-amber-200 rounded-xl border border-amber-500/40 font-mono active:scale-95">95-103</button>
+        <button onclick="selectExitVelo('104+')" class="py-3 bg-gradient-to-b from-rose-900/80 to-rose-950/90 hover:from-rose-800 text-rose-200 rounded-xl border border-rose-500/40 font-mono active:scale-95">104+</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: PINCH HITTER / BENCH SUB -->
   <div id="modal-sub" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="glass-panel rounded-3xl max-w-sm w-full p-4 space-y-3 shadow-2xl border border-white/10">
@@ -1041,6 +1059,7 @@
     let activeZone = 1;
     let activeZoneDesc = 'In-Zone Up-In';
     let selectedTrajectory = 'GroundBall';
+    let pendingInPlayData = null;
     let toastTimeout = null;
     let stagedParsedPlayers = [];
     
@@ -1573,32 +1592,81 @@
       });
     }
 
+    function getZoneHitterOverlay(zoneNum) {
+      const lineup = getActiveLineup();
+      if (lineup.length === 0) return '';
+      const b = lineup[state.gameInfo.currentBatterIndex];
+      if (!b) return '';
+
+      const batterPitches = state.pitches.filter(p => p.batterId === b.id && p.zone === zoneNum);
+      if (batterPitches.length === 0) return '';
+
+      const tags = [];
+      batterPitches.forEach(pt => {
+        if (pt.pitchCall === 'StrikeSwinging') {
+          tags.push(`<span class="px-1 py-0.2 bg-purple-900/90 text-purple-200 border border-purple-400/50 rounded text-[7.5px] font-black tracking-tight leading-tight">WHIFF (${pt.pitchType})</span>`);
+        } else if (pt.pitchCall === 'InPlay') {
+          const ev = pt.exitVelo || '';
+          const isHard = (ev === '95-103' || ev === '104+');
+          const isSoft = (ev === '<85' || ev === '85-94');
+          if (isHard) {
+            tags.push(`<span class="px-1 py-0.2 bg-rose-950/90 text-rose-200 border border-rose-500/60 rounded text-[7.5px] font-black tracking-tight leading-tight">HARD ${ev} (${pt.pitchType})</span>`);
+          } else if (isSoft) {
+            tags.push(`<span class="px-1 py-0.2 bg-blue-950/90 text-blue-200 border border-blue-400/60 rounded text-[7.5px] font-black tracking-tight leading-tight">SOFT ${ev} (${pt.pitchType})</span>`);
+          } else {
+            tags.push(`<span class="px-1 py-0.2 bg-emerald-950/90 text-emerald-200 border border-emerald-400/60 rounded text-[7.5px] font-black tracking-tight leading-tight">IN PLAY (${pt.pitchType})</span>`);
+          }
+        }
+      });
+
+      if (tags.length === 0) return '';
+      return `<div class="flex flex-wrap gap-0.5 justify-center items-center mt-0.5 max-w-full overflow-hidden pointer-events-none">${tags.join('')}</div>`;
+    }
+
     function selectZone(zoneNum, customDesc) {
       activeZone = zoneNum;
       activeZoneDesc = customDesc || `Zone ${zoneNum}`;
       document.getElementById('selected-loc-label').innerText = `Location: ${activeZoneDesc}`;
 
+      const zoneNames = {
+        1: ['Up-In', 'Z1'],
+        2: ['Up-Away', 'Z2'],
+        3: ['Down-In', 'Z3'],
+        4: ['Down-Away', 'Z4'],
+        5: ['MIDDLE', 'Heart (Z5)']
+      };
+
       for (let z = 1; z <= 9; z++) {
         const btn = document.getElementById(`zone-btn-${z}`);
         if (!btn) continue;
 
+        const overlayHtml = getZoneHitterOverlay(z);
+
         if (z <= 5) {
-          const title = document.getElementById(`zone-label-${z}`);
-          const sub = document.getElementById(`zone-sub-${z}`);
-          if (z === zoneNum) {
-            btn.className = (z === 5)
-              ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10"
-              : "bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 rounded-lg flex flex-col items-center justify-center active:scale-95 transition shadow-lg p-1";
-            if (title) title.className = "text-xs font-bold tracking-tight text-white leading-tight";
-            if (sub) sub.className = "text-[9px] font-mono text-emerald-100";
-          } else {
-            btn.className = (z === 5)
-              ? "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-16 rounded-xl glass-card border border-emerald-400/60 flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10"
-              : "glass-card-interactive rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1";
-            if (title) title.className = (z === 5) ? "text-xs font-black tracking-tight text-emerald-300 leading-tight" : "text-xs font-bold tracking-tight text-emerald-400 leading-tight";
-            if (sub) sub.className = (z === 5) ? "text-[8px] font-mono text-emerald-400/80" : "text-[9px] font-mono text-slate-400";
-          }
+          const isMiddle = (z === 5);
+          const isSelected = (z === zoneNum);
+          
+          btn.className = isMiddle
+            ? `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-20 rounded-xl flex flex-col items-center justify-center shadow-lg active:scale-95 transition z-10 p-0.5 ${isSelected ? 'bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300' : 'glass-card border border-emerald-400/60'}`
+            : `rounded-lg flex flex-col items-center justify-center active:scale-95 transition p-1 overflow-hidden ${isSelected ? 'bg-gradient-to-b from-emerald-600 to-emerald-700 border-2 border-emerald-300 shadow-lg' : 'glass-card-interactive'}`;
+
+          const titleClass = isSelected 
+            ? (isMiddle ? 'text-xs font-black tracking-tight text-white leading-tight' : 'text-xs font-bold tracking-tight text-white leading-tight')
+            : (isMiddle ? 'text-xs font-black tracking-tight text-emerald-300 leading-tight' : 'text-xs font-bold tracking-tight text-emerald-400 leading-tight');
+          const subClass = isSelected ? 'text-[8px] font-mono text-emerald-100' : 'text-[8px] font-mono text-slate-400';
+
+          btn.innerHTML = `
+            <span class="${titleClass}">${zoneNames[z][0]}</span>
+            <span class="${subClass}">${zoneNames[z][1]}</span>
+            ${overlayHtml}
+          `;
         } else {
+          const chaseLabels = {
+            6: '▲ Chase High / Waste',
+            7: '<span>◀ In</span><span class="text-[8px] text-slate-400 font-medium">(Arm)</span>',
+            8: '<span>Away ▶</span><span class="text-[8px] text-slate-400 font-medium">(Glove)</span>',
+            9: '▼ Chase Dirt / Below'
+          };
           if (z === zoneNum) {
             btn.classList.remove('bg-slate-900/80', 'text-slate-300', 'border-slate-700/80', 'border-dashed');
             btn.classList.add('bg-amber-500/30', 'text-amber-200', 'border-amber-400', 'border-solid');
@@ -1606,6 +1674,7 @@
             btn.classList.remove('bg-amber-500/30', 'text-amber-200', 'border-amber-400', 'border-solid');
             btn.classList.add('bg-slate-900/80', 'text-slate-300', 'border-slate-700/80', 'border-dashed');
           }
+          btn.innerHTML = `${chaseLabels[z]}${overlayHtml}`;
         }
       }
     }
@@ -1663,6 +1732,7 @@
         is1_1Win: is1_1Win,
         hitType: inPlayData ? inPlayData.trajectory : 'Undefined',
         playResult: inPlayData ? inPlayData.outcome : 'Undefined',
+        exitVelo: inPlayData ? (inPlayData.exitVeloBand || 'Undefined') : 'Undefined',
         timestamp: new Date().toLocaleTimeString()
       };
 
@@ -1688,8 +1758,9 @@
         paEnded = true; paSummary = "Hit By Pitch (HBP)";
       } else if (call === 'InPlay') {
         paEnded = true;
-        if (inPlayData.isOut) { nextOuts++; paSummary = `${inPlayData.trajectory} Out`; } 
-        else { paSummary = `${inPlayData.trajectory} (${inPlayData.outcome})`; }
+        const evSuffix = inPlayData.exitVeloBand ? ` [${inPlayData.exitVeloBand} EV]` : '';
+        if (inPlayData.isOut) { nextOuts++; paSummary = `${inPlayData.trajectory} Out${evSuffix}`; } 
+        else { paSummary = `${inPlayData.trajectory} (${inPlayData.outcome})${evSuffix}`; }
       }
 
       const veloTag = veloVal ? ` @ ${veloVal} mph` : '';
@@ -1757,9 +1828,27 @@
       const btn = document.getElementById(`traj-${activeMap[traj]}`);
       if (btn) btn.className = "py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl border border-emerald-400/40 font-black";
     }
+
     function commitInPlay(outcome, isOut) {
       closeInPlayModal();
-      recordPitch('InPlay', { trajectory: selectedTrajectory, outcome: outcome, isOut: isOut });
+      pendingInPlayData = { trajectory: selectedTrajectory, outcome: outcome, isOut: isOut };
+      openExitVeloModal();
+    }
+
+    function openExitVeloModal() {
+      document.getElementById('modal-exit-velo').classList.remove('hidden');
+    }
+
+    function closeExitVeloModal() {
+      document.getElementById('modal-exit-velo').classList.add('hidden');
+    }
+
+    function selectExitVelo(exitVeloBand) {
+      closeExitVeloModal();
+      if (!pendingInPlayData) return;
+      pendingInPlayData.exitVeloBand = exitVeloBand;
+      recordPitch('InPlay', pendingInPlayData);
+      pendingInPlayData = null;
     }
 
     function addBaseOut() {
@@ -2256,6 +2345,8 @@
       const tagsContainer = document.getElementById('batter-scouting-tags');
       tagsContainer.innerHTML = (b.tags || []).map(t => `<span class="text-[10px] glass-button text-slate-300 px-2 py-0.5 rounded-lg">${t}</span>`).join('');
       document.getElementById('batter-scouting-notes').innerText = b.notes || "No scouting notes entered for this batter.";
+
+      selectZone(activeZone, activeZoneDesc);
     }
 
     function renderCurrentSequence() {
@@ -2552,14 +2643,14 @@
         "PitchNo", "Time", "Inning", "Top/Bottom", "Outs", "Balls", "Strikes",
         "Pitcher", "PitcherThrows", "Batter", "BatterSide",
         "TaggedPitchType", "RelSpeed", "PitchCall", "TaggedHitType", "PlayResult",
-        "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win"
+        "ExitVeloBand", "Zone", "ZoneDescription", "Is1_1Count", "Is1_1Win"
       ];
 
       const rows = state.pitches.map(p => [
         p.pitchNo, `"${p.timestamp}"`, p.inning, isSingleMode ? "Inning" : (p.isTop ? "Top" : "Bottom"),
         p.outsBefore, p.ballsBefore, p.strikesBefore, `"${p.pitcherName}"`, p.pitcherThrows,
         `"${p.batterName}"`, p.batterSide, `"${p.taggedPitchType}"`, p.velo || "", `"${p.pitchCall}"`,
-        `"${p.hitType}"`, `"${p.playResult}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
+        `"${p.hitType}"`, `"${p.playResult}"`, `"${p.exitVelo || 'Undefined'}"`, p.zone, `"${p.zoneDesc}"`, p.is1_1Count ? 1 : 0,
         p.is1_1Win === true ? 1 : (p.is1_1Win === false ? 0 : "")
       ]);
 
