@@ -92,121 +92,233 @@
     }
 
     /* ========================================================
-       APPLE LIQUID GLASS LIGHT MODE SPECIFICATION
+       HIGH-CONTRAST ATHLETIC LIGHT MODE SPECIFICATION
        ======================================================== */
     body.light-mode {
-      background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
-      color: #0f172a !important;
-    }
-    body.light-mode .glass-panel {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.45) 100%) !important;
-      backdrop-filter: blur(25px) saturate(190%) !important;
-      -webkit-backdrop-filter: blur(25px) saturate(190%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.8) !important;
-      box-shadow: 0 12px 35px -8px rgba(100, 116, 139, 0.22), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95) !important;
-    }
-    body.light-mode .glass-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.65) 0%, rgba(248, 250, 252, 0.4) 100%) !important;
-      backdrop-filter: blur(20px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.7) !important;
-      box-shadow: 0 4px 18px -4px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
-    }
-    body.light-mode .glass-card-interactive {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(241, 245, 249, 0.55) 100%) !important;
-      backdrop-filter: blur(18px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.8) !important;
-      box-shadow: 0 4px 14px rgba(100, 116, 139, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
-    }
-    body.light-mode .glass-card-interactive:hover {
-      border-color: rgba(16, 185, 129, 0.6) !important;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(236, 253, 245, 0.7) 100%) !important;
-    }
-    body.light-mode .glass-button {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(241, 245, 249, 0.65) 100%) !important;
-      backdrop-filter: blur(14px) !important;
-      -webkit-backdrop-filter: blur(14px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.9) !important;
-      box-shadow: 0 3px 10px rgba(148, 163, 184, 0.2), inset 0 1px 0 #ffffff !important;
-      color: #1e293b !important;
+      background: radial-gradient(circle at 50% 0%, #ffffff 0%, #e2e8f0 60%, #cbd5e1 100%) !important;
+      color: #020617 !important;
     }
 
-    /* Light Mode Typography & Color Contrast */
-    body.light-mode .text-white {
+    /* Structured Panels & Card Elevations */
+    body.light-mode .glass-panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.94) 100%) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 #ffffff !important;
+    }
+
+    body.light-mode .glass-card {
+      background: #ffffff !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff !important;
+    }
+
+    body.light-mode .glass-card-interactive {
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff !important;
+    }
+
+    body.light-mode .glass-card-interactive:hover {
+      border-color: #059669 !important;
+      background: #f0fdf4 !important;
+      box-shadow: 0 6px 18px rgba(5, 150, 105, 0.15) !important;
+    }
+
+    body.light-mode .glass-button {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%) !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), inset 0 1px 0 #ffffff !important;
       color: #0f172a !important;
+    }
+    body.light-mode .glass-button:hover {
+      background: #ffffff !important;
+      border-color: #94a3b8 !important;
+      color: #020617 !important;
+    }
+
+    /* High-Contrast Typography */
+    body.light-mode .text-white {
+      color: #020617 !important;
     }
     body.light-mode .text-slate-200,
     body.light-mode .text-slate-300 {
-      color: #1e293b !important;
+      color: #0f172a !important;
+      font-weight: 600;
     }
     body.light-mode .text-slate-400 {
-      color: #475569 !important;
+      color: #334155 !important;
+      font-weight: 600;
     }
     body.light-mode .text-slate-500 {
-      color: #64748b !important;
+      color: #475569 !important;
+      font-weight: 500;
     }
+    body.light-mode .text-slate-600 {
+      color: #94a3b8 !important;
+    }
+
+    /* Saturated Dugout Data Accents */
     body.light-mode .text-emerald-300,
     body.light-mode .text-emerald-400 {
       color: #047857 !important;
+      font-weight: 800;
     }
     body.light-mode .text-amber-300,
     body.light-mode .text-amber-400 {
       color: #b45309 !important;
+      font-weight: 800;
     }
     body.light-mode .text-cyan-300,
     body.light-mode .text-cyan-400 {
       color: #0369a1 !important;
+      font-weight: 800;
     }
     body.light-mode .text-purple-300,
     body.light-mode .text-purple-400 {
       color: #6d28d9 !important;
+      font-weight: 800;
     }
     body.light-mode .text-rose-300,
     body.light-mode .text-rose-400 {
       color: #be123c !important;
-    }
-    body.light-mode .border-white\/10,
-    body.light-mode .border-white\/5 {
-      border-color: rgba(148, 163, 184, 0.25) !important;
-    }
-    body.light-mode .divide-white\/5 > * + * {
-      border-color: rgba(148, 163, 184, 0.2) !important;
+      font-weight: 800;
     }
 
-    /* Light Mode Strike Zone & Surfaces */
+    /* Dividers and Subtle Lines */
+    body.light-mode .border-white\/10,
+    body.light-mode .border-white\/5 {
+      border-color: #cbd5e1 !important;
+    }
+    body.light-mode .divide-white\/5 > * + * {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Dugout Strike Zone & Field Viewport */
     body.light-mode .bg-slate-950\/80,
     body.light-mode .bg-slate-950\/70,
     body.light-mode .bg-slate-950\/40,
     body.light-mode .bg-slate-950\/60,
     body.light-mode .bg-slate-900\/90,
     body.light-mode .bg-slate-900\/80 {
-      background: rgba(255, 255, 255, 0.6) !important;
-      border-color: rgba(255, 255, 255, 0.8) !important;
-      box-shadow: 0 4px 16px rgba(148, 163, 184, 0.15) !important;
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.08), inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     }
-    body.light-mode .bg-slate-950\/90 {
-      background: rgba(241, 245, 249, 0.95) !important;
+
+    body.light-mode .border-dashed {
+      border-color: #94a3b8 !important;
     }
-    body.light-mode .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(226, 232, 240, 0.6);
+
+    /* Strike Zone Heart / Middle */
+    body.light-mode #zone-btn-5 {
+      background: #ffffff !important;
+      border: 2px solid #059669 !important;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2) !important;
     }
-    body.light-mode .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.6);
+    body.light-mode #zone-btn-5 span:first-child {
+      color: #065f46 !important;
     }
+
+    /* Darker Solid Action Buttons for Outdoor Sun Glare */
+    body.light-mode button[onclick*="recordPitch('BallCalled')"] {
+      background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+      color: #ffffff !important;
+      border-color: #1e3a8a !important;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25) !important;
+    }
+    body.light-mode button[onclick*="recordPitch('BallCalled')"] span {
+      color: #ffffff !important;
+    }
+
+    body.light-mode button[onclick*="recordPitch('StrikeCalled')"] {
+      background: linear-gradient(180deg, #d97706 0%, #b45309 100%) !important;
+      color: #ffffff !important;
+      border-color: #92400e !important;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25) !important;
+    }
+    body.light-mode button[onclick*="recordPitch('StrikeCalled')"] span {
+      color: #ffffff !important;
+    }
+
+    body.light-mode button[onclick*="recordPitch('StrikeSwinging')"] {
+      background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%) !important;
+      color: #ffffff !important;
+      border-color: #5b21b6 !important;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+    }
+    body.light-mode button[onclick*="recordPitch('StrikeSwinging')"] span {
+      color: #ffffff !important;
+    }
+
+    body.light-mode button[onclick*="openInPlayModal()"] {
+      background: linear-gradient(180deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      border-color: #065f46 !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+    }
+    body.light-mode button[onclick*="openInPlayModal()"] span {
+      color: #ffffff !important;
+    }
+
+    body.light-mode button[onclick*="recordPitch('HitByPitch')"] {
+      background: linear-gradient(180deg, #e11d48 0%, #be123c 100%) !important;
+      color: #ffffff !important;
+      border-color: #9f1239 !important;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25) !important;
+    }
+    body.light-mode button[onclick*="recordPitch('HitByPitch')"] span {
+      color: #ffffff !important;
+    }
+
+    /* Out Indicator Dots */
+    body.light-mode #out-dot-1.bg-slate-800,
+    body.light-mode #out-dot-2.bg-slate-800 {
+      background: #cbd5e1 !important;
+      border-color: #94a3b8 !important;
+    }
+
+    /* 1-1 Count Highlight Card */
+    body.light-mode .leverage-pulse {
+      background: #fef3c7 !important;
+      border-color: #d97706 !important;
+      box-shadow: 0 4px 16px rgba(217, 119, 6, 0.3) !important;
+    }
+
+    /* Form Fields, Inputs & Dropdowns */
     body.light-mode textarea,
     body.light-mode input[type="text"],
     body.light-mode input[type="number"],
     body.light-mode select {
-      background: rgba(255, 255, 255, 0.8) !important;
-      border-color: rgba(203, 213, 225, 0.8) !important;
-      color: #0f172a !important;
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #020617 !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
     }
+    body.light-mode textarea:focus,
+    body.light-mode input:focus,
+    body.light-mode select:focus {
+      border-color: #059669 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    /* Drag & Drop Handle & Table States */
     body.light-mode .handle {
-      background: rgba(241, 245, 249, 0.8) !important;
-      border-right-color: rgba(203, 213, 225, 0.6) !important;
-      color: #64748b !important;
+      background: #e2e8f0 !important;
+      border-right: 1.5px solid #cbd5e1 !important;
+      color: #475569 !important;
     }
+
+    body.light-mode thead.bg-slate-950\/90 {
+      background: #f1f5f9 !important;
+      border-bottom: 2px solid #cbd5e1 !important;
+      color: #334155 !important;
+    }
+
+    /* Modals & Dialogs */
     body.light-mode #modal-settings > div,
     body.light-mode #modal-in-play > div,
     body.light-mode #modal-exit-velo > div,
@@ -214,11 +326,9 @@
     body.light-mode #modal-player-form > div,
     body.light-mode #modal-quick-paste > div,
     body.light-mode #modal-sync-review > div {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.88) 100%) !important;
-      backdrop-filter: blur(28px) saturate(200%) !important;
-      -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.95) !important;
-      box-shadow: 0 20px 45px -10px rgba(71, 85, 105, 0.3) !important;
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
     }
   </style>
 </head>
@@ -914,7 +1024,7 @@
               </div>
               <div>
                 <span class="font-bold text-white block">Light Mode</span>
-                <span class="text-slate-400 text-[11px] leading-tight block">Minimalist Apple liquid glass aesthetic with frosted translucent panels and outdoor sunlight clarity.</span>
+                <span class="text-slate-400 text-[11px] leading-tight block">High-contrast athletic daylight UI designed for outdoor dugout and tablet visibility.</span>
               </div>
             </div>
             <label class="relative inline-flex items-center cursor-pointer ml-2">
@@ -1299,7 +1409,6 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           if (!parsed.settings) parsed.settings = { trackingMode: 'single', lightMode: false };
-          // Backwards compatibility migration from previous highContrast key
           if (parsed.settings.highContrast !== undefined && parsed.settings.lightMode === undefined) {
             parsed.settings.lightMode = parsed.settings.highContrast;
             delete parsed.settings.highContrast;
@@ -1358,7 +1467,7 @@
         else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
       } else {
         if (document.exitFullscreen) doc.exitFullscreen();
-        else if (document.webkitExitFullscreen) doc.webkitExitFullscreen();
+        else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
       }
     }
 
@@ -1377,7 +1486,7 @@
       saveState();
       applyLightModeTheme(state.settings.lightMode);
       updateSettingsUI();
-      showQuickToast(state.settings.lightMode ? "Light Mode Active" : "Standard Theme Restored");
+      showQuickToast(state.settings.lightMode ? "Light Mode Active (High Contrast)" : "Standard Theme Restored");
     }
 
     function applyLightModeTheme(isLightMode) {
@@ -3012,12 +3121,14 @@
       const [type, idStr] = selVal.split('-');
       const id = parseInt(idStr);
       Object.values(state.teams).forEach(t => {
-        const b = t.lineup.find(x => x.id === id) || t.bench.find(x => x.id === id);
-        if (b) {
-          if (!b.tags) b.tags = [];
-          const idx = b.tags.indexOf(tagName);
-          if (idx !== -1) b.tags.splice(idx, 1);
-          else b.tags.push(tagName);
+        if (type === 'batter') {
+          const b = t.lineup.find(x => x.id === id) || t.bench.find(x => x.id === id);
+          if (b) {
+            if (!b.tags) b.tags = [];
+            const idx = b.tags.indexOf(tagName);
+            if (idx !== -1) b.tags.splice(idx, 1);
+            else b.tags.push(tagName);
+          }
         }
       });
       saveState();
